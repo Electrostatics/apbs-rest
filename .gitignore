@@ -1,0 +1,6 @@
+# Python virtual environments
+venv
+
+# VS Code-created directories/files
+.vscode
+__pycache__
