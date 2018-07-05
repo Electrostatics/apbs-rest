@@ -4,3 +4,6 @@ venv
 # VS Code-created directories/files
 .vscode
 __pycache__
+
+# Node modules created from npm
+node_modules
