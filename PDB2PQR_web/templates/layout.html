@@ -4,13 +4,20 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>APBS-PDB2PQR Home</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
-    <script src="main.js"></script> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" />
+    <!-- <script src="main.js"></script> -->
 </head>
+<body>
 
-    <body>
+    
+    <div>
         {% block content %}{% endblock %}
-    </body>
+    </div>
 
+    <script src="/static/js/jquery-3.3.1.js"></script>
+    <script src="/static/js/popper.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
 </html>
