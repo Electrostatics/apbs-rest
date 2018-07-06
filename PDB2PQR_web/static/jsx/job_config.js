@@ -4,7 +4,9 @@ class Button extends React.Component{}
 class SubmitButton extends React.Component{}
 
 class ButtonWindow extends React.Component{
-    constructor(props)
+    constructor(props){
+
+    }
 }
 
 class Configuration extends React.Component{
@@ -13,7 +15,9 @@ class Configuration extends React.Component{
     }
     render(){
         if (this.state.jobtype === null){
-            
+
         }
     }
 }
+
+ReactDOM.render(<Configuration />, document.getElementById('choose_job'))
