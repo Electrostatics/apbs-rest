@@ -62,12 +62,12 @@ var FormWindow = function (_React$Component2) {
 
     _createClass(FormWindow, [{
         key: "createButton",
-        value: function createButton(txt) {
+        value: function createButton(txt, additional_classNames) {
             var _this3 = this;
 
             return React.createElement(Button, {
                 value: txt,
-                buttonType: "btn btn-primary",
+                buttonType: additional_classNames,
                 onClick: function onClick() {
                     return _this3.props.onClick(txt);
                 }
@@ -79,7 +79,7 @@ var FormWindow = function (_React$Component2) {
             var view = [];
 
             for (var i = 0; i < option_list.length; i++) {
-                view.push(this.createButton(option_list[i]));
+                view.push(this.createButton(option_list[i], "btn btn-primary mx-2"));
             }
 
             return view;
@@ -87,27 +87,16 @@ var FormWindow = function (_React$Component2) {
     }, {
         key: "render",
         value: function render() {
-            // let choices = [];
-            // this.props.job_list.forEach(function(element){
-            // choices.push(this.renderButton(element))
-            // });
-            // console.log(choices)
-            // numJobs = this.props.job_list.length;
-
             return React.createElement(
                 "div",
                 { className: "container" },
                 React.createElement(
                     "div",
-                    { className: "row" },
+                    { className: "row my-3" },
                     React.createElement(
                         "div",
                         { className: "col-lg-12" },
-                        React.createElement(
-                            "div",
-                            { className: "btn-group" },
-                            this.createWindow(this.props.job_list)
-                        )
+                        this.createWindow(this.props.job_list)
                     )
                 )
             );
@@ -128,15 +117,22 @@ var Configuration = function (_React$Component3) {
         _this4.selectJobClick = _this4.selectJobClick.bind(_this4);
         _this4.state = {
             job_type: null,
+
+            // Maintains state for PDB2PQR configuration in case user hops back and forth
             pdb2pqr_settings: {
                 pdb_id: null,
                 ff: null,
                 output_scheme: null
             },
+
+            // Maintains state for APBS for same purpose as pdb2pqr_settings
             apbs_settings: {}
         };
         return _this4;
     }
+
+    // onClick handler for user selecting a job. Is passed into child componenets
+
 
     _createClass(Configuration, [{
         key: "selectJobClick",
@@ -151,6 +147,7 @@ var Configuration = function (_React$Component3) {
         value: function render() {
             var _this5 = this;
 
+            // Renders landing page, with choice to do PDB2PQR or APBS
             if (this.state.job_type == null) {
                 var job_options = ["PDB2PQR", "APBS"];
                 // let blah = <FormWindow onClick={j => this.selectJobClick(j)}/>
@@ -160,14 +157,22 @@ var Configuration = function (_React$Component3) {
                         return _this5.selectJobClick(j);
                     }
                 });
-            } else if (this.state.job_type == "PDB2PQR") {
-                return "Selected PDB2PQR";
-            } else if (this.state.job_type == "APBS") {
-                console.log("selected apbs");
-                return "Selected APBS";
-            } else {
-                return "job_type is invalid";
             }
+
+            // Renders configuration elements to set up an PDB2PQR job
+            else if (this.state.job_type == "PDB2PQR") {
+                    return "Selected PDB2PQR";
+                }
+
+                // Renders configuration elements to set up an APBS job
+                else if (this.state.job_type == "APBS") {
+                        return "Selected APBS";
+                    }
+
+                    // This should be unreachable since the state is only changed via a button press
+                    else {
+                            return "job_type is invalid";
+                        }
         }
     }]);
 

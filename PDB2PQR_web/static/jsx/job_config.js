@@ -23,11 +23,11 @@ function Button(props){
 }
 
 class FormWindow extends React.Component{
-    createButton(txt){
+    createButton(txt, additional_classNames){
         return(
             <Button
                 value={txt}
-                buttonType="btn btn-primary"
+                buttonType={additional_classNames}
                 onClick={() => this.props.onClick(txt)}
             />
         )
@@ -37,30 +37,18 @@ class FormWindow extends React.Component{
         let view = [];
 
         for(let i = 0; i < option_list.length; i++){
-            view.push(this.createButton(option_list[i]));
+            view.push(this.createButton(option_list[i], "btn btn-primary mx-2"));
         }
 
         return view;
     }
 
     render(){
-        // let choices = [];
-        // this.props.job_list.forEach(function(element){
-            // choices.push(this.renderButton(element))
-        // });
-        // console.log(choices)
-        // numJobs = this.props.job_list.length;
-
         return(
             <div className="container">
-                <div className="row">
+                <div className="row my-3">
                     <div className="col-lg-12">
-                        <div className="btn-group">
-                            {/* {this.createButton(this.props.job_list[0])} */}
-                            {/* {this.createButton("PDB2PQR")} */}
-                            {/* {this.createButton("APBS")} */}
-                            {this.createWindow(this.props.job_list)}
-                        </div>
+                        {this.createWindow(this.props.job_list)}
                     </div>
                 </div>
             </div>
@@ -74,15 +62,22 @@ class Configuration extends React.Component{
         this.selectJobClick = this.selectJobClick.bind(this)
         this.state = {
             job_type: null,
+
+            // Maintains state for PDB2PQR configuration in case user hops back and forth
             pdb2pqr_settings: {
                 pdb_id: null,
                 ff: null,
                 output_scheme: null,
             },
-            apbs_settings: {},
+            
+            // Maintains state for APBS for same purpose as pdb2pqr_settings
+            apbs_settings: {
+
+            },
         };
     }
 
+    // onClick handler for user selecting a job. Is passed into child componenets
     selectJobClick(selected_job){
         this.setState({
             job_type: selected_job
@@ -91,6 +86,7 @@ class Configuration extends React.Component{
     }
 
     render(){
+        // Renders landing page, with choice to do PDB2PQR or APBS
         if (this.state.job_type == null){
             let job_options = ["PDB2PQR", "APBS"]
             // let blah = <FormWindow onClick={j => this.selectJobClick(j)}/>
@@ -101,13 +97,18 @@ class Configuration extends React.Component{
                 />
             );
         }
+
+        // Renders configuration elements to set up an PDB2PQR job
         else if (this.state.job_type == "PDB2PQR"){
             return("Selected PDB2PQR")
         }
+
+        // Renders configuration elements to set up an APBS job
         else if (this.state.job_type == "APBS"){
-            console.log("selected apbs")
             return("Selected APBS")
         }
+
+        // This should be unreachable since the state is only changed via a button press
         else{
             return ("job_type is invalid")
         }
