@@ -7,17 +7,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"> 
     <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" />
     <!-- <script src="main.js"></script> -->
+    <script src="/static/js/jquery-3.3.1.js"></script>
+    <script src="/static/js/popper.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
 </head>
 <body>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">APBS-PDB2PQR Server</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+        </button>
 
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://www.poissonboltzmann.org/" target="_blank">About</a>
+                </li>
+            </ul>        
+        </div>
+    </nav>
     
     <div>
         {% block content %}{% endblock %}
     </div>
 
-    <script src="/static/js/jquery-3.3.1.js"></script>
-    <script src="/static/js/popper.js"></script>
-    <script src="/static/js/bootstrap.js"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

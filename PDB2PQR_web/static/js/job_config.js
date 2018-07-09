@@ -61,8 +61,8 @@ var FormWindow = function (_React$Component2) {
     }
 
     _createClass(FormWindow, [{
-        key: "renderButton",
-        value: function renderButton(txt) {
+        key: "createButton",
+        value: function createButton(txt) {
             var _this3 = this;
 
             return React.createElement(Button, {
@@ -74,14 +74,42 @@ var FormWindow = function (_React$Component2) {
             });
         }
     }, {
+        key: "createWindow",
+        value: function createWindow(option_list) {
+            var view = [];
+
+            for (var i = 0; i < option_list.length; i++) {
+                view.push(this.createButton(option_list[i]));
+            }
+
+            return view;
+        }
+    }, {
         key: "render",
         value: function render() {
+            // let choices = [];
+            // this.props.job_list.forEach(function(element){
+            // choices.push(this.renderButton(element))
+            // });
+            // console.log(choices)
+            // numJobs = this.props.job_list.length;
+
             return React.createElement(
                 "div",
-                { className: "btn-group" },
-                this.renderButton("PDB2PQR"),
-                this.renderButton("APBS"),
-                this.renderButton("APBSSKLADFH")
+                { className: "container" },
+                React.createElement(
+                    "div",
+                    { className: "row" },
+                    React.createElement(
+                        "div",
+                        { className: "col-lg-12" },
+                        React.createElement(
+                            "div",
+                            { className: "btn-group" },
+                            this.createWindow(this.props.job_list)
+                        )
+                    )
+                )
             );
         }
     }]);
@@ -97,6 +125,7 @@ var Configuration = function (_React$Component3) {
 
         var _this4 = _possibleConstructorReturn(this, (Configuration.__proto__ || Object.getPrototypeOf(Configuration)).call(this, props));
 
+        _this4.selectJobClick = _this4.selectJobClick.bind(_this4);
         _this4.state = {
             job_type: null,
             pdb2pqr_settings: {
@@ -111,9 +140,9 @@ var Configuration = function (_React$Component3) {
 
     _createClass(Configuration, [{
         key: "selectJobClick",
-        value: function selectJobClick(jobtype) {
+        value: function selectJobClick(selected_job) {
             this.setState({
-                job_type: jobtype
+                job_type: selected_job
             });
             console.log(this.state.job_type);
         }
@@ -122,13 +151,22 @@ var Configuration = function (_React$Component3) {
         value: function render() {
             var _this5 = this;
 
-            if (this.state.jobtype == null) {
-                var blah = React.createElement(FormWindow, { onClick: function onClick(j) {
+            if (this.state.job_type == null) {
+                var job_options = ["PDB2PQR", "APBS"];
+                // let blah = <FormWindow onClick={j => this.selectJobClick(j)}/>
+                return React.createElement(FormWindow, {
+                    job_list: job_options,
+                    onClick: function onClick(j) {
                         return _this5.selectJobClick(j);
-                    } });
-                return blah;
-            } else if (this.state.jobtype == "pdb2pqr") {} else if (this.state.jobtype == "apbs") {
+                    }
+                });
+            } else if (this.state.job_type == "PDB2PQR") {
+                return "Selected PDB2PQR";
+            } else if (this.state.job_type == "APBS") {
                 console.log("selected apbs");
+                return "Selected APBS";
+            } else {
+                return "job_type is invalid";
             }
         }
     }]);

@@ -23,7 +23,7 @@ function Button(props){
 }
 
 class FormWindow extends React.Component{
-    renderButton(txt){
+    createButton(txt){
         return(
             <Button
                 value={txt}
@@ -33,12 +33,36 @@ class FormWindow extends React.Component{
         )
     }
 
+    createWindow(option_list){
+        let view = [];
+
+        for(let i = 0; i < option_list.length; i++){
+            view.push(this.createButton(option_list[i]));
+        }
+
+        return view;
+    }
+
     render(){
+        // let choices = [];
+        // this.props.job_list.forEach(function(element){
+            // choices.push(this.renderButton(element))
+        // });
+        // console.log(choices)
+        // numJobs = this.props.job_list.length;
+
         return(
-            <div className="btn-group">
-                {this.renderButton("PDB2PQR")}
-                {this.renderButton("APBS")}
-                {this.renderButton("APBSSKLADFH")}
+            <div className="container">
+                <div className="row">
+                    <div className="col-lg-12">
+                        <div className="btn-group">
+                            {/* {this.createButton(this.props.job_list[0])} */}
+                            {/* {this.createButton("PDB2PQR")} */}
+                            {/* {this.createButton("APBS")} */}
+                            {this.createWindow(this.props.job_list)}
+                        </div>
+                    </div>
+                </div>
             </div>
         )
     }
@@ -47,6 +71,7 @@ class FormWindow extends React.Component{
 class Configuration extends React.Component{
     constructor(props){
         super(props);
+        this.selectJobClick = this.selectJobClick.bind(this)
         this.state = {
             job_type: null,
             pdb2pqr_settings: {
@@ -58,22 +83,34 @@ class Configuration extends React.Component{
         };
     }
 
-    selectJobClick(jobtype){
+    selectJobClick(selected_job){
         this.setState({
-            job_type: jobtype
+            job_type: selected_job
         })
         console.log(this.state.job_type)
     }
 
     render(){
-        if (this.state.jobtype == null){
-            let blah = <FormWindow onClick={j => this.selectJobClick(j)}/>
+        if (this.state.job_type == null){
+            let job_options = ["PDB2PQR", "APBS"]
+            // let blah = <FormWindow onClick={j => this.selectJobClick(j)}/>
             return(
-                blah
+                <FormWindow 
+                    job_list={job_options}
+                    onClick={j => this.selectJobClick(j)}
+                />
             );
         }
-        else if (this.state.jobtype == "pdb2pqr"){}
-        else if (this.state.jobtype == "apbs"){console.log("selected apbs")}
+        else if (this.state.job_type == "PDB2PQR"){
+            return("Selected PDB2PQR")
+        }
+        else if (this.state.job_type == "APBS"){
+            console.log("selected apbs")
+            return("Selected APBS")
+        }
+        else{
+            return ("job_type is invalid")
+        }
     }
 }
 
