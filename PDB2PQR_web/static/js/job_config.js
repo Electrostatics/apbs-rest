@@ -11,38 +11,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SelectJob = function (_React$Component) {
-    _inherits(SelectJob, _React$Component);
-
-    function SelectJob() {
-        _classCallCheck(this, SelectJob);
-
-        return _possibleConstructorReturn(this, (SelectJob.__proto__ || Object.getPrototypeOf(SelectJob)).apply(this, arguments));
-    }
-
-    _createClass(SelectJob, [{
-        key: "render",
-        value: function render() {
-            return React.createElement(
-                "div",
-                { className: "btn-group" },
-                React.createElement(
-                    "button",
-                    { type: "button", className: "btn btn-primary" },
-                    "PDB2PQR"
-                ),
-                React.createElement(
-                    "button",
-                    { type: "button", className: "btn btn-primary" },
-                    "APBS"
-                )
-            );
-        }
-    }]);
-
-    return SelectJob;
-}(React.Component);
-
 function Button(props) {
     return React.createElement(
         "button",
@@ -51,25 +19,25 @@ function Button(props) {
     );
 }
 
-var FormWindow = function (_React$Component2) {
-    _inherits(FormWindow, _React$Component2);
+var JobLanding = function (_React$Component) {
+    _inherits(JobLanding, _React$Component);
 
-    function FormWindow() {
-        _classCallCheck(this, FormWindow);
+    function JobLanding() {
+        _classCallCheck(this, JobLanding);
 
-        return _possibleConstructorReturn(this, (FormWindow.__proto__ || Object.getPrototypeOf(FormWindow)).apply(this, arguments));
+        return _possibleConstructorReturn(this, (JobLanding.__proto__ || Object.getPrototypeOf(JobLanding)).apply(this, arguments));
     }
 
-    _createClass(FormWindow, [{
+    _createClass(JobLanding, [{
         key: "createButton",
         value: function createButton(txt, additional_classNames) {
-            var _this3 = this;
+            var _this2 = this;
 
             return React.createElement(Button, {
                 value: txt,
                 buttonType: additional_classNames,
                 onClick: function onClick() {
-                    return _this3.props.onClick(txt);
+                    return _this2.props.onClick(txt);
                 }
             });
         }
@@ -79,7 +47,7 @@ var FormWindow = function (_React$Component2) {
             var view = [];
 
             for (var i = 0; i < option_list.length; i++) {
-                view.push(this.createButton(option_list[i], "btn btn-primary mx-2"));
+                view.push(this.createButton(option_list[i], "btn btn-primary mx-1"));
             }
 
             return view;
@@ -88,14 +56,24 @@ var FormWindow = function (_React$Component2) {
         key: "render",
         value: function render() {
             return React.createElement(
-                "div",
-                { className: "container" },
+                "section",
+                { className: "jumbotron text-center" },
                 React.createElement(
                     "div",
-                    { className: "row my-3" },
+                    { className: "container" },
                     React.createElement(
-                        "div",
-                        { className: "col-lg-12" },
+                        "h1",
+                        { className: "jumbotron-heading" },
+                        "Welcome to the PDB2PQR Server"
+                    ),
+                    React.createElement(
+                        "p",
+                        { className: "lead text-muted" },
+                        "This server enables a user to convert PDB files into PQR files. PQR files are PDB files where the occupancy and B-factor columns have been replaced by per-atom charge and radius."
+                    ),
+                    React.createElement(
+                        "p",
+                        null,
                         this.createWindow(this.props.job_list)
                     )
                 )
@@ -103,7 +81,32 @@ var FormWindow = function (_React$Component2) {
         }
     }]);
 
-    return FormWindow;
+    return JobLanding;
+}(React.Component);
+
+var ConfigPDB2PQR = function (_React$Component2) {
+    _inherits(ConfigPDB2PQR, _React$Component2);
+
+    function ConfigPDB2PQR() {
+        _classCallCheck(this, ConfigPDB2PQR);
+
+        return _possibleConstructorReturn(this, (ConfigPDB2PQR.__proto__ || Object.getPrototypeOf(ConfigPDB2PQR)).apply(this, arguments));
+    }
+
+    _createClass(ConfigPDB2PQR, [{
+        key: "createScrollspyToC",
+
+        // prepares the list-group for the parts of configuration
+        value: function createScrollspyToC() {}
+
+        // prepares the elements where user will enter information
+
+    }, {
+        key: "createConfigOptions",
+        value: function createConfigOptions() {}
+    }]);
+
+    return ConfigPDB2PQR;
 }(React.Component);
 
 var Configuration = function (_React$Component3) {
@@ -140,7 +143,18 @@ var Configuration = function (_React$Component3) {
             this.setState({
                 job_type: selected_job
             });
-            console.log(this.state.job_type);
+        }
+
+        // 
+
+    }, {
+        key: "handleConfigClick",
+        value: function handleConfigClick(selected_job, option, selection) {
+            this.setState({
+                selected_job: {
+                    option: selection
+                }
+            });
         }
     }, {
         key: "render",
@@ -150,8 +164,8 @@ var Configuration = function (_React$Component3) {
             // Renders landing page, with choice to do PDB2PQR or APBS
             if (this.state.job_type == null) {
                 var job_options = ["PDB2PQR", "APBS"];
-                // let blah = <FormWindow onClick={j => this.selectJobClick(j)}/>
-                return React.createElement(FormWindow, {
+                // let blah = <JobLanding onClick={j => this.selectJobClick(j)}/>
+                return React.createElement(JobLanding, {
                     job_list: job_options,
                     onClick: function onClick(j) {
                         return _this5.selectJobClick(j);

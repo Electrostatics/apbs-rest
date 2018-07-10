@@ -20,3 +20,7 @@
 ## JavaScript
 
 * [Mozilla JavaScript Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference)
+
+## Links for what I plan to next implement
+
+* [Bootstrap Scrollspy](https://getbootstrap.com/docs/4.0/components/scrollspy/#example-with-list-group)

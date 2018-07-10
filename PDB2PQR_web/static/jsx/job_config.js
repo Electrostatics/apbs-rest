@@ -3,17 +3,6 @@
 // class SubmitButton extends React.Component{}
 // class FormWindowHeader extends React.Component{}
 
-class SelectJob extends React.Component{
-    render(){
-        return(
-            <div className="btn-group">
-                <button type="button" className="btn btn-primary">PDB2PQR</button>
-                <button type="button" className="btn btn-primary">APBS</button>
-            </div>
-        )
-    };
-}
-
 function Button(props){
     return(
         <button type="button" className={props.buttonType} onClick={props.onClick}>
@@ -22,7 +11,7 @@ function Button(props){
     )
 }
 
-class FormWindow extends React.Component{
+class JobLanding extends React.Component{
     createButton(txt, additional_classNames){
         return(
             <Button
@@ -37,7 +26,7 @@ class FormWindow extends React.Component{
         let view = [];
 
         for(let i = 0; i < option_list.length; i++){
-            view.push(this.createButton(option_list[i], "btn btn-primary mx-2"));
+            view.push(this.createButton(option_list[i], "btn btn-primary mx-1"));
         }
 
         return view;
@@ -45,14 +34,34 @@ class FormWindow extends React.Component{
 
     render(){
         return(
-            <div className="container">
-                <div className="row my-3">
-                    <div className="col-lg-12">
+            <section className="jumbotron text-center">
+                <div className="container">
+                    <h1 className="jumbotron-heading">
+                        Welcome to the PDB2PQR Server
+                    </h1>
+                    <p className="lead text-muted">
+                        This server enables a user to convert PDB files into PQR files.
+                        PQR files are PDB files where the occupancy and B-factor columns
+                        have been replaced by per-atom charge and radius.
+                    </p>
+                    <p>
                         {this.createWindow(this.props.job_list)}
-                    </div>
+                    </p>
                 </div>
-            </div>
+            </section>
         )
+    }
+}
+
+class ConfigPDB2PQR extends React.Component{
+    // prepares the list-group for the parts of configuration
+    createScrollspyToC(){
+        
+    }
+
+    // prepares the elements where user will enter information
+    createConfigOptions(){
+
     }
 }
 
@@ -82,16 +91,24 @@ class Configuration extends React.Component{
         this.setState({
             job_type: selected_job
         })
-        console.log(this.state.job_type)
+    }
+
+    // 
+    handleConfigClick(selected_job, option, selection){
+        this.setState({
+            selected_job: {
+                option: selection
+            }
+        })
     }
 
     render(){
         // Renders landing page, with choice to do PDB2PQR or APBS
         if (this.state.job_type == null){
             let job_options = ["PDB2PQR", "APBS"]
-            // let blah = <FormWindow onClick={j => this.selectJobClick(j)}/>
+            // let blah = <JobLanding onClick={j => this.selectJobClick(j)}/>
             return(
-                <FormWindow 
+                <JobLanding 
                     job_list={job_options}
                     onClick={j => this.selectJobClick(j)}
                 />
