@@ -97,13 +97,41 @@ var ConfigPDB2PQR = function (_React$Component2) {
         key: "createScrollspyToC",
 
         // prepares the list-group for the parts of configuration
-        value: function createScrollspyToC() {}
+        value: function createScrollspyToC(scrollspy_name, names_map) {
+            var all_headers = [];
+            names_map.forEach(function (value, key, map) {
+                all_headers.push(React.createElement(
+                    "a",
+                    { className: "list-group-iterm list-group-item-action", href: '#'.concat(key) },
+                    value
+                ));
+            });
+            return React.createElement(
+                "div",
+                { id: scrollspy_name, className: "list-group" },
+                all_headers
+            );
+        }
 
         // prepares the elements where user will enter information
 
     }, {
         key: "createConfigOptions",
-        value: function createConfigOptions() {}
+        value: function createConfigOptions(scrollspy_name) {
+
+            return React.createElement("div", { "data-spy": "scroll", "data-target": '#'.concat(scrollspy_name), className: "list-group" });
+        }
+    }, {
+        key: "render",
+        value: function render() {
+
+            return React.createElement(
+                "form",
+                null,
+                this.createScrollspyToC(this.props.scrollspy_name, this.props.config_headers),
+                this.createConfigOptions(this.props.scrollspy_name, this.props.config_headers)
+            );
+        }
     }]);
 
     return ConfigPDB2PQR;
@@ -175,7 +203,19 @@ var Configuration = function (_React$Component3) {
 
             // Renders configuration elements to set up an PDB2PQR job
             else if (this.state.job_type == "PDB2PQR") {
-                    return "Selected PDB2PQR";
+                    var pdb2pqr_scrollspy = "pdb2pqr_config";
+                    var pdb2pqr_headers = new Map();
+                    pdb2pqr_headers.set("which_pdb", "PDB ID Entry");
+                    pdb2pqr_headers.set("which_ff", "Forcefield");
+                    pdb2pqr_headers.set("which_output", "Output Naming Scheme");
+                    pdb2pqr_headers.set("which_options", "Output Naming Scheme");
+                    pdb2pqr_headers.set("which_pka", "pKa Settings (optional)");
+                    pdb2pqr_headers.set("submission", "Start Job");
+
+                    return React.createElement(ConfigPDB2PQR, {
+                        scrollspy_name: pdb2pqr_scrollspy,
+                        config_headers: pdb2pqr_headers
+                    });
                 }
 
                 // Renders configuration elements to set up an APBS job

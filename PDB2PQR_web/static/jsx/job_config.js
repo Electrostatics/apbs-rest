@@ -55,13 +55,38 @@ class JobLanding extends React.Component{
 
 class ConfigPDB2PQR extends React.Component{
     // prepares the list-group for the parts of configuration
-    createScrollspyToC(){
-        
+    createScrollspyToC(scrollspy_name, names_map){
+        let all_headers = []
+        names_map.forEach(function(value, key, map){
+            all_headers.push(
+                <a className="list-group-iterm list-group-item-action" href={'#'.concat(key)}>{value}</a>
+            );
+        })
+        return(
+            <div id={scrollspy_name} className="list-group">
+                {all_headers}
+            </div>
+        )
     }
 
     // prepares the elements where user will enter information
-    createConfigOptions(){
+    createConfigOptions(scrollspy_name){
 
+        return(
+            <div data-spy="scroll" data-target={'#'.concat(scrollspy_name)} className="list-group">
+
+            </div>
+        )
+    }
+
+    render(){
+
+        return(
+            <form>
+                {this.createScrollspyToC(this.props.scrollspy_name, this.props.config_headers)}
+                {this.createConfigOptions(this.props.scrollspy_name, this.props.config_headers)}
+            </form>
+        )
     }
 }
 
@@ -117,7 +142,21 @@ class Configuration extends React.Component{
 
         // Renders configuration elements to set up an PDB2PQR job
         else if (this.state.job_type == "PDB2PQR"){
-            return("Selected PDB2PQR")
+            let pdb2pqr_scrollspy = "pdb2pqr_config";
+            let pdb2pqr_headers = new Map();
+            pdb2pqr_headers.set("which_pdb",     "PDB ID Entry")
+            pdb2pqr_headers.set("which_ff",      "Forcefield")
+            pdb2pqr_headers.set("which_output",  "Output Naming Scheme")
+            pdb2pqr_headers.set("which_options", "Output Naming Scheme")
+            pdb2pqr_headers.set("which_pka",     "pKa Settings (optional)")
+            pdb2pqr_headers.set("submission",    "Start Job")
+    
+            return(
+                <ConfigPDB2PQR
+                    scrollspy_name={pdb2pqr_scrollspy}
+                    config_headers={pdb2pqr_headers}
+                />
+            )
         }
 
         // Renders configuration elements to set up an APBS job
