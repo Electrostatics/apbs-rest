@@ -5,6 +5,7 @@
 * [Tutorial](https://reactjs.org/tutorial/tutorial.html)
 * [Thinking in React](https://reactjs.org/docs/thinking-in-react.html)
 * [Add React to a Website](https://reactjs.org/docs/add-react-to-a-website.html)
+* [Using Create React App](https://github.com/facebook/create-react-app)
 
 ## Bootstrap
 
