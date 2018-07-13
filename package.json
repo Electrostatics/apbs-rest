@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Eo300/react_flask_pdb2pqr#readme",
   "dependencies": {
+    "antd": "^3.6.6",
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2"
   }
