@@ -9,7 +9,7 @@
 
 * From the repository root, set the appropriate environment variables for running/debug and have at it
 ```bash
-$ export FLASK_APP=server.py
-$ export FLASK_DEBUG=1
-$ flask run
+export FLASK_APP=server.py
+export FLASK_DEBUG=1
+flask run
 ```
