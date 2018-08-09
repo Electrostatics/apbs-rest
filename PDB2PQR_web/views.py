@@ -17,48 +17,80 @@ navbar_links = {
 @app.route('/pdb2pqr', methods=["GET", "POST"])
 @app.route('/apbs', methods=["GET", "POST"])
 def home():
-    # return render_template("index.html", navbar_home="/", navbar_about="http://www.poissonboltzmann.org/")
-    return render_template("index.html", **navbar_links)
+    """Delivers website to user
+    
+    All the above route here because the content shown is determined by React Router
+    """
+    return render_template("index.html")
+
 
 @app.route('/jobstatus', methods=["GET", "POST"])
 def jobstatus():
+    """
+    Handles job requests depending on method
+
+    POST handles job submission/startup, redirecting user to the status page
+    GET takes the user directly to the status page
+
+    A query string in the URL is how the status page is rendered
+    """
     if request.method == 'POST':
         f = request.files
-        print(request.form["PDBID"])
         redirectURL = main_cgi.mainCGI(request.form, request.files)
-        # print redirectURL
         return redirect(redirectURL)
-        # return("should be redirected to: "+str(redirectURL))
-        # return redirect( redirectURL )
 
     elif request.method == 'GET':
-        # print("Job Id: "+request.args['jobid'])
-        return render_template( "index.html", **navbar_links)
-        # return( "This should be the job status page: " + request.query_string )
-        # return main_cgi.mainCGI()
+        return render_template( "index.html")
 
 
 @app.route('/about')
 def about():
+    """Currently redirects to http://www.poissonboltzmann.org/"""
     return redirect(navbar_links["navbar_about"])
+
 
 @app.route('/legacy')
 def legacy():
+    """Redirects to the old PDB2PQR web server at http://nbcr-222.ucsd.edu/pdb2pqr_2.1.1/"""
     return redirect(navbar_links["legacy_ucsd"])
+
 
 @app.route('/api/jobstatus')
 def status_and_files():
+    """API interface for fetching job status
+    
+    Given a query string containing 'jobid' with a valid ID, a JSON response is constructed with the status of the specicied job.
+    Query string must specify which job type is desired.  In other words, the responses are assumed false unless specified otherwise.
+
+    With a query string of '?jobid=15336614662&pdb2pqr=true&apbs=true', Flask should return:
+        {
+            "apbs": {
+                "status": null,
+                "files": [],
+                "endTime": null,
+                "startTime": null
+            },
+            "pdb2pqr": {
+                "status": "complete",
+                "files": ["http://localhost:5000/tmp/15336614662/15336614662-input.p", "http://localhost:5000/tmp/15336614662/15336614662.in", "http://localhost:5000/tmp/15336614662/15336614662.pdb", "http://localhost:5000/tmp/15336614662/15336614662.pqr", "http://localhost:5000/tmp/15336614662/15336614662.summary"],
+                "endTime": 1533661467.76,
+                "startTime": 1533661466.62
+            },
+            "jobid": "15336614662"
+        }
+
+    """
     from src.aconf import *
     from json import JSONEncoder
 
-    # if request.args['jobid'] != None:
     json_status = {}
     if request.args.has_key('jobid'):
+        '''Builds JSON response if the jobid is specified in query'''
         jobid = request.args['jobid']
         # has_pdb2pqr = True # (request.args.has_key('pdb2pqr')) # ? bool(request.args['pdb2pqr']) : False
         # has_apbs = True # (request.args.has_key('apbs')) # ? bool(request.args['apbs']) : False
-        has_pdb2pqr = False if ( request.args.has_key('pdb2pqr') and request.args['pdb2pqr'].lower() == 'false') else True
-        has_apbs =    False if ( request.args.has_key('apbs')    and request.args['apbs'].lower() == 'false'   ) else True
+        has_pdb2pqr = True if ( request.args.has_key('pdb2pqr') and request.args['pdb2pqr'].lower() == 'true') else False
+        has_apbs =    True if ( request.args.has_key('apbs')    and request.args['apbs'].lower() == 'true'   ) else False
 
         ''' Obtains status info for PDB2PQR '''
         pdb2pqr_progress = []
@@ -89,8 +121,6 @@ def status_and_files():
                 'startTime': pdb2pqr_starttime,
                 'endTime': pdb2pqr_endtime
             }
-        else:
-            print(has_pdb2pqr)
         if has_apbs:
             json_status['apbs'] = {
                 'status': apbs_status,
@@ -98,15 +128,12 @@ def status_and_files():
                 'startTime': apbs_starttime,
                 'endTime': apbs_endtime
             }
-        else:
-            print(has_apbs)
 
         # return JSONEncoder().encode(json_status)
 
     else:
+        '''Returns jobid as null if jobid not specified in query'''
         json_status['jobid'] = None
-        # return JSONEncoder().encode(json_status)
-        # return "No job ID specified. <i>YEET</i>"
 
     ''' FOR TESTING: allows React dev environment to fetch from here '''
     response = make_response(JSONEncoder().encode(json_status))
@@ -117,6 +144,7 @@ def status_and_files():
 
 @app.route('/tmp/<jobid>/<filename>')
 def job_file(jobid, filename):
+    """Delivers files from temporary directory for the appropriate job"""
     from src.aconf import *
     job_path = os.path.join(INSTALLDIR, TMPDIR, jobid)
     return send_from_directory(job_path, filename)
