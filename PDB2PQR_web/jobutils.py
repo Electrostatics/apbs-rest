@@ -26,7 +26,11 @@ def get_jobstatusinfo(jobid, jobtype):
         # job_progress = []
         fin = open(job_status_path, 'r')
         for line in fin:
-            job_progress.append(line.strip())
+            line_stripped = line.strip()
+            if os.path.exists(line_stripped):
+                job_progress.append(line_stripped)
+            elif  len(job_progress) == 0:
+                job_progress.append(line_stripped)
         fin.close()
         job_status = job_progress[0]
 

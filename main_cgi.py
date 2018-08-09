@@ -499,6 +499,7 @@ def handleNonOpal(weboptions):
     
     dummydef = Definition()
     dummyprot = Protein(pdblist, dummydef)
+    """
     if len(pdblist) == 0 and len(errlist) == 0:
         text = "Unable to find PDB file - Please make sure this is "
         text += "a valid PDB file ID!"
@@ -532,6 +533,7 @@ def handleNonOpal(weboptions):
         #print "Content-type: text/html\n"
         print text
         sys.exit(2)
+    """    
 
     try:
         starttime = time.time()

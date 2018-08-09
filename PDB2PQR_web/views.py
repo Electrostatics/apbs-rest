@@ -55,6 +55,10 @@ def status_and_files():
     json_status = {}
     if request.args.has_key('jobid'):
         jobid = request.args['jobid']
+        # has_pdb2pqr = True # (request.args.has_key('pdb2pqr')) # ? bool(request.args['pdb2pqr']) : False
+        # has_apbs = True # (request.args.has_key('apbs')) # ? bool(request.args['apbs']) : False
+        has_pdb2pqr = False if ( request.args.has_key('pdb2pqr') and request.args['pdb2pqr'].lower() == 'false') else True
+        has_apbs =    False if ( request.args.has_key('apbs')    and request.args['apbs'].lower() == 'false'   ) else True
 
         ''' Obtains status info for PDB2PQR '''
         pdb2pqr_progress = []
@@ -78,18 +82,24 @@ def status_and_files():
 
         ''' Builds JSON response of job status '''
         json_status['jobid'] = jobid
-        json_status['pdb2pqr'] = {
-            'status': pdb2pqr_status,
-            'files': pdb2pqr_progress[1:],
-            'startTime': pdb2pqr_starttime,
-            'endTime': pdb2pqr_endtime
-        }
-        json_status['apbs'] = {
-            'status': apbs_status,
-            'files': apbs_progress[1:],
-            'startTime': apbs_starttime,
-            'endTime': apbs_endtime
-        }
+        if has_pdb2pqr:
+            json_status['pdb2pqr'] = {
+                'status': pdb2pqr_status,
+                'files': pdb2pqr_progress[1:],
+                'startTime': pdb2pqr_starttime,
+                'endTime': pdb2pqr_endtime
+            }
+        else:
+            print(has_pdb2pqr)
+        if has_apbs:
+            json_status['apbs'] = {
+                'status': apbs_status,
+                'files': apbs_progress[1:],
+                'startTime': apbs_starttime,
+                'endTime': apbs_endtime
+            }
+        else:
+            print(has_apbs)
 
         # return JSONEncoder().encode(json_status)
 
