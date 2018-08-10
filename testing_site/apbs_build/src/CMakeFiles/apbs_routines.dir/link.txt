@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC   -shared -Wl,-soname,libapbs_routines.so -o ../lib/libapbs_routines.so CMakeFiles/apbs_routines.dir/routines.c.o  -L/home/eoffor/apbs-pdb2pqr/apbs/externals/fetk/maloc/lib -lm -lstdc++ /home/eoffor/apbs-pdb2pqr/apbs/externals/fetk/maloc/lib/libmaloc.so -Wl,-rpath,/home/eoffor/apbs-pdb2pqr/apbs/externals/fetk/maloc/lib: 

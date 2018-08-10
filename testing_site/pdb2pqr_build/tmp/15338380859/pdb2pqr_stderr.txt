@@ -1,0 +1,12 @@
+127.0.0.1 - - [09/Aug/2018 11:08:12] "POST /jobstatus HTTP/1.1" 500 -
+Error on request:
+Traceback (most recent call last):
+  File "/home/eoffor/venv_pdb2pqr/lib/python2.7/site-packages/werkzeug/serving.py", line 270, in run_wsgi
+    execute(self.server.app)
+  File "/home/eoffor/venv_pdb2pqr/lib/python2.7/site-packages/werkzeug/serving.py", line 261, in execute
+    write(data)
+  File "/home/eoffor/venv_pdb2pqr/lib/python2.7/site-packages/werkzeug/serving.py", line 224, in write
+    self.send_response(code, msg)
+  File "/home/eoffor/venv_pdb2pqr/lib/python2.7/site-packages/werkzeug/serving.py", line 337, in send_response
+    self.wfile.write(hdr.encode('ascii'))
+IOError: [Errno 32] Broken pipe
