@@ -35,9 +35,12 @@ def jobstatus():
     A query string in the URL is how the status page is rendered
     """
     if request.method == 'POST':
-        f = request.files
-        redirectURL = main_cgi.mainCGI(request.form, request.files)
-        return redirect(redirectURL)
+        if request.args.has_key('submitType') and request.args['submitType'] == 'pdb2pqr':
+            f = request.files
+            redirectURL = main_cgi.mainCGI(request.form, request.files)
+            return redirect(redirectURL)
+        elif request.args.has_key('submitType') and request.args['submitType'] == 'apbs':
+            return redirect('/jobstatus')
 
     elif request.method == 'GET':
         return render_template( "index.html")

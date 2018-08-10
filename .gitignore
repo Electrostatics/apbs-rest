@@ -14,4 +14,4 @@ pdb2pqr
 PDB2PQR_web/pdb2pqr
 
 testing_site
-./*.pyc
+*.pyc
