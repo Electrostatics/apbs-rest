@@ -1,2 +1,0 @@
-{'opt': True, 'drop_water': False, 'verbose': True, 'chain': False, 'selectedExtensions': ['summary'], 'pdb': u'1a1p.pdb', 'debump': True, 'neutralc': False, 'ff': u'parse', 'neutraln': False, 'ph': 7.0, 'apbs': True, 'typemap': False, 'whitespace': False}
-parse

@@ -1,9 +1,0 @@
-Beginning PDB2PQR...
-
-Parsed Amino Acid definition file.
-Created protein object -
-	Number of residues in protein: 0
-	Number of atoms in protein   : 0
-Setting the termini... 
-Done.
-Checking for missing heavy atoms... 
