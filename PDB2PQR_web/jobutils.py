@@ -28,10 +28,8 @@ def get_jobstatusinfo(jobid, jobtype):
     job_progress = []
     job_status_path = '%s%s%s/%s_status' % (INSTALLDIR, TMPDIR, jobid, jobtype)
     if os.path.exists(job_status_path):
-        '''
-        If status file exists, populate job_status and job_progress
-        with the status and potential output files, respectively
-        '''
+        # If status file exists, populate job_status and job_progress
+        # with the status and potential output files, respectively
         fin = open(job_status_path, 'r')
         for line in fin:
             line_stripped = line.strip()
@@ -42,7 +40,7 @@ def get_jobstatusinfo(jobid, jobtype):
         fin.close()
         job_status = job_progress[0]
 
-        '''Converts the retrieved files to URL-friendly versions'''
+        # Converts the retrieved files to URL-friendly versions
         for i in range(1, len(job_progress)):
             filename = job_progress[i].split('/')[-1]
             job_progress[i] = '%s%s%s/%s' % (WEBSITE, TMPDIR, jobid, filename)

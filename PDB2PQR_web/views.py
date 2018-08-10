@@ -92,7 +92,7 @@ def status_and_files():
         has_pdb2pqr = True if ( request.args.has_key('pdb2pqr') and request.args['pdb2pqr'].lower() == 'true') else False
         has_apbs =    True if ( request.args.has_key('apbs')    and request.args['apbs'].lower() == 'true'   ) else False
 
-        ''' Obtains status info for PDB2PQR '''
+        # Obtains status info for PDB2PQR
         pdb2pqr_progress = []
         pdb2pqr_status = None
         pdb2pqr_starttime = None
@@ -102,7 +102,7 @@ def status_and_files():
         pdb2pqr_endtime = jobutils.get_endtime(jobid, 'pdb2pqr')
         pdb2pqr_status, pdb2pqr_progress = jobutils.get_jobstatusinfo(jobid, 'pdb2pqr')
 
-        ''' Obtains status info for APBS '''
+        # Obtains status info for APBS
         apbs_progress = []
         apbs_status = None
         apbs_starttime = None
@@ -112,7 +112,7 @@ def status_and_files():
         apbs_endtime = jobutils.get_endtime(jobid, 'apbs')
         apbs_status, apbs_progress = jobutils.get_jobstatusinfo(jobid, 'apbs')
 
-        ''' Builds JSON response of job status '''
+        # Builds JSON response of job status
         json_status['jobid'] = jobid
         if has_pdb2pqr:
             json_status['pdb2pqr'] = {
