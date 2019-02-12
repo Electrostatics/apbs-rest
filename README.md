@@ -2,13 +2,13 @@
 
 **Warning: Still under development. Homepage is up but interaction is all over the place right now.**
 
-## Initiate Python virtualenv "./venv/"
-* From the repository root, run [initVenv.sh](initVenv.sh), which will build a Python virtualenv at "./venv" and installs the necessary Python modules within it
+## Initiate Python 2 virtualenv "./venv/"
+* From the repository root, run [initVenv.sh](initVenv.sh), which will build a Python 2 virtualenv at "./venv" and installs the necessary Python modules within it
 ```shell
 ./initVenv.sh
 ```
 
-## To run (Python virtualenv is recommended)
+## To run (Python 2 virtualenv is recommended)
 
 * Install the latest version of Flask
 `pip install flask`
