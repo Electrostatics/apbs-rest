@@ -4,7 +4,7 @@
 # required Python modules from requirements.txt
 
 if [ ! -d "./venv" ]; then
-  virtualenv venv
+  python -m virtualenv venv
 fi
 
 source ./venv/bin/activate || source ./venv/Scripts/activate

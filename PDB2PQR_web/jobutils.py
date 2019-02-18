@@ -44,5 +44,14 @@ def get_jobstatusinfo(jobid, jobtype):
         for i in range(1, len(job_progress)):
             filename = job_progress[i].split('/')[-1]
             job_progress[i] = '%s%s%s/%s' % (WEBSITE, TMPDIR, jobid, filename)
+    
+    # Print information to be sent (for debugging)
+    '''
+    print("job_type:     " + str(jobtype))
+    print("job_status:   " + str(job_status))
+    import sys
+    sys.stdout.write("job_progress: ")
+    print(job_progress)
+    '''
 
     return job_status, job_progress

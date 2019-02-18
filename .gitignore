@@ -21,5 +21,8 @@ pdb2pqr
 pdb2pqr_build
 PDB2PQR_web/pdb2pqr
 
+# Miscellaneous
 testing_site
 *.pyc
+copied_from_build
+path_for_build
