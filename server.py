@@ -1,4 +1,9 @@
+import sys, os
 from os import environ
+
+# Adds build directory to module path to for module compatibility
+sys.path.append(os.getcwd() + "/pdb2pqr_build")
+
 from PDB2PQR_web import app
 
 if __name__ == '__main__':
