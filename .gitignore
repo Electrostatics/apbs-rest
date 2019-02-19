@@ -1,6 +1,7 @@
 # Python virtual environments
 venv
 venv2
+win_venv
 
 # Related cloned repositories
 apbs-pdb2pqr
