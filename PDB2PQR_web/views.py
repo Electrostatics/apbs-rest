@@ -1,6 +1,8 @@
 from flask import render_template, redirect, request, send_from_directory, make_response
+# from werkzeug import secure_filename
 from PDB2PQR_web import app
 from PDB2PQR_web import jobutils
+from src.aconf import *
 import os
 import main_cgi
 import querystatus
@@ -35,7 +37,11 @@ def jobstatus():
     A query string in the URL is how the status page is rendered
     """
     if request.method == 'POST':
-        f = request.files
+        # f = request.files['PDB']
+        # print("f is of type: "+str(type(f)))
+        # print(f['PDB'])
+        # filename = secure_filename(f.filename)
+        # print('filename: ' + filename)
         redirectURL = main_cgi.mainCGI(request.form, request.files)
         return redirect(redirectURL)
 
@@ -80,7 +86,6 @@ def status_and_files():
         }
 
     """
-    from src.aconf import *
     from json import JSONEncoder
 
     json_status = {}
@@ -145,6 +150,5 @@ def status_and_files():
 @app.route('/tmp/<jobid>/<filename>')
 def job_file(jobid, filename):
     """Delivers files from temporary directory for the appropriate job"""
-    from src.aconf import *
     job_path = os.path.join(INSTALLDIR, TMPDIR, jobid)
     return send_from_directory(job_path, filename)

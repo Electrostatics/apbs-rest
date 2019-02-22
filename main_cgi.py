@@ -206,10 +206,10 @@ class WebOptions(object):
             self.pdbfile = StringIO(self.pdbfilestring)
             self.pdbfilename = form["PDBID"]
         elif files.has_key("PDB") and files["PDB"].filename and form["PDBSOURCE"] == 'UPLOAD':
-            print("filename: "+files['PDB'].filename)
-            self.pdbfilestring = files["PDB"].filename
+            self.pdbfilestring = files["PDB"].stream.read()
             self.pdbfile = StringIO(self.pdbfilestring)
             self.pdbfilename = sanitizeFileName(files["PDB"].filename)
+            print("filename: "+self.pdbfilename)
         else:
             raise WebOptionsError('You need to specify a pdb ID or upload a pdb file.')
             
@@ -671,7 +671,10 @@ def mainCGI(form, files):
     cgitb.enable()
     # form = cgi.FieldStorage()
     print("Elvis was here")
-    print(form["PDBID"])
+    print("form['PDBID']: " + form["PDBID"])
+    if form.has_key('PDBID'):
+        print("hello world")
+    # print("form['PDB']: " + form["PDB"])
     
     try:
         weboptions = WebOptions(form, files)
