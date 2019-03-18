@@ -9,7 +9,7 @@
 * [Execution](##Execution)
 
 ## Preface
-This repository servers as the backend interface for an overhauled PDB2PQR web server.  As such, the code contained herein serves as **one of three** components necessary to fully operate the website.  The frontend interface and APBS-PDB2PQR software should be cloned and built separately.  Links to both are below, respectively:
+This repository serves as the backend interface for an overhauled PDB2PQR web server.  As such, the code contained herein serves as **one of three** components necessary to fully operate the website.  The frontend interface and APBS-PDB2PQR software should be cloned and built separately.  Links to both are below, respectively:
 * [antd_pdb2pqr](https://github.com/Eo300/antd_pdb2pqr) (front-end)
   * After cloning to your desired location, use the ```npm run build``` command to build a production-ready version of the latest build
 * [apbs-pdb2pqr](https://github.com/Electrostatics/apbs-pdb2pqr)  
