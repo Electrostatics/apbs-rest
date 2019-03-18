@@ -25,6 +25,7 @@ From the repository root, run [initVenv.sh](initVenv.sh), which will build a Pyt
 ```
 
 ### Create Symbolic Link to Website Frontend Build Directory
+From the PDB2PQR_web directory:
 ```shell
 ln -s <PATH TO FRONTEND DIRECTORY> ./build
 ```
@@ -39,7 +40,7 @@ From the repository root, copy related PDB2PQR files ([main_cgi.py](main_cgi.py)
 ```shell
 cp main_cgi.py pdb2pqr.py querystatus.py ./pdb2pqr_build/.
 ```  
-Alternatively, you may create a symbolic link to the aforementioned files instead
+Alternatively, you may create a symbolic link to the aforementioned files instead. **This is recommended if editing the files as it'd remove the need to constantly copy/paste to see new changes**
 
 ## Execution
 ### To run the Flask server (Python virtualenv is recommended)
