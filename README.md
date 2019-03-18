@@ -13,6 +13,7 @@ This repository serves as the backend interface for an overhauled PDB2PQR web se
 * [antd_pdb2pqr](https://github.com/Eo300/antd_pdb2pqr) (front-end)
   * After cloning to your desired location, use the ```npm run build``` command to build a production-ready version of the latest build
 * [apbs-pdb2pqr](https://github.com/Electrostatics/apbs-pdb2pqr)  
+  * You will need to build APBS and PDB2PQR since both are used for the job functions of the website
 
 For both of the above, feel free to clone them in a location of your choosing, though I did so outside of this repository to avoid confusion within Git. 
 
