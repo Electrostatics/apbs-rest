@@ -31,17 +31,17 @@ ln -s <PATH TO FRONTEND DIRECTORY> ./build
 ```
 
 ### Create Symbolic Link to Your PDB2PQR Build Directory
-From the repository root
+From the repository root:
 ```shell
 ln -s <PATH TO PDB2PQR BUILD DIRECTORY> ./pdb2pqr_build
 ```
 
 ### Copy edited PDB2PQR *.py files into build directory  
-From the repository root, copy related PDB2PQR files ([main_cgi.py](main_cgi.py), [pdb2pqr.py](pdb2pqr.py), and [querystatus.py](querystatus.py)) into the build directory as they are modified to work with the Flask server
+From the repository root, copy the related PDB2PQR files ([main_cgi.py](main_cgi.py) and [querystatus.py](querystatus.py)) into the build directory as they are modified to work with the Flask server
 ```shell
-cp main_cgi.py pdb2pqr.py querystatus.py ./pdb2pqr_build/.
+cp main_cgi.py querystatus.py ./pdb2pqr_build/.
 ```  
-Alternatively, you may create a symbolic link to the aforementioned files instead. **This is recommended if editing the files as it'd remove the need to constantly copy/paste to see new changes**
+Alternatively, you may create a symbolic link to the aforementioned files instead. **(This is recommended if editing the files as it'd remove the need to constantly copy/paste to see new changes)**
 
 ## Execution
 ### To run the Flask server (Python virtualenv is recommended)
