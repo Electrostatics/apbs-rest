@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Initiates a Python virtal environment and installs the
+# Initiates a Python virtual environment and installs the
 # required Python modules from requirements.txt
 
 if [ ! -d "./venv" ]; then
