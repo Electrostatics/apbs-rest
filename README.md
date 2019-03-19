@@ -25,12 +25,13 @@ From the repository root, run [initVenv.sh](initVenv.sh), which will build a Pyt
 ```
 
 ### Create Symbolic Link to Website Frontend Build Directory
-From the PDB2PQR_web directory:
+From the [./PDB2PQR_web](PDB2PQR_web) directory:
 ```shell
 ln -s <PATH TO FRONTEND DIRECTORY> ./build
 ```
 
 ### Create Symbolic Link to Your PDB2PQR Build Directory
+From the repository root
 ```shell
 ln -s <PATH TO PDB2PQR BUILD DIRECTORY> ./pdb2pqr_build
 ```
