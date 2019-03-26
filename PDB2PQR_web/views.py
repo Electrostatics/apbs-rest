@@ -142,7 +142,8 @@ def status_and_files():
 
     ''' FOR TESTING: allows React dev environment to fetch from here '''
     response = make_response(JSONEncoder().encode(json_status))
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8000'
+    # response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
     
     # return JSONEncoder().encode(json_status)
     return response
