@@ -141,8 +141,15 @@ def status_and_files():
         json_status['jobid'] = None
 
     ''' FOR TESTING: allows React dev environment to fetch from here '''
+    origin_whitelist = ['http://localhost:3000/jobstatus', 'http://localhost:8000/jobstatus']
+    request_origin_url = request.referrer.split('?')[0]
+
     response = make_response(JSONEncoder().encode(json_status))
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8000'
+    # response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    if request_origin_url in origin_whitelist:
+        cleared_domain = request_origin_url[:request_origin_url.index('/jobstatus')]
+        response.headers['Access-Control-Allow-Origin'] = cleared_domain
+
     # response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
     
     # return JSONEncoder().encode(json_status)
