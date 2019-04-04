@@ -5,7 +5,7 @@ RUN apt update -y \
     && apt install -y python-pip swig cmake g++ make git \
     && git clone https://github.com/Electrostatics/apbs-pdb2pqr.git
 
-COPY build_config.py /app/apbs-pdb2pqr/pdb2pqr/build_config.py
+COPY docker_materials/build_config.py /app/apbs-pdb2pqr/pdb2pqr/build_config.py
 
 WORKDIR /app/apbs-pdb2pqr/apbs
 RUN git submodule init \
