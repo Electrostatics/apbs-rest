@@ -25,5 +25,6 @@ cd ..
 cd ../builds/pdb2pqr_build
 ln -s ../../react_flask_pdb2pqr/main_cgi.py main_cgi.py
 ln -s ../../react_flask_pdb2pqr/querystatus.py querystatus.py
+ln -s ../../react_flask_pdb2pqr/apbs_cgi.py apbs_cgi.py
 # ln -s ../../react_flask_pdb2pqr/pdb2pqr.py pdb2pqr.py
 cd ../../react_flask_pdb2pqr

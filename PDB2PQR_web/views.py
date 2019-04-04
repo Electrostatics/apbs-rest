@@ -4,9 +4,10 @@ from PDB2PQR_web import app
 from PDB2PQR_web import jobutils
 from src.aconf import *
 import os
-import main_cgi
+import main_cgi # main driver for PDB2PQR
 import querystatus
 # import pdb2pqr.main_cgi
+import apbs_cgi # main driver for APBS
 
 navbar_links = {
     "navbar_home"     : "/home",
@@ -42,7 +43,15 @@ def jobstatus():
         # print(f['PDB'])
         # filename = secure_filename(f.filename)
         # print('filename: ' + filename)
-        redirectURL = main_cgi.mainCGI(request.form, request.files)
+        job_type = request.args['submitType']
+        print(job_type)
+        print(request.args)
+        if job_type == 'pdb2pqr':
+            redirectURL = main_cgi.mainCGI(request.form, request.files)
+        elif job_type == 'apbs':
+            redirectURL = apbs_cgi.mainInput(request.form)
+            pass
+
         return redirect(redirectURL)
 
     elif request.method == 'GET':
