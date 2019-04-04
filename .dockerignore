@@ -8,4 +8,7 @@ README.md
 reference_links.md
 
 pdb2pqr_build
-PDB2PQR_web/build
+# PDB2PQR_web/build
+
+Dockerfile
+.dockerignore
