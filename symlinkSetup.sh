@@ -23,8 +23,8 @@ ln -s ../../antd_pdb2pqr/build ./build
 cd ..
 
 cd ../builds/pdb2pqr_build
-ln -s ../../react_flask_pdb2pqr/main_cgi.py main_cgi.py
-ln -s ../../react_flask_pdb2pqr/querystatus.py querystatus.py
-ln -s ../../react_flask_pdb2pqr/apbs_cgi.py apbs_cgi.py
+ln -s ../../react_flask_pdb2pqr/src/pdb2pqr_build_materials/main_cgi.py main_cgi.py
+ln -s ../../react_flask_pdb2pqr/src/pdb2pqr_build_materials/querystatus.py querystatus.py
+ln -s ../../react_flask_pdb2pqr/src/pdb2pqr_build_materials/apbs_cgi.py apbs_cgi.py
 # ln -s ../../react_flask_pdb2pqr/pdb2pqr.py pdb2pqr.py
 cd ../../react_flask_pdb2pqr
