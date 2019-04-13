@@ -1,5 +1,6 @@
 from flask import render_template, redirect, request, send_from_directory, make_response
 # from werkzeug import secure_filename
+from json import JSONEncoder
 from PDB2PQR_web import app
 from PDB2PQR_web import jobutils
 from src.aconf import *
@@ -14,6 +15,13 @@ navbar_links = {
     "navbar_about"    : "http://www.poissonboltzmann.org/",
     "legacy_ucsd"     : "http://nbcr-222.ucsd.edu/pdb2pqr_2.1.1/"
 }
+
+ORIGIN_WHITELIST = [
+    'http://localhost:3000/jobstatus',
+    'http://localhost:8000/jobstatus',
+    'http://localhost:3000/apbs',
+    'http://localhost:8000/apbs',
+]
 
 @app.route('/', methods=["GET", "POST"])
 @app.route('/home', methods=["GET", "POST"])
@@ -44,11 +52,16 @@ def jobstatus():
         # filename = secure_filename(f.filename)
         # print('filename: ' + filename)
         job_type = request.args['submitType']
-        print(job_type)
-        print(request.args)
+        # print(job_type)
+        # print(request.args)
         if job_type == 'pdb2pqr':
             redirectURL = main_cgi.mainCGI(request.form, request.files)
         elif job_type == 'apbs':
+            import pprint as pp
+            print(pp.pformat(request.form.to_dict(), indent=4, width=10))
+            return pp.pformat(request.form.to_dict(), indent=4, width=10)
+            # return str(request.form)
+            # return str(request.form['removewater'])
             redirectURL = apbs_cgi.mainInput(request.form)
             pass
 
@@ -70,7 +83,7 @@ def legacy():
     return redirect(navbar_links["legacy_ucsd"])
 
 
-@app.route('/api/jobstatus')
+@app.route('/api/jobstatus', methods=['GET'])
 def status_and_files():
     """API interface for fetching job status
     
@@ -95,7 +108,6 @@ def status_and_files():
         }
 
     """
-    from json import JSONEncoder
 
     json_status = {}
     if request.args.has_key('jobid'):
@@ -150,12 +162,13 @@ def status_and_files():
         json_status['jobid'] = None
 
     ''' FOR TESTING: allows React dev environment to fetch from here '''
-    origin_whitelist = ['http://localhost:3000/jobstatus', 'http://localhost:8000/jobstatus']
+    # origin_whitelist = ['http://localhost:3000/jobstatus', 'http://localhost:8000/jobstatus']
     request_origin_url = request.referrer.split('?')[0]
 
+    ''' Prepare response to API request '''
     response = make_response(JSONEncoder().encode(json_status))
     # response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
-    if request_origin_url in origin_whitelist:
+    if request_origin_url in ORIGIN_WHITELIST:
         cleared_domain = request_origin_url[:request_origin_url.index('/jobstatus')]
         response.headers['Access-Control-Allow-Origin'] = cleared_domain
 
@@ -164,8 +177,30 @@ def status_and_files():
     # return JSONEncoder().encode(json_status)
     return response
 
-@app.route('/tmp/<jobid>/<filename>')
-def job_file(jobid, filename):
+@app.route('/api/autofill/jobs/<job_type>/<job_id>', methods=['GET'])
+def autofill(job_id, job_type):
+    json_response_dict = {}
+    json_response_dict['dummy'] = 'fetch succeeded'
+    print('job_id:   '+job_id)
+    print('job_type: '+job_type)
+
+    if job_type == 'apbs' and job_id:
+        json_response_dict = apbs_cgi.unpickleVars(job_id)
+        print(type(json_response_dict))
+        print(type(json_response_dict['dime']))
+        print(len(json_response_dict.keys()))
+
+    ''' Prepare response to API request '''
+    response = make_response(JSONEncoder().encode(json_response_dict))
+    request_origin_url = request.referrer.split('?')[0]
+    if request_origin_url in ORIGIN_WHITELIST:
+        cleared_domain = request_origin_url[:request_origin_url.index('/apbs')]
+        response.headers['Access-Control-Allow-Origin'] = cleared_domain
+
+    return response
+
+@app.route('/tmp/<job_id>/<file_name>')
+def job_file(job_id, file_name):
     """Delivers files from temporary directory for the appropriate job"""
-    job_path = os.path.join(INSTALLDIR, TMPDIR, jobid)
-    return send_from_directory(job_path, filename)
+    job_path = os.path.join(INSTALLDIR, TMPDIR, job_id)
+    return send_from_directory(job_path, file_name)
