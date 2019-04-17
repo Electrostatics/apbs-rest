@@ -1484,6 +1484,10 @@ def pqrFileCreator(apbsOptions):
     apbsOptions['tab'] = "    " # 4 spaces - used for writing to file
     input = open('%s/tmp/%s/%s' % (INSTALLDIR, apbsOptions['writeStem'], apbsOptions['tempFile']), 'w')
     
+    print("apbsOptions['tmpDirName'] = " + apbsOptions['tmpDirName'])
+    print("apbsOptions['tempFile'] = " + apbsOptions['tempFile'])
+    print("apbsOptions['pqrPath'] = " + apbsOptions['pqrPath'])
+    print("apbsOptions['pqrFileName'] = " + apbsOptions['pqrFileName'])
 
     # writing READ section to file
     input.write('read\n')

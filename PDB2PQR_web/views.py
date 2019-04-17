@@ -1,14 +1,17 @@
 from flask import render_template, redirect, request, send_from_directory, make_response
-# from werkzeug import secure_filename
+from werkzeug import secure_filename
 from json import JSONEncoder
 from PDB2PQR_web import app
 from PDB2PQR_web import jobutils
 from src.aconf import *
+from src import inputgen
+from src import psize
 import os
 import main_cgi # main driver for PDB2PQR
 import querystatus
 # import pdb2pqr.main_cgi
 import apbs_cgi # main driver for APBS
+import time
 
 navbar_links = {
     "navbar_home"     : "/home",
@@ -59,7 +62,8 @@ def jobstatus():
         elif job_type == 'apbs':
             import pprint as pp
             print(pp.pformat(request.form.to_dict(), indent=4, width=10))
-            return pp.pformat(request.form.to_dict(), indent=4, width=10)
+            # return pp.pformat(request.form.to_dict(), indent=4, width=10)
+
             # return str(request.form)
             # return str(request.form['removewater'])
             redirectURL = apbs_cgi.mainInput(request.form)
@@ -71,13 +75,13 @@ def jobstatus():
         return render_template( "index.html")
 
 
-@app.route('/about')
+@app.route('/about', methods=['GET'])
 def about():
     """Currently redirects to http://www.poissonboltzmann.org/"""
     return redirect(navbar_links["navbar_about"])
 
 
-@app.route('/legacy')
+@app.route('/legacy', methods=['GET'])
 def legacy():
     """Redirects to the old PDB2PQR web server at http://nbcr-222.ucsd.edu/pdb2pqr_2.1.1/"""
     return redirect(navbar_links["legacy_ucsd"])
@@ -181,14 +185,14 @@ def status_and_files():
 def autofill(job_id, job_type):
     json_response_dict = {}
     json_response_dict['dummy'] = 'fetch succeeded'
-    print('job_id:   '+job_id)
-    print('job_type: '+job_type)
+    # print('job_id:   '+job_id)
+    # print('job_type: '+job_type)
 
     if job_type == 'apbs' and job_id:
         json_response_dict = apbs_cgi.unpickleVars(job_id)
-        print(type(json_response_dict))
-        print(type(json_response_dict['dime']))
-        print(len(json_response_dict.keys()))
+        # print(type(json_response_dict))
+        # print(type(json_response_dict['dime']))
+        # print(len(json_response_dict.keys()))
 
     ''' Prepare response to API request '''
     response = make_response(JSONEncoder().encode(json_response_dict))
@@ -198,6 +202,90 @@ def autofill(job_id, job_type):
         response.headers['Access-Control-Allow-Origin'] = cleared_domain
 
     return response
+
+def allowed_file(filename, valid_extensions):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in valid_extensions
+
+# @app.route('/upload', methods=['GET', 'POST'])
+@app.route('/api/upload/autofill/pqr', methods=['POST', 'OPTIONS'])
+def upload_autofill():
+    print("helloooo")
+    EXTENSION_WHITELIST = set(['pqr'])
+    json_response = None
+    http_status_response = None
+    app.config['UPLOAD FOLDER'] = os.path.join(INSTALLDIR, TMPDIR)
+
+    if request.method == 'POST':
+        # print(dict(request.files).keys())
+        print(request)
+        try:
+            print(request.files.keys())
+            files = request.files['file']
+            if files:
+                filename = secure_filename(files.filename)
+                # filename = 
+                mime_type = files.content_type
+
+                if files and allowed_file(files.filename, EXTENSION_WHITELIST):
+                    print("passed whitelist")
+                    new_job_id = str(time.time()).replace('.' , '')
+                    tmp_dir_path = os.path.join(INSTALLDIR, TMPDIR)
+                    job_dir_path = os.path.join(tmp_dir_path, new_job_id)
+                    upload_path  = os.path.join(job_dir_path, '%s.pqr' % (new_job_id) )
+                    if not os.path.exists(job_dir_path):
+                        print("passed does_exists()")
+                        os.makedirs(job_dir_path)
+                        files.save(upload_path)
+
+                        # Lifted from main_cgi.py APBS handler, line 626
+                        method = "mg-auto"
+                        size = psize.Psize()
+                        size.parseInput(upload_path)
+                        size.runPsize(upload_path)
+                        async = 0 # No async files here!
+                        myinput = inputgen.Input(upload_path, size, method, async, potdx=True)
+                        myinput.printInputFiles()
+                        myinput.dumpPickle()
+                        # return autofill(new_job_id, 'apbs')
+                        json_response = {
+                            'upload_status': 'Success',
+                            'job_id': new_job_id,
+                        }
+                        http_status_response = 201
+
+                        # json_response = apbs_cgi.unpickleVars(new_job_id)
+                else:
+                    raise Exception('File must be a PQR file')
+
+        except Exception as e:
+            # json_response = 'failed: %s' % (e)
+            json_response = '%s' % (e)
+            http_status_response = 500
+
+    ''' Prepare response to API request '''
+    response = make_response(JSONEncoder().encode(json_response))
+    if request.method == 'OPTIONS':
+        # json_response = 'this is OPTIONS'
+        print('this is OPTIONS')
+        response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
+        response.headers['Access-Control-Allow-Methods'] = 'POST'
+        http_status_response = 204
+    if request.referrer:
+        # Add origin header to response if origin is in whitelist
+        request_origin_url = request.referrer.split('?')[0]
+        if request_origin_url in ORIGIN_WHITELIST:
+            print(request_origin_url)
+            cleared_domain = request_origin_url[:request_origin_url.index('/apbs')]
+            response.headers['Access-Control-Allow-Origin'] = cleared_domain
+
+    return response, http_status_response
+
+    # if request.method == 'GET':
+    #     pass
+        
+    # pass
+
 
 @app.route('/tmp/<job_id>/<file_name>')
 def job_file(job_id, file_name):
