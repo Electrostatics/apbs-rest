@@ -28,7 +28,7 @@ WORKDIR /app
 COPY . ./
 COPY --from=apbs_pdb2pqr-build /app/apbs_build ./apbs_build
 COPY --from=apbs_pdb2pqr-build /app/pdb2pqr_build ./pdb2pqr_build
-RUN cp main_cgi.py querystatus.py ./pdb2pqr_build \
+RUN cp ./src/main_cgi.py ./src/querystatus.py ./src/apbs_cgi.py ./pdb2pqr_build \
     && python -m pip install -r requirements.txt
 # RUN export FLASK_APP=server.py
 # RUN export FLASK_DEBUG=1
