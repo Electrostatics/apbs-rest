@@ -287,7 +287,7 @@ def upload_autofill():
     # pass
 
 
-@app.route('/tmp/<job_id>/<file_name>')
+@app.route('/download/<job_id>/<file_name>')
 def job_file(job_id, file_name):
     """Delivers files from temporary directory for the appropriate job"""
     job_path = os.path.join(INSTALLDIR, TMPDIR, job_id)
