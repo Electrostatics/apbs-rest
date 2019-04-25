@@ -17,6 +17,8 @@ RUN RELEASE_TARBALL_URL=$( \
     && RELEASE_FILENAME=$(          \
         echo $RELEASE_TARBALL_URL | rev | cut -d "/" -f 1 | rev \
     ) \
+    && echo $RELEASE_FILENAME\
+    && echo $RELEASE_TARBALL_URL\
     && wget -q $RELEASE_TARBALL_URL \
     # expected output
     # $EXTRACTED_DIRNAME = Electrostatics-apbs-pdb2pqr-c0c65e4/
@@ -27,7 +29,7 @@ RUN RELEASE_TARBALL_URL=$( \
     && mv $EXTRACTED_DIRNAME apbs-pdb2pqr
 
 
-COPY build_config.py /app/apbs-pdb2pqr/pdb2pqr/build_config.py
+COPY docker_materials/build_config.py /app/apbs-pdb2pqr/pdb2pqr/build_config.py
 
 WORKDIR /app/apbs-pdb2pqr/apbs
 # RUN git submodule init \
