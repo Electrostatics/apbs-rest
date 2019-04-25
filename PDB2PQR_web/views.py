@@ -38,12 +38,50 @@ def home():
     return render_template("index.html")
 
 
+@app.route('/submit/pdb2pqr', methods=['POST'])
+def submit_pdb2pqr():
+    """
+    Handles PDB2PQR job submissions.
+    Runs the PDB2PQR main function originally from 'main_cgi.py'.
+    """
+    if request.method == 'POST':
+        redirectURL = main_cgi.mainCGI(request.form, request.files)
+
+        '''=== DEBUG LINE FOR DEV: REMOVE IN FINAL ==='''
+        if 'http://localhost:5000' in redirectURL:
+            print(redirectURL)
+            redirectURL = redirectURL.replace('http://localhost:5000', 'http://localhost:3000')
+            print(redirectURL)
+        '''==========================================='''
+
+        return redirect(redirectURL)
+
+@app.route('/submit/apbs', methods=['POST'])
+def submit_apbs():
+    """
+    Handles APBS job submissions.
+    Runs the APBS main function originally from 'apbs_cgi.py'.
+    """
+    if request.method == 'POST':
+
+        import pprint as pp
+        print(pp.pformat(request.form.to_dict(), indent=4, width=10))
+        # return str(request.form)
+        # return str(request.form['removewater'])
+        redirectURL = apbs_cgi.mainInput(request.form)
+
+        '''=== DEBUG LINE FOR DEV: REMOVE IN FINAL ==='''
+        if 'http://localhost:5000' in redirectURL:
+            print(redirectURL)
+            redirectURL = redirectURL.replace('http://localhost:5000', 'http://localhost:3000')
+            print(redirectURL)
+        '''==========================================='''
+
+        return redirect(redirectURL)
+
 @app.route('/jobstatus', methods=["GET", "POST"])
 def jobstatus():
     """
-    Handles job requests depending on method
-
-    POST handles job submission/startup, redirecting user to the status page
     GET takes the user directly to the status page
 
     A query string in the URL is how the status page is rendered
@@ -68,6 +106,13 @@ def jobstatus():
             # return str(request.form['removewater'])
             redirectURL = apbs_cgi.mainInput(request.form)
             pass
+
+        '''=== DEBUG LINE FOR DEV: REMOVE IN FINAL ==='''
+        if ':5000' in redirectURL:
+            print(redirectURL)
+            redirectURL = redirectURL.replace(':5000', ':3000')
+            print(redirectURL)
+        '''==========================================='''
 
         return redirect(redirectURL)
 
@@ -189,7 +234,9 @@ def autofill(job_id, job_type):
     # print('job_type: '+job_type)
 
     if job_type == 'apbs' and job_id:
+        response_id = str(time.time()).replace('.','')
         json_response_dict = apbs_cgi.unpickleVars(job_id)
+        json_response_dict['response_id'] = response_id
         # print(type(json_response_dict))
         # print(type(json_response_dict['dime']))
         # print(len(json_response_dict.keys()))
