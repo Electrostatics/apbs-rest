@@ -1,6 +1,6 @@
 from flask import render_template, redirect, request, send_from_directory, make_response
 from werkzeug import secure_filename
-from json import JSONEncoder
+from json import JSONEncoder, loads
 from PDB2PQR_web import app
 from PDB2PQR_web import jobutils
 from src.aconf import *
@@ -12,6 +12,8 @@ import querystatus
 # import pdb2pqr.main_cgi
 import apbs_cgi # main driver for APBS
 import time
+
+import pprint as pp
 
 navbar_links = {
     "navbar_home"     : "/home",
@@ -56,6 +58,82 @@ def submit_pdb2pqr():
 
         return redirect(redirectURL)
 
+@app.route('/submit/pdb2pqr/json', methods=['POST'])
+def submit_pdb2pqr_json():
+    """
+    Handles PDB2PQR job submissions.
+    Runs the PDB2PQR main function originally from 'main_cgi.py'.
+    """
+    if request.method == 'POST':
+        # form_json
+        # print(pp.pformat(request.form.to_dict(), indent=4, width=10))
+        pp.pprint(request.form.to_dict())
+
+        redirectURL = main_cgi.mainCGI(request.form, request.files)
+
+        '''=== DEBUG LINE FOR DEV: REMOVE IN FINAL ==='''
+        if 'http://localhost:5000' in redirectURL:
+            print(redirectURL)
+            redirectURL = redirectURL.replace('http://localhost:5000', 'http://localhost:3000')
+            print(redirectURL)
+        '''==========================================='''
+
+        return redirect(redirectURL)
+
+@app.route('/submit/apbs/json', methods=['POST', 'OPTIONS'])
+def submit_apbs_json():
+    """
+    Handles APBS job submissions.
+    Runs the APBS main function originally from 'apbs_cgi.py'.
+    """
+
+    json_response = None
+    http_status_response = None
+
+    if request.method == 'POST':
+        form = loads(request.data)['form']
+        for key in form.keys():
+            if key == 'output_scalar':
+                for option in form[key]:
+                    form[option] = option
+                form.pop('output_scalar')
+            else:
+                form[key] = str(form[key])
+            # form[key] = unicode(form[key])
+        print('\n\n')
+        print(pp.pformat(form, indent=4, width=10))
+        print('\n\n')
+        # print(pp.pformat(request.form.to_dict(), indent=4, width=10))
+
+        # redirectURL = apbs_cgi.mainInput(request.form)
+        # redirectURL = apbs_cgi.mainInput(loads(request.data))
+        redirectURL = apbs_cgi.mainInput(form)
+
+        '''=== DEBUG LINE FOR DEV: REMOVE IN FINAL ==='''
+        # if 'http://localhost:5000' in redirectURL:
+        #     print(redirectURL)
+        #     redirectURL = redirectURL.replace('http://localhost:5000', 'http://localhost:3000')
+        #     print(redirectURL)
+        '''==========================================='''
+
+        # return redirect(redirectURL)
+        response = make_response(JSONEncoder().encode({'status': 'success'}))
+        http_status_code = 202
+
+    elif request.method == 'OPTIONS':
+        response = make_response(JSONEncoder().encode(json_response))
+        response = jobutils.get_request_options(response, 'POST')
+        http_status_code = 204
+
+    if request.referrer:
+        # Add origin header to response if origin is in whitelist
+        request_origin_url = request.referrer.split('?')[0]
+        if request_origin_url in ORIGIN_WHITELIST:
+            cleared_domain = request_origin_url[:request_origin_url.index('/apbs')]
+            response.headers['Access-Control-Allow-Origin'] = cleared_domain
+
+    return response, http_status_code
+
 @app.route('/submit/apbs', methods=['POST'])
 def submit_apbs():
     """
@@ -64,7 +142,6 @@ def submit_apbs():
     """
     if request.method == 'POST':
 
-        import pprint as pp
         print(pp.pformat(request.form.to_dict(), indent=4, width=10))
         # return str(request.form)
         # return str(request.form['removewater'])
@@ -98,7 +175,6 @@ def jobstatus():
         if job_type == 'pdb2pqr':
             redirectURL = main_cgi.mainCGI(request.form, request.files)
         elif job_type == 'apbs':
-            import pprint as pp
             print(pp.pformat(request.form.to_dict(), indent=4, width=10))
             # return pp.pformat(request.form.to_dict(), indent=4, width=10)
 
@@ -257,7 +333,6 @@ def allowed_file(filename, valid_extensions):
 # @app.route('/upload', methods=['GET', 'POST'])
 @app.route('/api/upload/autofill/pqr', methods=['POST', 'OPTIONS'])
 def upload_autofill():
-    print("helloooo")
     EXTENSION_WHITELIST = set(['pqr'])
     json_response = None
     http_status_response = None
@@ -314,9 +389,10 @@ def upload_autofill():
     response = make_response(JSONEncoder().encode(json_response))
     if request.method == 'OPTIONS':
         # json_response = 'this is OPTIONS'
-        print('this is OPTIONS')
-        response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
-        response.headers['Access-Control-Allow-Methods'] = 'POST'
+        # print('this is OPTIONS')
+        response = jobutils.get_request_options(response, 'POST')
+        # response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
+        # response.headers['Access-Control-Allow-Methods'] = 'POST'
         http_status_response = 204
     if request.referrer:
         # Add origin header to response if origin is in whitelist

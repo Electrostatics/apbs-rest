@@ -1,6 +1,7 @@
 import os
 from src.aconf import *
 from json import JSONEncoder
+from flask import make_response
 
 def get_starttime(jobid, jobtype):
     """Returns the start time for the specified job id and type"""
@@ -21,6 +22,11 @@ def get_endtime(jobid, jobtype):
         endtime = float(fin.readline())
     return endtime
 
+def get_request_options(response, methods_array):
+    # response = make_response
+    response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
+    response.headers['Access-Control-Allow-Methods'] = methods_array
+    return response
 
 def get_jobstatusinfo(jobid, jobtype):
     """Returns the status and potential output files for the specified job id and type"""
