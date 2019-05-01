@@ -123,6 +123,7 @@ def submit_apbs_json():
     elif request.method == 'OPTIONS':
         response = make_response(JSONEncoder().encode(json_response))
         response = jobutils.get_request_options(response, 'POST')
+        response.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
         http_status_code = 204
 
     if request.referrer:
