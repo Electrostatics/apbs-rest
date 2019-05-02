@@ -1,6 +1,6 @@
 # My Attempt At Modernizing the PDB2PQR Server Via React and Flask
 
-**Warning: Still under development. Homepage is up but interaction is all over the place right now.**  
+**Warning: Still under development. Stability not guaranteed.**  
 **Tested using build of APBS-PDB2PQR through Ubuntu**
 
 ## Table of Contents
@@ -12,6 +12,7 @@
 This repository serves as the backend interface for an overhauled PDB2PQR web server.  As such, the code contained herein serves as **one of three** components necessary to fully operate the website.  The frontend interface and APBS-PDB2PQR software should be cloned and built separately.  Links to both are below, respectively:
 * [antd_pdb2pqr](https://github.com/Eo300/antd_pdb2pqr) (front-end)
   * After cloning to your desired location, use the ```npm run build``` command to build a production-ready version of the latest build
+  * [**UPDATE**] With a recent move to Dockerize this component, building this frontend component may not be necessary as the build would exist in it's own container
 * [apbs-pdb2pqr](https://github.com/Electrostatics/apbs-pdb2pqr)  
   * You will need to build APBS and PDB2PQR since both are used for the job functions of the website
 
@@ -37,9 +38,9 @@ ln -s <PATH TO PDB2PQR BUILD DIRECTORY> ./pdb2pqr_build
 ```
 
 ### Copy edited PDB2PQR *.py files into build directory  
-From the repository root, copy the related PDB2PQR files ([main_cgi.py](main_cgi.py) and [querystatus.py](querystatus.py)) into the build directory as they are modified to work with the Flask server
+From the repository root, copy the related PDB2PQR files ([main_cgi.py](src/pdb2pqr_build_materials/main_cgi.py), [apbs_cgi.py](src/pdb2pqr_build_materials/apbs_cgi.py), and [querystatus.py](src/pdb2pqr_build_materials/querystatus.py)) into the build directory as they are modified to work with the Flask server
 ```shell
-cp main_cgi.py querystatus.py ./pdb2pqr_build/.
+cp main_cgi.py apbs_cgi.py querystatus.py ./pdb2pqr_build/.
 ```  
 Alternatively, you may create a symbolic link to the aforementioned files instead. **(This is recommended if editing the files as it'd remove the need to constantly copy/paste to see new changes)**
 

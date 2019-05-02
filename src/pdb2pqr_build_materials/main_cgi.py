@@ -671,8 +671,8 @@ def mainCGI(form, files):
     cgitb.enable()
     # form = cgi.FieldStorage()
     print("Elvis was here")
-    print("form['PDBID']: " + form["PDBID"])
     if form.has_key('PDBID'):
+        print("form['PDBID']: " + form["PDBID"])
         print("hello world")
     # print("form['PDB']: " + form["PDB"])
     
