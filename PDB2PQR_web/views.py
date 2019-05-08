@@ -447,32 +447,14 @@ storageCache = storageutils.StorageCache(MINIO_CACHE_DIR, MINIO_ACCESS_KEY, MINI
 def storage_service(job_id, file_name):
     """Endpoint serving as the gateway to storage bucket"""
     if request.method == 'GET':
-        # if payload.has_key('job_id'):
-            # job_id    = str(payload['job_id'])
-        # if payload.has_key('file_name'):
-            # file_name = str(payload['file_name'])
         object_name = os.path.join(job_id, file_name)
         print(object_name)
-
-        # response_data = storageCache.get_object(JOB_BUCKET_NAME, object_name)
-        # return response_data
 
         '''send_file_from_directory'''
         file_path_in_cache = storageCache.fget_object(JOB_BUCKET_NAME, object_name)
         file_dir = os.path.dirname(file_path_in_cache)
         return send_from_directory(file_dir, file_path_in_cache.split('/')[-1])
         # return send_from_directory(os.path.dirname(file_path_in_cache), file_path_in_cache)
-
-        '''
-        print(object_name)
-        if not storageCache.inside_cache(job_id, file_name)
-            requested_object = minioClient.get_object(JOB_BUCKET_NAME, object_name)
-            response_data = requested_object.data.decode('utf-8')
-        else:
-            # response_data = storageCache.get
-        return response_data
-        '''        
-        
 
     elif request.method == 'PUT':
         try:
