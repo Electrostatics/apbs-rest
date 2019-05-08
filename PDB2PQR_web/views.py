@@ -28,6 +28,8 @@ ORIGIN_WHITELIST = [
     'http://localhost:8000/apbs',
 ]
 
+STORAGE_SERVICE = os.environ.get('STORAGE_URL', 'http://localhost:5000/api/storage')
+
 @app.route('/', methods=["GET", "POST"])
 @app.route('/home', methods=["GET", "POST"])
 @app.route('/pdb2pqr', methods=["GET", "POST"])
@@ -126,6 +128,7 @@ def submit_apbs_json():
         response.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
         http_status_code = 204
 
+    response.headers['Content-Type'] = 'application/json'
     if request.referrer:
         # Add origin header to response if origin is in whitelist
         request_origin_url = request.referrer.split('?')[0]
@@ -287,18 +290,19 @@ def status_and_files():
         '''Returns jobid as null if jobid not specified in query'''
         json_status['jobid'] = None
 
-    ''' FOR TESTING: allows React dev environment to fetch from here '''
-    # origin_whitelist = ['http://localhost:3000/jobstatus', 'http://localhost:8000/jobstatus']
-    request_origin_url = request.referrer.split('?')[0]
-
     ''' Prepare response to API request '''
     response = make_response(JSONEncoder().encode(json_status))
-    # response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
-    if request_origin_url in ORIGIN_WHITELIST:
-        cleared_domain = request_origin_url[:request_origin_url.index('/jobstatus')]
-        response.headers['Access-Control-Allow-Origin'] = cleared_domain
+    response.headers['Content-Type'] = 'application/json'
+    if request.referrer:
+        # print(request.referrer)
+        host_name = request.host.split('/')[0]
+        # print(host_name)
+        # origin_whitelist = ['http://localhost:3000/jobstatus', 'http://localhost:8000/jobstatus']
+        request_origin_url = request.referrer.split('?')[0]
+        if request_origin_url in ORIGIN_WHITELIST:
+            cleared_domain = request_origin_url[:request_origin_url.index('/jobstatus')]
+            response.headers['Access-Control-Allow-Origin'] = cleared_domain
 
-    # response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
     
     # return JSONEncoder().encode(json_status)
     return response
@@ -311,7 +315,7 @@ def autofill(job_id, job_type):
     # print('job_type: '+job_type)
 
     if job_type == 'apbs' and job_id:
-        response_id = str(time.time()).replace('.','')
+        response_id = jobutils.get_new_id() # id num so frontend knows to refill fields
         json_response_dict = apbs_cgi.unpickleVars(job_id)
         json_response_dict['response_id'] = response_id
         # print(type(json_response_dict))
@@ -320,6 +324,7 @@ def autofill(job_id, job_type):
 
     ''' Prepare response to API request '''
     response = make_response(JSONEncoder().encode(json_response_dict))
+    response.headers['Content-Type'] = 'application/json'
     request_origin_url = request.referrer.split('?')[0]
     if request_origin_url in ORIGIN_WHITELIST:
         cleared_domain = request_origin_url[:request_origin_url.index('/apbs')]
@@ -352,7 +357,7 @@ def upload_autofill():
 
                 if files and allowed_file(files.filename, EXTENSION_WHITELIST):
                     print("passed whitelist")
-                    new_job_id = str(time.time()).replace('.' , '')
+                    new_job_id = jobutils.get_new_id()
                     tmp_dir_path = os.path.join(INSTALLDIR, TMPDIR)
                     job_dir_path = os.path.join(tmp_dir_path, new_job_id)
                     upload_path  = os.path.join(job_dir_path, '%s.pqr' % (new_job_id) )
@@ -388,6 +393,7 @@ def upload_autofill():
 
     ''' Prepare response to API request '''
     response = make_response(JSONEncoder().encode(json_response))
+    response.headers['Content-Type'] = 'application/json'
     if request.method == 'OPTIONS':
         # json_response = 'this is OPTIONS'
         # print('this is OPTIONS')
@@ -403,6 +409,7 @@ def upload_autofill():
             cleared_domain = request_origin_url[:request_origin_url.index('/apbs')]
             response.headers['Access-Control-Allow-Origin'] = cleared_domain
 
+    print(type(minioClient))
     return response, http_status_response
 
     # if request.method == 'GET':
@@ -411,8 +418,69 @@ def upload_autofill():
     # pass
 
 
-@app.route('/download/<job_id>/<file_name>')
+@app.route('/download/<job_id>/<file_name>', methods=['GET'])
 def job_file(job_id, file_name):
     """Delivers files from temporary directory for the appropriate job"""
     job_path = os.path.join(INSTALLDIR, TMPDIR, job_id)
     return send_from_directory(job_path, file_name)
+
+
+
+''' 
+    Below is the endpoint to interact with the storage container.
+    This should be decoupled into its own container in the future.
+'''
+# from src.storage import storageutils
+import sys
+sys.path.append(os.getcwd() + "/src")
+from storage import storageutils
+# from json import loads
+
+MINIO_CACHE_DIR  = os.environ.get('STORAGE_CACHE_DIR', os.path.join(INSTALLDIR, TMPDIR, '.minio_cache')) # change path when decoupling
+MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
+MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
+JOB_BUCKET_NAME  = os.environ.get('MINIO_JOB_BUCKET', 'jobs')
+minioClient = storageutils.get_minio_client(MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
+storageCache = storageutils.StorageCache(MINIO_CACHE_DIR, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
+
+@app.route('/api/storage/<job_id>/<file_name>', methods=['GET', 'PUT', 'DELETE'])
+def storage_service(job_id, file_name):
+    """Endpoint serving as the gateway to storage bucket"""
+    if request.method == 'GET':
+        # if payload.has_key('job_id'):
+            # job_id    = str(payload['job_id'])
+        # if payload.has_key('file_name'):
+            # file_name = str(payload['file_name'])
+        object_name = os.path.join(job_id, file_name)
+        print(object_name)
+
+        # response_data = storageCache.get_object(JOB_BUCKET_NAME, object_name)
+        # return response_data
+
+        '''send_file_from_directory'''
+        file_path_in_cache = storageCache.fget_object(JOB_BUCKET_NAME, object_name)
+        file_dir = os.path.dirname(file_path_in_cache)
+        return send_from_directory(file_dir, file_path_in_cache.split('/')[-1])
+        # return send_from_directory(os.path.dirname(file_path_in_cache), file_path_in_cache)
+
+        '''
+        print(object_name)
+        if not storageCache.inside_cache(job_id, file_name)
+            requested_object = minioClient.get_object(JOB_BUCKET_NAME, object_name)
+            response_data = requested_object.data.decode('utf-8')
+        else:
+            # response_data = storageCache.get
+        return response_data
+        '''        
+        
+
+    elif request.method == 'PUT':
+        try:
+            payload = loads(request.data)
+        except:
+            payload = request.data
+
+    elif request.method == 'DELETE':
+        pass
+        
+    # return 'Success', 200

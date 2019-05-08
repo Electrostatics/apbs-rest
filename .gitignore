@@ -27,3 +27,4 @@ testing_site
 *.pyc
 copied_from_build
 path_for_build
+docker_materials/minio_cred

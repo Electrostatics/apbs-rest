@@ -36,6 +36,8 @@ RUN cp  ./src/pdb2pqr_build_materials/main_cgi.py \
 # RUN export FLASK_DEBUG=1
 # ENV FLASK_APP=server.py
 # ENV FLASK_DEBUG=1
+ENV SERVER_HOST="0.0.0.0" \
+    SERVER_PORT="5555"
 
 EXPOSE 5555
 

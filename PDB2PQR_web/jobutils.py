@@ -1,7 +1,13 @@
-import os
+import os, time
 from src.aconf import *
 from json import JSONEncoder
 from flask import make_response
+
+def get_new_id():
+    """Returns a unique identifier string"""
+    new_id = str(time.time())
+    new_id = new_id.replace('.','')
+    return new_id
 
 def get_starttime(jobid, jobtype):
     """Returns the start time for the specified job id and type"""
@@ -62,3 +68,6 @@ def get_jobstatusinfo(jobid, jobtype):
     '''
 
     return job_status, job_progress
+
+def send_to_storage_service(file_list):
+    pass
