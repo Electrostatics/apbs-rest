@@ -1,7 +1,7 @@
 from minio import Minio
 from minio.error import ResponseError
 from shutil import rmtree
-import os
+import os, hashlib
 
 class StorageCache:
     def __init__(self, dir_path, access_key=None, secret_key=None):
@@ -21,20 +21,17 @@ class StorageCache:
         """
         data = None
         object_path = None
-        if not self.inside_cache(*object_name.split('/')):
-            # obj = self.minio_client.get_object(bucket_name, object_name)
-            # data = obj.data.decode('utf-8')
-
+        if not self.inside_cache(bucket_name, object_name):
+            '''Retrieve object from bucket, saving to local file system'''
             save_path = os.path.join(self.cache_path, object_name)
             self.minio_client.fget_object(bucket_name, object_name, save_path, request_headers=request_headers)
-            # self.save_to_local(save_path, data)
 
             # data = 'object retrieved from bucket'
             print('object retrieved from bucket')
             object_path = save_path
 
         else:
-            '''Retrieve file from file system'''
+            '''Retrieve file path from file system'''
             object_path = os.path.join(self.cache_path, object_name)
             # with open(object_path, 'r') as fin:
             #     data = fin.read()
@@ -57,15 +54,25 @@ class StorageCache:
                                                 metadata=metadata)
         return etag_str
 
-    def save_to_local(self, path, data):
-        dir_name = os.path.dirname(path)
+    def get_local_etag(self, file_name):
+        '''Compute etag of local file used by S3'''
+        data = None
+        with open(file_name, 'rb') as fin:
+            data = fin.read()
+        etag = hashlib.md5(data)
+        etag = str(etag.hexdigest())
+
+        return etag
+
+    def save_to_local(self, file_path, data):
+        dir_name = os.path.dirname(file_path)
 
         # create job dir if it doesn't exist
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
         
         # open file from path, overwrite data, close
-        with open(path, 'w+') as fout:
+        with open(file_path, 'w+') as fout:
             fout.write(data)
 
     def clear_cache(self):
@@ -77,12 +84,23 @@ class StorageCache:
             else:
                 os.remove(file_path)
 
-    def inside_cache(self, dir_name, file_name):
-        """"""
+    # def inside_cache(self, dir_name, file_name):
+    def inside_cache(self, bucket_name, object_name):
+        """ Compares etags of bucket with MD5 hash of local
+            Returns true if they match, false otherwise
+        """
+        dir_name, file_name = object_name.split('/')
         path = os.path.join(self.cache_path, dir_name, file_name)
-        print(path)
-        return os.path.exists(path)
 
+        if os.path.exists(path):
+            '''Check if local version is up to date with bucket'''
+            bucket_etag = self.minio_client.stat_object(bucket_name, object_name).etag
+            local_etag = self.get_local_etag(path)
+            # print('bucket etag: '+ bucket_etag)
+            # print('local etag:  '+ local_etag)
+            return bucket_etag == local_etag
+        else:
+            return False
     
 
 def get_minio_client(access_key, secret_key):
