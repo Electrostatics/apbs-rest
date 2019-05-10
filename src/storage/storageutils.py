@@ -1,7 +1,7 @@
 from minio import Minio
 from minio.error import ResponseError
 from shutil import rmtree
-import os, hashlib
+import os, hashlib, sys
 
 class StorageCache:
     def __init__(self, dir_path, access_key=None, secret_key=None):
@@ -46,13 +46,18 @@ class StorageCache:
                    content_type='application/octet-stream', metadata=None):
         '''Before sending to bucket, save locally'''
         file_path = os.path.join(self.cache_path, object_name)
-        self.save_to_local(file_path, data)
+        self.save_to_local(file_path, data.read())
+        data.seek(0)
 
-        etag_str = self.minio_client.put_object(bucket_name, object_name, data, 
-                                                os.stat(file_path).st_size, 
-                                                content_type=content_type, 
-                                                metadata=metadata)
-        return etag_str
+        try:
+        
+            etag_str = self.minio_client.put_object(bucket_name, object_name, data, 
+                                                    os.stat(file_path).st_size, 
+                                                    content_type=content_type, 
+                                                    metadata=metadata)
+            return etag_str
+        except ResponseError as err:
+            sys.stderr.write(err)
 
     def get_local_etag(self, file_name):
         '''Compute etag of local file used by S3'''

@@ -1,7 +1,10 @@
-import os, time
+from __future__ import print_function
+import os, time, sys
+from sys import stdout
 from src.aconf import *
 from json import JSONEncoder
 from flask import make_response
+import requests
 
 def get_new_id():
     """Returns a unique identifier string"""
@@ -69,5 +72,30 @@ def get_jobstatusinfo(jobid, jobtype):
 
     return job_status, job_progress
 
-def send_to_storage_service(file_list):
+def send_to_storage_service(storage_host, job_id, file_list, local_upload_dir):
+    if sys.version_info[0] == 2:
+        # for name in file_list:
+        # stdout.write('Uploading %s to storage container... ' % name)
+        stdout.write('Uploading to storage container... \n')
+        stdout.flush()
+    elif sys.version_info[0] == 3:
+        print('Uploading to storage container... ', end='', flush=True)
+        pass
+    # print(file_list)
+    for f in file_list:
+        # print(f)
+        stdout.write('    sending %s ...\n' % f)
+        # time.sleep(0.5)
+        f_name = os.path.join(local_upload_dir, job_id, f)
+        files = {'file_data': open(f_name, 'rb')}
+        # values = {'job_id': job_id}
+        # values = JSONEncoder().encode(values)
+        # print(type(values))
+        url = '%s/api/storage/%s/%s' % (storage_host, job_id, f)
+
+        r = requests.post(url, files=files)#, data=values)
+        
+    stdout.write(u'done \u2713\n\n')
+    # stdout.write('  done\n\n')
+
     pass

@@ -29,6 +29,7 @@ ORIGIN_WHITELIST = [
 ]
 
 STORAGE_SERVICE = os.environ.get('STORAGE_URL', 'http://localhost:5000/api/storage')
+STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5000')
 
 @app.route('/', methods=["GET", "POST"])
 @app.route('/home', methods=["GET", "POST"])
@@ -342,7 +343,7 @@ def upload_autofill():
     EXTENSION_WHITELIST = set(['pqr'])
     json_response = None
     http_status_response = None
-    app.config['UPLOAD FOLDER'] = os.path.join(INSTALLDIR, TMPDIR)
+    app.config['UPLOAD_FOLDER'] = os.path.join(INSTALLDIR, TMPDIR)
 
     if request.method == 'POST':
         # print(dict(request.files).keys())
@@ -357,7 +358,7 @@ def upload_autofill():
 
                 if files and allowed_file(files.filename, EXTENSION_WHITELIST):
                     print("passed whitelist")
-                    new_job_id = jobutils.get_new_id()
+                    new_job_id = jobutils.get_new_id()  
                     tmp_dir_path = os.path.join(INSTALLDIR, TMPDIR)
                     job_dir_path = os.path.join(tmp_dir_path, new_job_id)
                     upload_path  = os.path.join(job_dir_path, '%s.pqr' % (new_job_id) )
@@ -376,6 +377,13 @@ def upload_autofill():
                         myinput.printInputFiles()
                         myinput.dumpPickle()
                         # return autofill(new_job_id, 'apbs')
+                        
+                        jobutils.send_to_storage_service( STORAGE_HOST, new_job_id, 
+                            [   new_job_id+'.pqr',
+                                new_job_id+'.in',
+                                new_job_id+'-input.p',
+                            ], app.config['UPLOAD_FOLDER'] )
+
                         json_response = {
                             'upload_status': 'Success',
                             'job_id': new_job_id,
@@ -435,20 +443,24 @@ import sys
 sys.path.append(os.getcwd() + "/src")
 from storage import storageutils
 # from json import loads
+import atexit
 
 MINIO_CACHE_DIR  = os.environ.get('STORAGE_CACHE_DIR', os.path.join(INSTALLDIR, TMPDIR, '.minio_cache')) # change path when decoupling
 MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
 MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
 JOB_BUCKET_NAME  = os.environ.get('MINIO_JOB_BUCKET', 'jobs')
+
 minioClient = storageutils.get_minio_client(MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
 storageCache = storageutils.StorageCache(MINIO_CACHE_DIR, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
+atexit.register(storageCache.clear_cache)
 
-@app.route('/api/storage/<job_id>/<file_name>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/api/storage/<job_id>/<file_name>', methods=['GET', 'PUT', 'POST', 'DELETE'])
 def storage_service(job_id, file_name):
     """Endpoint serving as the gateway to storage bucket"""
+    object_name = os.path.join(job_id, file_name)
+    # print('%s %s' % (request.method, object_name))
+
     if request.method == 'GET':
-        object_name = os.path.join(job_id, file_name)
-        print(object_name)
 
         '''send_file_from_directory'''
         file_path_in_cache = storageCache.fget_object(JOB_BUCKET_NAME, object_name)
@@ -461,6 +473,20 @@ def storage_service(job_id, file_name):
             payload = loads(request.data)
         except:
             payload = request.data
+
+    elif request.method == 'POST':
+        EXTENSION_WHITELIST = set(['pqr', 'pdb', 'in', 'p'])
+        pp.pprint(dict(request.files))
+        # pp.pprint(request.form['job_id'])
+        file_data = request.files['file_data']
+        if file_data.filename:
+            file_name = secure_filename(file_data.filename)
+            if file_data.filename and allowed_file(file_name, EXTENSION_WHITELIST):
+                # print('uploading to bucket')
+                storageCache.put_object(JOB_BUCKET_NAME, object_name, file_data)
+
+        # time.sleep(1)
+        return 'Success', 201
 
     elif request.method == 'DELETE':
         pass
