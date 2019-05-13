@@ -31,10 +31,10 @@ ORIGIN_WHITELIST = [
 STORAGE_SERVICE = os.environ.get('STORAGE_URL', 'http://localhost:5000/api/storage')
 STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5000')
 
-@app.route('/', methods=["GET", "POST"])
-@app.route('/home', methods=["GET", "POST"])
-@app.route('/pdb2pqr', methods=["GET", "POST"])
-@app.route('/apbs', methods=["GET", "POST"])
+@app.route('/', methods=["GET"])
+@app.route('/home', methods=["GET"])
+@app.route('/pdb2pqr', methods=["GET"])
+@app.route('/apbs', methods=["GET"])
 def home():
     """Delivers website to user
     
@@ -455,9 +455,13 @@ storageCache = storageutils.StorageCache(MINIO_CACHE_DIR, MINIO_ACCESS_KEY, MINI
 atexit.register(storageCache.clear_cache)
 
 @app.route('/api/storage/<job_id>/<file_name>', methods=['GET', 'PUT', 'POST', 'DELETE'])
-def storage_service(job_id, file_name):
+@app.route('/api/storage/<job_id>', methods=['DELETE'])
+def storage_service(job_id, file_name=None):
+    # def storage_service(job_id, file_name=None):
     """Endpoint serving as the gateway to storage bucket"""
-    object_name = os.path.join(job_id, file_name)
+    
+    if file_name:
+        object_name = os.path.join(job_id, file_name)
     # print('%s %s' % (request.method, object_name))
 
     if request.method == 'GET':
@@ -489,6 +493,19 @@ def storage_service(job_id, file_name):
         return 'Success', 201
 
     elif request.method == 'DELETE':
-        pass
-        
+        object_list = []
+        if file_name is None:
+            # get list of objects with prefix
+            # for each object, delete from bucket
+            job_objects = storageCache.list_objects(JOB_BUCKET_NAME, prefix=job_id+'/')
+            for obj in job_objects:
+                object_list.append(obj.object_name)
+
+        else:
+            # delete single object from bucket
+            object_list.append(object_name)
+
+        storageCache.remove_objects(JOB_BUCKET_NAME, object_list)
+
+        return 'Success', 204
     # return 'Success', 200

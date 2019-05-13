@@ -1,3 +1,4 @@
+from __future__ import print_function
 from minio import Minio
 from minio.error import ResponseError
 from shutil import rmtree
@@ -59,6 +60,25 @@ class StorageCache:
         except ResponseError as err:
             sys.stderr.write(err)
 
+    def remove_objects(self, bucket_name, objects_iter):
+        try:
+            # delete object files from local cache
+            for object_name in objects_iter:
+                file_path = os.path.join(self.cache_path, object_name)
+                self.remove_from_local(file_path)
+
+            for del_err in self.minio_client.remove_objects(bucket_name, objects_iter):
+                print("Deletion Error: {}".format(del_err), file=sys.stderr)
+        except ResponseError as err:
+            print(err, file=sys.stderr)
+        pass
+
+    def list_objects(self, bucket_name, prefix=None, recursive=False):
+        object_list = self.minio_client.list_objects(bucket_name,
+                                                     prefix=prefix,
+                                                     recursive=recursive)
+        return object_list
+
     def get_local_etag(self, file_name):
         '''Compute etag of local file used by S3'''
         data = None
@@ -79,6 +99,16 @@ class StorageCache:
         # open file from path, overwrite data, close
         with open(file_path, 'w+') as fout:
             fout.write(data)
+
+    def remove_from_local(self, file_path):
+        dir_name = os.path.dirname(file_path)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        if os.path.exists(dir_name):
+            # removes job directory if empty
+            if len(os.listdir(dir_name)) == 0:
+                os.rmdir(dir_name)
 
     def clear_cache(self):
         """Deletes ALL contents of the cache directory"""
