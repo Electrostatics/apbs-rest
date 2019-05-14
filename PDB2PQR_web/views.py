@@ -50,7 +50,7 @@ def submit_pdb2pqr():
     Runs the PDB2PQR main function originally from 'main_cgi.py'.
     """
     if request.method == 'POST':
-        redirectURL = main_cgi.mainCGI(request.form, request.files)
+        redirectURL = main_cgi.mainCGI(request.form, request.files, STORAGE_HOST)
 
         '''=== DEBUG LINE FOR DEV: REMOVE IN FINAL ==='''
         if 'http://localhost:5000' in redirectURL:
@@ -72,7 +72,7 @@ def submit_pdb2pqr_json():
         # print(pp.pformat(request.form.to_dict(), indent=4, width=10))
         pp.pprint(request.form.to_dict())
 
-        redirectURL = main_cgi.mainCGI(request.form, request.files)
+        redirectURL = main_cgi.mainCGI(request.form, request.files, STORAGE_HOST)
 
         '''=== DEBUG LINE FOR DEV: REMOVE IN FINAL ==='''
         if 'http://localhost:5000' in redirectURL:
@@ -103,14 +103,15 @@ def submit_apbs_json():
             else:
                 form[key] = str(form[key])
             # form[key] = unicode(form[key])
-        print('\n\n')
+        # print('\n\n')
         print(pp.pformat(form, indent=4, width=10))
-        print('\n\n')
+        # print('\n\n')
+        
         # print(pp.pformat(request.form.to_dict(), indent=4, width=10))
 
         # redirectURL = apbs_cgi.mainInput(request.form)
         # redirectURL = apbs_cgi.mainInput(loads(request.data))
-        redirectURL = apbs_cgi.mainInput(form)
+        redirectURL = apbs_cgi.mainInput(form, STORAGE_HOST)
 
         '''=== DEBUG LINE FOR DEV: REMOVE IN FINAL ==='''
         # if 'http://localhost:5000' in redirectURL:
@@ -485,9 +486,14 @@ def storage_service(job_id, file_name=None):
         file_data = request.files['file_data']
         if file_data.filename:
             file_name = secure_filename(file_data.filename)
-            if file_data.filename and allowed_file(file_name, EXTENSION_WHITELIST):
-                # print('uploading to bucket')
+            if file_data.filename and file_name:
                 storageCache.put_object(JOB_BUCKET_NAME, object_name, file_data)
+            # if file_data.filename and allowed_file(file_name, EXTENSION_WHITELIST):
+            #     # print('uploading to bucket')
+            #     storageCache.put_object(JOB_BUCKET_NAME, object_name, file_data)
+            # elif not allowed_file(file_name, EXTENSION_WHITELIST):
+            #     return 'Unsupported media type', 415
+
 
         # time.sleep(1)
         return 'Success', 201

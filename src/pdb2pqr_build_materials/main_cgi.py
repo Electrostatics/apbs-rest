@@ -490,7 +490,7 @@ def handleOpal(weboptions):
         print details
         createError(name, details)
 
-def handleNonOpal(weboptions):
+def handleNonOpal(weboptions, storage_host):
     """
         Handle non opal run.
     """
@@ -651,6 +651,21 @@ def handleNonOpal(weboptions):
                 statusfile.write(filename+'\n')
             statusfile.close()
 
+            '''Upload associated APBS run files to the storage service'''
+            from PDB2PQR_web import jobutils
+            jobDir = os.path.join(INSTALLDIR, TMPDIR, name)
+            sys.stdout = open('%s/debug_forked_stdout.out' % (jobDir), 'a+')
+            sys.stderr = open('%s/debug_forked_stderr.out' % (jobDir), 'a+')
+            file_list = os.listdir(jobDir)
+            if isinstance(file_list, list):
+                try:
+                    jobutils.send_to_storage_service(storage_host, name, file_list, os.path.join(INSTALLDIR, TMPDIR))
+                except Exception as err:
+                    with open('storage_err', 'a+') as fin:
+                        fin.write(err)
+            sys.stdout.close()
+            sys.stderr.close()
+
     #TODO: Better error reporting.
     #Also, get forked job to properly write error status on failure.
     except StandardError, details:
@@ -660,7 +675,7 @@ def handleNonOpal(weboptions):
         #print details
         createError(name, details)
 
-def mainCGI(form, files):
+def mainCGI(form, files, storage_host):
     """
         Main driver for running PDB2PQR from a web page
     """
@@ -685,7 +700,7 @@ def mainCGI(form, files):
     if HAVE_PDB2PQR_OPAL:
         handleOpal(weboptions)
     else:
-        queryURL = handleNonOpal(weboptions)
+        queryURL = handleNonOpal(weboptions, storage_host)
         return queryURL
         
     return

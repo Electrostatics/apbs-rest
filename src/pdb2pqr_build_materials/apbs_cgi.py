@@ -94,8 +94,7 @@ def apbsOpalExec(logTime, form, apbsOptions):
 
     return resp._jobID
 
-def apbsExec(logTime, form, apbsOptions):
-    
+def apbsExec(logTime, form, apbsOptions, storage_host):
     tempPage = "results.html"
 
     # Temporary index.py html page - refreshes in 30 seconds
@@ -191,7 +190,20 @@ def apbsExec(logTime, form, apbsOptions):
         statusStr += jobDir + 'apbs_stdout.txt\n'
         statusStr += jobDir + 'apbs_stderr.txt\n'
         startLogFile(logTime, 'apbs_status', statusStr)
-        
+
+        '''Upload associated APBS run files to the storage service'''
+        from PDB2PQR_web import jobutils
+        sys.stdout = open('%s/debug_forked_stdout.out' % (jobDir), 'a+')
+        sys.stderr = open('%s/debug_forked_stderr.out' % (jobDir), 'a+')
+        file_list = os.listdir(jobDir)
+        if isinstance(file_list, list):
+            try:
+                jobutils.send_to_storage_service(storage_host, logTime, file_list, os.path.join(INSTALLDIR, TMPDIR))
+            except Exception as err:
+                with open('storage_err', 'a+') as fin:
+                    fin.write(err)
+        sys.stdout.close()
+        sys.stderr.close()
 #        statusfile=open('%s%s%s/apbs_status' % (INSTALLDIR, TMPDIR, logTime),'w')
 #        statusfile.write("complete\n")
 #        statusfile.write("%s%s%s/apbsinput.in\n" % (INSTALLDIR, TMPDIR, logTime))
@@ -1663,7 +1675,7 @@ def redirector(logTime):
     # return string
     return redirectURL
 
-def mainInput(form) :
+def mainInput(form, storage_host) :
     """
         Main function
     """
@@ -1764,8 +1776,8 @@ def mainInput(form) :
 #            apbsOpalJobIDFile.write(apbsOpalJobID)
 #            apbsOpalJobIDFile.close()
         else:
-           queryURL = apbsExec(logTime, form, apbsOptions)
-           return queryURL
+            queryURL = apbsExec(logTime, form, apbsOptions, storage_host)
+            return queryURL
 
 
 if __name__ == "__main__" and os.environ.has_key("REQUEST_METHOD"):
