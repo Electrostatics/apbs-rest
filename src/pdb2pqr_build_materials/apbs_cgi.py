@@ -8,6 +8,7 @@ __author__ = "Samir Unni"
 __version__ = "0.0.1"
 
 import string, sys, os, time, errno, shutil, tempfile, urllib, copy, pickle, glob
+import subprocess
 #sys.path.append("/home/samir/public_html/pdb2pqr")
 import src
 import cgi, cgitb
@@ -162,8 +163,10 @@ def apbsExec(logTime, form, apbsOptions, storage_host):
 #        statusfile.write("running\n")
 #        statusfile.close()
 
-
-        apbs_stdin, apbs_stdout, apbs_stderr = os.popen3('%s apbsinput.in' % APBS_LOCATION)
+        p = subprocess.Popen([APBS_LOCATION, 'apbsinput.in'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        apbs_stdin = p.stdin
+        apbs_stdout = p.stdout
+        apbs_stderr  = p.stderr
 
         startLogFile(logTime, 'apbs_stdout.txt', apbs_stdout.read())
 #        stdoutFile=open('%s%s%s/apbs_stdout.txt' % (INSTALLDIR, TMPDIR, logTime), 'w')
