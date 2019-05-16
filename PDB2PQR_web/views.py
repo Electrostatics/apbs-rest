@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, send_from_directory, make_response
+from flask import render_template, redirect, request, send_from_directory, make_response, Response
 from werkzeug import secure_filename
 from json import JSONEncoder, loads
 from PDB2PQR_web import app
@@ -71,6 +71,8 @@ def submit_pdb2pqr_json():
         # form_json
         # print(pp.pformat(request.form.to_dict(), indent=4, width=10))
         pp.pprint(request.form.to_dict())
+        print(type(request.form))
+        print(type(request.form.to_dict()))
 
         redirectURL = main_cgi.mainCGI(request.form, request.files, STORAGE_HOST)
 
@@ -515,3 +517,75 @@ def storage_service(job_id, file_name=None):
 
         return 'Success', 204
     # return 'Success', 200
+
+
+'''
+    Below is the service that would run an APBS job
+    from our Go CLI application.
+'''
+''' Request should have <apbs_file>.in, optional arguments, 
+    and file reference by READ '''
+''' Pipe the stdout and stderr streams through a socket back to Go client '''
+import subprocess
+import threading
+import uuid
+
+# @app.route('/cli/apbs', methods=['POST'])
+@app.route('/cli/apbs', methods=['POST', 'GET'])
+def run_apbs_cli():
+    # create and navigate to job directory
+    job_id = uuid.uuid4().hex
+    job_dir = os.path.join(INSTALLDIR, TMPDIR, job_id)
+    os.makedirs(job_dir)
+    os.chdir(job_dir)
+
+    # get input files and corresponding data
+    param_dict = loads(request.data)
+    pp.pprint(param_dict)
+    return Response(JSONEncoder.encode(param_dict), content_type='application/json')
+    
+
+    return 'current directory: ' + os.getcwd()
+    # run APBS using data and 
+    proc = subprocess.Popen([APBS_LOCATION, ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    
+
+''' Function used to test piping from a subprocess;
+        BE SURE TO REMOVE
+'''
+@app.route('/stdout', methods=['GET'])
+def test_pipe():
+    def stdout_thread(stream):
+        for line in iter(stream.readline,''):
+            time.sleep(0.2)                           # Don't need this just shows the text streaming
+            yield line.rstrip() + '<br/>\n'
+    def stderr_thread(stream):
+        for line in iter(stream.readline,''):
+            time.sleep(0.2)                           # Don't need this just shows the text streaming
+            yield line.rstrip() + '<br/>\n'
+
+    def inner():
+        proc = subprocess.Popen(
+            ['ls -la && uhh'],             #call something with a lot of output so we can see it
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        # t_out = threading.Thread(target=stdout_thread, args=(proc.stdout,))
+        # t_err = threading.Thread(target=stderr_thread, args=(proc.stderr,))
+        # t_out.start()
+        # t_err.start()
+        for line in iter(proc.stdout.readline,''):
+            time.sleep(0.2)                           # Don't need this just shows the text streaming
+            yield line.rstrip() + '<br/>\n'
+        for line in iter(proc.stderr.readline,''):
+            time.sleep(0.1)                           # Don't need this just shows the text streaming
+            yield line.rstrip() + '<br/>\n'
+
+
+    return Response(inner(), content_type='application/json')  # text/html is required for most browsers to show th$
+    # return Response(inner(), mimetype='text/html')  # text/html is required for most browsers to show th$
