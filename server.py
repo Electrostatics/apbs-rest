@@ -8,9 +8,9 @@ sys.path.append(os.getcwd() + "/src")
 from PDB2PQR_web import app
 
 if __name__ == '__main__':
-    HOST = environ.get('SERVER_HOST', 'localhost')
+    HOST = environ.get('FLASK_RUN_HOST', 'localhost')
     try:
-        PORT = int(environ.get('SERVER_PORT', '5555'))
+        PORT = int(environ.get('FLASK_RUN_PORT', '5555'))
     except ValueError:
         PORT = 5555
     app.run(HOST, PORT)
