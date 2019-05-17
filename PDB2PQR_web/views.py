@@ -1,4 +1,5 @@
-from flask import render_template, redirect, request, send_from_directory, make_response, Response
+from flask import ( render_template, redirect, request, 
+                    send_from_directory, make_response, Response )
 from werkzeug import secure_filename
 
 import os, time
@@ -7,7 +8,9 @@ from json import JSONEncoder, loads
 
 from PDB2PQR_web import app
 from PDB2PQR_web import jobutils
-from storage import storage_service
+
+# Uncomment storage_service import below if running storage through from same host/port
+# from storage import storage_service
 
 from src.aconf import *
 from src import inputgen
