@@ -2,6 +2,8 @@
 venv
 venv2
 win_venv
+win_venv_storage
+storage_ubuntu_venv
 
 # Related cloned repositories
 apbs-pdb2pqr

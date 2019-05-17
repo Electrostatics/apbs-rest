@@ -1,19 +1,21 @@
 from flask import render_template, redirect, request, send_from_directory, make_response, Response
 from werkzeug import secure_filename
+
+import os, time
+import pprint as pp
 from json import JSONEncoder, loads
+
 from PDB2PQR_web import app
 from PDB2PQR_web import jobutils
+from storage import storage_service
+
 from src.aconf import *
 from src import inputgen
 from src import psize
-import os
 import main_cgi # main driver for PDB2PQR
 import querystatus
 # import pdb2pqr.main_cgi
 import apbs_cgi # main driver for APBS
-import time
-
-import pprint as pp
 
 navbar_links = {
     "navbar_home"     : "/home",
@@ -420,7 +422,6 @@ def upload_autofill():
             cleared_domain = request_origin_url[:request_origin_url.index('/apbs')]
             response.headers['Access-Control-Allow-Origin'] = cleared_domain
 
-    print(type(minioClient))
     return response, http_status_response
 
     # if request.method == 'GET':
@@ -434,89 +435,6 @@ def job_file(job_id, file_name):
     """Delivers files from temporary directory for the appropriate job"""
     job_path = os.path.join(INSTALLDIR, TMPDIR, job_id)
     return send_from_directory(job_path, file_name)
-
-
-
-''' 
-    Below is the endpoint to interact with the storage container.
-    This should be decoupled into its own container in the future.
-'''
-# from src.storage import storageutils
-import sys
-sys.path.append(os.getcwd() + "/src")
-from storage import storageutils
-# from json import loads
-import atexit
-
-MINIO_CACHE_DIR  = os.environ.get('STORAGE_CACHE_DIR', os.path.join(INSTALLDIR, TMPDIR, '.minio_cache')) # change path when decoupling
-MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
-MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
-JOB_BUCKET_NAME  = os.environ.get('MINIO_JOB_BUCKET', 'jobs')
-
-minioClient = storageutils.get_minio_client(MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
-storageCache = storageutils.StorageCache(MINIO_CACHE_DIR, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
-atexit.register(storageCache.clear_cache)
-
-@app.route('/api/storage/<job_id>/<file_name>', methods=['GET', 'PUT', 'POST', 'DELETE'])
-@app.route('/api/storage/<job_id>', methods=['DELETE'])
-def storage_service(job_id, file_name=None):
-    # def storage_service(job_id, file_name=None):
-    """Endpoint serving as the gateway to storage bucket"""
-    
-    if file_name:
-        object_name = os.path.join(job_id, file_name)
-    # print('%s %s' % (request.method, object_name))
-
-    if request.method == 'GET':
-
-        '''send_file_from_directory'''
-        file_path_in_cache = storageCache.fget_object(JOB_BUCKET_NAME, object_name)
-        file_dir = os.path.dirname(file_path_in_cache)
-        return send_from_directory(file_dir, file_path_in_cache.split('/')[-1])
-        # return send_from_directory(os.path.dirname(file_path_in_cache), file_path_in_cache)
-
-    elif request.method == 'PUT':
-        try:
-            payload = loads(request.data)
-        except:
-            payload = request.data
-
-    elif request.method == 'POST':
-        EXTENSION_WHITELIST = set(['pqr', 'pdb', 'in', 'p'])
-        pp.pprint(dict(request.files))
-        # pp.pprint(request.form['job_id'])
-        file_data = request.files['file_data']
-        if file_data.filename:
-            file_name = secure_filename(file_data.filename)
-            if file_data.filename and file_name:
-                storageCache.put_object(JOB_BUCKET_NAME, object_name, file_data)
-            # if file_data.filename and allowed_file(file_name, EXTENSION_WHITELIST):
-            #     # print('uploading to bucket')
-            #     storageCache.put_object(JOB_BUCKET_NAME, object_name, file_data)
-            # elif not allowed_file(file_name, EXTENSION_WHITELIST):
-            #     return 'Unsupported media type', 415
-
-
-        # time.sleep(1)
-        return 'Success', 201
-
-    elif request.method == 'DELETE':
-        object_list = []
-        if file_name is None:
-            # get list of objects with prefix
-            # for each object, delete from bucket
-            job_objects = storageCache.list_objects(JOB_BUCKET_NAME, prefix=job_id+'/')
-            for obj in job_objects:
-                object_list.append(obj.object_name)
-
-        else:
-            # delete single object from bucket
-            object_list.append(object_name)
-
-        storageCache.remove_objects(JOB_BUCKET_NAME, object_list)
-
-        return 'Success', 204
-    # return 'Success', 200
 
 
 '''
