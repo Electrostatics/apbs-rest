@@ -1,6 +1,7 @@
 import sys, os
 from os import environ
-
+from dotenv import load_dotenv
+load_dotenv()
 # Adds build directory to module path to for module compatibility
 sys.path.append(os.getcwd() + "/pdb2pqr_build")
 sys.path.append(os.getcwd() + "/src")

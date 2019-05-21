@@ -1,5 +1,3 @@
-# from dotenv import load_dotenv, find_dotenv
-# load_dotenv()
 import sys, os
 from os import environ
 from flask import Flask

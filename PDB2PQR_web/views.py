@@ -225,7 +225,7 @@ def legacy():
 def status_and_files():
     """API interface for fetching job status
     
-    Given a query string containing 'jobid' with a valid ID, a JSON response is constructed with the status of the specicied job.
+    Given a query string containing 'jobid' with a valid ID, a JSON response is constructed with the status of the specified job.
     Query string must specify which job type is desired.  In other words, the responses are assumed false unless specified otherwise.
 
     With a query string of '?jobid=15336614662&pdb2pqr=true&apbs=true', Flask should return:
@@ -264,7 +264,7 @@ def status_and_files():
 
         pdb2pqr_starttime = jobutils.get_starttime(jobid, 'pdb2pqr')
         pdb2pqr_endtime = jobutils.get_endtime(jobid, 'pdb2pqr')
-        pdb2pqr_status, pdb2pqr_progress = jobutils.get_jobstatusinfo(jobid, 'pdb2pqr')
+        pdb2pqr_status, pdb2pqr_progress = jobutils.get_jobstatus_info(jobid, 'pdb2pqr')
 
         # Obtains status info for APBS
         apbs_progress = []
@@ -274,7 +274,7 @@ def status_and_files():
         
         apbs_starttime = jobutils.get_starttime(jobid, 'apbs')
         apbs_endtime = jobutils.get_endtime(jobid, 'apbs')
-        apbs_status, apbs_progress = jobutils.get_jobstatusinfo(jobid, 'apbs')
+        apbs_status, apbs_progress = jobutils.get_jobstatus_info(jobid, 'apbs')
 
         # Builds JSON response of job status
         json_status['jobid'] = jobid
