@@ -5,7 +5,7 @@ Jinja2==2.10.1
 MarkupSafe==1.0
 Werkzeug==0.14.1
 minio==4.0.16
-requests==2.21.0
+requests==2.22.0
 python-dotenv==0.10.2
 Flask-SocketIO==3.3.2
 eventlet==0.24.1
