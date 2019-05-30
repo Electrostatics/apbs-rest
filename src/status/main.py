@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 import sys, os
 from os import environ
 from flask import Flask

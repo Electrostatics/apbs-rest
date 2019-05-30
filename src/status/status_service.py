@@ -55,11 +55,12 @@ def get_status(json):
             'startTime' : start_time,
             'endTime'   : end_time
         }
+        # pp.pprint(status_response)
         emit(job_type+'_status', status_response)
 
     print('checking status...')
 
-    end_states = ['complete', 'error']
+    end_states = ['complete', 'error', None]
     progress   = None
     run_state  = None
     start_time = None
@@ -83,6 +84,7 @@ def get_status(json):
             while run_state not in end_states:
                 status_socketio.sleep(1)
                 run_state = status_utils.get_jobstatus_state(job_id, job_type)
+                # print(job_type+' getting job status')
 
             print('%s - %s reached end state: %s' % (job_type, job_id, str(run_state)))
             start_time  = status_utils.get_starttime(job_id, job_type)
