@@ -145,7 +145,22 @@ def apbsExec(logTime, form, apbsOptions, storage_host):
     pid = os.fork()
     if pid:
         # print redirector(logTime)
-        return redirector(logTime)
+        redirect = redirector(logTime)
+
+        from PDB2PQR_web import jobutils
+        file_list = [
+            'apbs_status',
+            'apbs_start_time',
+        ]
+        if isinstance(file_list, list):
+            # try:
+            jobutils.send_to_storage_service(storage_host, logTime, file_list, os.path.join(INSTALLDIR, TMPDIR))
+            # except Exception as err:
+            #     sys.stderr.write(err)
+            #     with open('storage_err', 'a+') as fin:
+            #         fin.write(err)
+
+        return redirect
         sys.exit()
     else:
         currentdir = os.getcwd()

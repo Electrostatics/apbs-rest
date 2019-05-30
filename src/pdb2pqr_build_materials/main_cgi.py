@@ -564,8 +564,20 @@ def handleNonOpal(weboptions, storage_host):
 
         pid = os.fork()
         if pid:
+            from PDB2PQR_web import jobutils
+            redirect = redirector(name, weboptions)
+            file_list = [
+                'pdb2pqr_status',
+                'pdb2pqr_start_time',
+            ]
+            if isinstance(file_list, list):
+                try:
+                    jobutils.send_to_storage_service(storage_host, name, file_list, os.path.join(INSTALLDIR, TMPDIR))
+                except Exception as err:
+                    with open('storage_err', 'a+') as fin:
+                        fin.write(err)
             # print redirector(name, weboptions)
-            return redirector(name, weboptions)
+            return redirect
             sys.exit()
         else:
             currentdir = os.getcwd()
