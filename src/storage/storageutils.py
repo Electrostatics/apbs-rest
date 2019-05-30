@@ -4,16 +4,37 @@ from minio.error import ResponseError
 from shutil import rmtree
 import os, hashlib, sys
 
-class StorageCache:
-    def __init__(self, dir_path, access_key=None, secret_key=None):
-        self.cache_path = os.path.abspath(dir_path)
+class StorageClient:
+    def __init__(self, storage_url, cache_dir_path, access_key=None, secret_key=None):
+        self.cache_path = os.path.abspath(cache_dir_path)
 
         if access_key and secret_key:
-            self.minio_client = get_minio_client(access_key, secret_key)
+            self.__minio_client = get_minio_client(storage_url, access_key, secret_key)
 
         '''Utilize tempfile module in future'''
         if not os.path.exists(self.cache_path):
             os.makedirs(self.cache_path)
+
+    def get_object(self, bucket_name, object_name, request_headers=None):
+        data = None
+        if not self.inside_cache(bucket_name, object_name):
+            '''Retrieve object from bucket, saving to local file system'''
+            data = self.__minio_client.get_object(bucket_name, object_name, request_headers=request_headers)
+            data = data.read()
+            # data = 'object retrieved from bucket'
+            print('object retrieved from bucket')
+            # object_path = save_path
+
+        else:
+            '''Retrieve file path from file system'''
+            object_path = os.path.join(self.cache_path, object_name)
+            with open(object_path, 'r') as fin:
+                data = fin.read()
+
+            # data = 'object retrieved from cache'
+            print('object retrieved from cache')
+
+        return data
 
     def fget_object(self, bucket_name, object_name, request_headers=None):
         """ 
@@ -25,7 +46,7 @@ class StorageCache:
         if not self.inside_cache(bucket_name, object_name):
             '''Retrieve object from bucket, saving to local file system'''
             save_path = os.path.join(self.cache_path, object_name)
-            self.minio_client.fget_object(bucket_name, object_name, save_path, request_headers=request_headers)
+            self.__minio_client.fget_object(bucket_name, object_name, save_path, request_headers=request_headers)
 
             # data = 'object retrieved from bucket'
             print('object retrieved from bucket')
@@ -46,14 +67,19 @@ class StorageCache:
     def put_object(self, bucket_name, object_name, data, length=None,
                    content_type='application/octet-stream', metadata=None):
         '''Before sending to bucket, save locally'''
+
+        '''CONSIDER CHANGING data TO MORE SELF-EXPLANATORY NAME, LIKE fin'''
         file_path = os.path.join(self.cache_path, object_name)
         self.save_to_local(file_path, data.read())
         data.seek(0)
 
+        if length is None:
+            length = os.stat(file_path).st_size
+
         try:
-        
-            etag_str = self.minio_client.put_object(bucket_name, object_name, data, 
-                                                    os.stat(file_path).st_size, 
+            etag_str = self.__minio_client.put_object(bucket_name, object_name, data, 
+                                                    length, 
+                                                    # os.stat(file_path).st_size, 
                                                     content_type=content_type, 
                                                     metadata=metadata)
             return etag_str
@@ -67,14 +93,14 @@ class StorageCache:
                 file_path = os.path.join(self.cache_path, object_name)
                 self.remove_from_local(file_path)
 
-            for del_err in self.minio_client.remove_objects(bucket_name, objects_iter):
+            for del_err in self.__minio_client.remove_objects(bucket_name, objects_iter):
                 print("Deletion Error: {}".format(del_err), file=sys.stderr)
         except ResponseError as err:
             print(err, file=sys.stderr)
         pass
 
     def list_objects(self, bucket_name, prefix=None, recursive=False):
-        object_list = self.minio_client.list_objects(bucket_name,
+        object_list = self.__minio_client.list_objects(bucket_name,
                                                      prefix=prefix,
                                                      recursive=recursive)
         return object_list
@@ -97,7 +123,7 @@ class StorageCache:
             os.makedirs(dir_name)
         
         # open file from path, overwrite data, close
-        with open(file_path, 'w+') as fout:
+        with open(file_path, 'wb') as fout:
             fout.write(data)
 
     def remove_from_local(self, file_path):
@@ -129,7 +155,7 @@ class StorageCache:
 
         if os.path.exists(path):
             '''Check if local version is up to date with bucket'''
-            bucket_etag = self.minio_client.stat_object(bucket_name, object_name).etag
+            bucket_etag = self.__minio_client.stat_object(bucket_name, object_name).etag
             local_etag = self.get_local_etag(path)
             # print('bucket etag: '+ bucket_etag)
             # print('local etag:  '+ local_etag)
@@ -138,8 +164,8 @@ class StorageCache:
             return False
     
 
-def get_minio_client(access_key, secret_key):
-    minioClient = Minio('localhost:9000',
+def get_minio_client(minio_url, access_key, secret_key):
+    minioClient= Minio( minio_url,
                         access_key=access_key,
                         secret_key=secret_key,
                         secure=False)
