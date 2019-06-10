@@ -12,6 +12,7 @@ antd_pdb2pqr
 
 # VS Code-created directories/files
 .vscode
+.devcontainer
 __pycache__
 
 # Node modules created from npm
