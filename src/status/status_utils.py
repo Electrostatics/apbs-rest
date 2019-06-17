@@ -25,10 +25,11 @@ def get_starttime(jobid, jobtype):
     #     starttime = float(fin.readline())
 
     object_name = '%s/%s_start_time' % (jobid, jobtype)
-    starttime_url = '%s/api/storage/%s?string=true' % (STORAGE_HOST, object_name)
+    starttime_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
     response = requests.get( starttime_url )
     if response.status_code == 200:
         status_str = response.content
+        print(status_str)
         status_str = loads(status_str)[object_name]
         if status_str is not None:
             starttime = float(status_str.split('\n')[0].strip())
@@ -48,7 +49,7 @@ def get_endtime(jobid, jobtype):
     #     endtime = float(fin.readline())
 
     object_name = '%s/%s_end_time' % (jobid, jobtype)
-    endtime_url = '%s/api/storage/%s?string=true' % (STORAGE_HOST, object_name)
+    endtime_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
     response = requests.get( endtime_url )
     if response.status_code == 200 and get_jobstatus_state(jobid, jobtype) in END_STATES:
         status_str = response.content
@@ -77,7 +78,7 @@ def get_jobstatus_state(jobid, jobtype):
     #         job_status = fin.readline().strip()
 
     object_name = '%s/%s_status' % (jobid, jobtype)
-    status_url = '%s/api/storage/%s?string=true' % (STORAGE_HOST, object_name)
+    status_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
     response = requests.get( status_url )
     if response.status_code == 200:
         status_str = response.content
@@ -110,7 +111,7 @@ def get_jobstatus_info(jobid, jobtype):
     #                 job_progress.append(line_stripped)
 
     object_name = '%s/%s_status' % (jobid, jobtype)
-    status_url = '%s/api/storage/%s?string=true' % (STORAGE_HOST, object_name)
+    status_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
     # print('status_url: \n    %s'%status_url)
     response = requests.get( status_url )
     if response.status_code == 200:

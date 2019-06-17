@@ -6,8 +6,10 @@ from flask import request, send_from_directory, make_response, Response, Bluepri
 # from flask.json import json_encoder, json_decoder
 from flask import json
 from werkzeug import secure_filename
+from urllib3.exceptions import MaxRetryError
 # from PDB2PQR_web import app
-import storageutils
+# import storageutils
+from . import storageutils
 
 storage_app = Blueprint('storage_app', __name__)
 
@@ -37,16 +39,25 @@ def storage_service(job_id, file_name=None):
     # print('%s %s' % (request.method, object_name))
 
     if request.method == 'GET':
-        return_string = False
-        if request.args.has_key('string'):
-            if request.args['string'].lower() == 'true':
-                return_string = True
+        return_json = False
+        if 'json' in request.args.keys():
+            if request.args['json'].lower() == 'true':
+                return_json = True
 
-        if not return_string:
+        if not return_json:
             '''send_file_from_directory'''
-            file_path_in_cache = storageClient.fget_object(JOB_BUCKET_NAME, object_name)
-            file_dir = os.path.dirname(file_path_in_cache)
-            return send_from_directory(file_dir, file_path_in_cache.split('/')[-1])
+            # file_path_in_cache = storageClient.fget_object(JOB_BUCKET_NAME, object_name)
+            # file_dir = os.path.dirname(file_path_in_cache)
+            # return send_from_directory(file_dir, file_path_in_cache.split('/')[-1])
+
+            try:
+                file_path_in_cache = storageClient.fget_object(JOB_BUCKET_NAME, object_name)
+                file_dir = os.path.dirname(file_path_in_cache)
+                return send_from_directory(file_dir, file_path_in_cache.split('/')[-1])
+            except MaxRetryError:
+                return 'Error in retrieving file', 500
+            except:
+                return 'File %s does not exist' % file_name, 404
         else:
             try:
                 file_str = storageClient.get_object(JOB_BUCKET_NAME, object_name)
@@ -54,12 +65,22 @@ def storage_service(job_id, file_name=None):
                 response = make_response(JSONEncoder().encode(file_str_json))
                 response = make_response( dumps(file_str_json) )
                 response.headers['Content-Type'] = 'application/json'
-                return response
+                http_response_code = 200
+                # return response, http_response_code
+            except MaxRetryError:
+                json_string = {object_name: None}
+                response = make_response(dumps(json_string))
+                response.headers['Content-Type'] = 'application/json'
+                http_response_code = 500
+                # return response, 500
             except:
                 json_string = {object_name: None}
                 response = make_response(dumps(json_string))
                 response.headers['Content-Type'] = 'application/json'
-                return response
+                http_response_code = 500
+                # return response, 500
+            finally:
+                return response, http_response_code
 
     elif request.method == 'PUT':
         try:
