@@ -147,7 +147,7 @@ def apbsExec(logTime, form, apbsOptions, storage_host):
         # print redirector(logTime)
         redirect = redirector(logTime)
 
-        from PDB2PQR_web import jobutils
+        from workflow import jobutils
         file_list = [
             'apbs_status',
             'apbs_start_time',
@@ -210,7 +210,7 @@ def apbsExec(logTime, form, apbsOptions, storage_host):
         startLogFile(logTime, 'apbs_status', statusStr)
 
         '''Upload associated APBS run files to the storage service'''
-        from PDB2PQR_web import jobutils
+        from workflow import jobutils
         sys.stdout = open('%s/debug_forked_stdout.out' % (jobDir), 'a+')
         sys.stderr = open('%s/debug_forked_stderr.out' % (jobDir), 'a+')
         file_list = os.listdir(jobDir)

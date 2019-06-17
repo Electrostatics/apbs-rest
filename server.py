@@ -6,7 +6,10 @@ load_dotenv()
 sys.path.append(os.getcwd() + "/pdb2pqr_build")
 sys.path.append(os.getcwd() + "/src")
 
-from PDB2PQR_web import app
+# from PDB2PQR_web import app
+# from workflow import app
+# from workflow.views import workflow_app
+from workflow import app
 
 if __name__ == '__main__':
     HOST = environ.get('FLASK_RUN_HOST', 'localhost')
