@@ -2,7 +2,7 @@ import sys, os
 from os import environ
 from flask import Flask
 from flask_api import FlaskAPI
-from uid_service import uid_gen
+from .uid_service import uid_gen
 
 app = FlaskAPI(__name__)
 # app = Flask(__name__)

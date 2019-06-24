@@ -1,6 +1,8 @@
 from __future__ import print_function
 from flask import request, Blueprint
 import uuid
+from random import choices
+from string import ascii_lowercase, digits
 
 uid_gen = Blueprint('uid_gen', __name__)
 
@@ -14,6 +16,8 @@ uid_gen = Blueprint('uid_gen', __name__)
 def uid_generator():
     """On GET, generate a unique ID string"""
     if request.method == 'GET':
-        job_id = uuid.uuid4().hex
-        response = {'job_id': job_id}
+        # job_id = uuid.uuid4().hex
+        # job_id = uuid.uuid4().int
+        job_id = ''.join(choices(ascii_lowercase+digits, k=10)) # random 10-character alphanumeric string
+        response = {'job_id': str(job_id)}
         return response
