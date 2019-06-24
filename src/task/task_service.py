@@ -79,14 +79,21 @@ def task_action(job_id, task_name):
             }
         else:
             if task_name == 'apbs':
-                pass
+                form = request.data
+                for key in form.keys():
+                    if key == 'output_scalar':
+                        for option in form[key]:
+                            form[option] = option
+                        form.pop('output_scalar')
+                    else:
+                        form[key] = str(form[key])
+
+                post('%s/api/exec/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
+
             elif task_name == 'pdb2pqr':
                 # print('sending task')
                 form = request.data
-                # print(type(form))
-                # print((form))
                 post('%s/api/exec/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
-                pass
                 
                 
 
