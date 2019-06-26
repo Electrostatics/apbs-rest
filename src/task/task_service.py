@@ -51,7 +51,8 @@ def task_action(job_id, task_name):
                 
             response[task_name] = {
                 'status':    run_state,
-                'files':     progress[1:],
+                # 'files':     progress[1:],
+                'files':     progress,
                 'startTime': start_time,
                 'endTime':   end_time
             }
@@ -79,20 +80,33 @@ def task_action(job_id, task_name):
             }
         else:
             if task_name == 'apbs':
-                form = request.data
-                for key in form.keys():
-                    if key == 'output_scalar':
-                        for option in form[key]:
-                            form[option] = option
-                        form.pop('output_scalar')
+                # print('checking ')
+                if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
+                    data = request.data
+                    if 'filename' in data:
+                        post('%s/api/exec/%s/%s?infile=true' % (TMP_EXEC_HOST, job_id, task_name), json=data)
                     else:
-                        form[key] = str(form[key])
+                        '''throw some error here'''
+                        pass
 
-                post('%s/api/exec/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
+                else:
+                    form = request.data
+                    for key in form.keys():
+                        # unravels output parameters from form
+                        if key == 'output_scalar':
+                            for option in form[key]:
+                                form[option] = option
+                            form.pop('output_scalar')
+                        else:
+                            form[key] = str(form[key])
+
+                    # Send task to placeholder executor service
+                    # TODO: Build Kubernetes execotor service to replace this
+                    post('%s/api/exec/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
 
             elif task_name == 'pdb2pqr':
-                # print('sending task')
                 form = request.data
+                # Send task to placeholder executor service
                 post('%s/api/exec/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
                 
                 

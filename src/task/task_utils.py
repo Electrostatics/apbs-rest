@@ -93,7 +93,7 @@ def get_jobstatus_info(jobid, task_name):
             print(status_str)
 
         # Converts the retrieved files to URL-friendly versions
-        for i in range(1, len(job_progress)):
+        for i in range(len(job_progress)):
             filename = job_progress[i].split('/')[-1]
             job_progress[i] = '%s/%s' % (jobid, filename)
     
