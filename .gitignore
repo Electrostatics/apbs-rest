@@ -1,10 +1,17 @@
 # Python virtual environments
 venv
 venv2
+venv_py2
+venv_py3
 win_venv
 win_venv_storage
+win_venv_test_storage
+ubuntu_venv
 storage_ubuntu_venv
 status_ubuntu_venv
+
+# Test-related
+src/storage/test
 
 # Related cloned repositories
 apbs-pdb2pqr
