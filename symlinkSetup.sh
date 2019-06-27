@@ -39,6 +39,14 @@ ln -s ../../../../builds/pdb2pqr_build/extensions/
 ln -s ../../../../builds/pdb2pqr_build/pdb2pka/
 ln -s ../../../../builds/pdb2pqr_build/propka30/
 
+cd ../../apbs-rest/src/tmp_task_exec/legacy/
+ln -s ../../../../builds/pdb2pqr_build/src/
+ln -s ../../../../builds/pdb2pqr_build/main.pyc
+
+ln -s ../../../../builds/pdb2pqr_build/extensions/
+ln -s ../../../../builds/pdb2pqr_build/pdb2pka/
+ln -s ../../../../builds/pdb2pqr_build/propka30/
+
 # cd ../../apbs-rest/src/workflow/legacy/src
 # ln -s ../../../../../builds/pdb2pqr_build/src/utilities.pyc utilities.pyc
 # ln -s ../../../../../builds/pdb2pqr_build/src/aconf.pyc aconf.pyc
