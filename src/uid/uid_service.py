@@ -19,5 +19,7 @@ def uid_generator():
         # job_id = uuid.uuid4().hex
         # job_id = uuid.uuid4().int
         job_id = ''.join(choices(ascii_lowercase+digits, k=10)) # random 10-character alphanumeric string
+
+        http_code = 200
         response = {'job_id': str(job_id)}
-        return response
+        return response, http_code

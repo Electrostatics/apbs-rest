@@ -1,11 +1,13 @@
 import sys, os
+sys.path.append(os.getcwd())
+
 from os import environ
 from flask import Flask
-from flask_api import FlaskAPI
-from .uid_service import uid_gen
+from flask_cors import CORS
+from uid_service import uid_gen
 
-app = FlaskAPI(__name__)
-# app = Flask(__name__)
+app = Flask(__name__)
+CORS(app)
 app.register_blueprint(uid_gen)
 
 if __name__ == "__main__":

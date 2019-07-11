@@ -25,7 +25,7 @@ class UIDServiceTest(unittest.TestCase):
         
     def test_uid_uniqueness(self):
         uid_list = []
-        for i in range(1000):
+        for i in range(5000):
             response = self.client.get('/api/uid')
             data_json = json.loads(response.data)
             uid_list.append(data_json['job_id'])
