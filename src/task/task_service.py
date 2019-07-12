@@ -2,10 +2,13 @@ from __future__ import print_function
 from flask import request, Blueprint
 
 import time
-from os import getenv
+from sys import path
+from os import getenv, getcwd
 from requests import get, post
-# import task_utils
-from . import task_utils
+
+path.append(getcwd())
+import task_utils
+# from task import task_utils
 
 task_app = Blueprint('task_app', __name__)
 

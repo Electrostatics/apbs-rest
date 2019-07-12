@@ -2,7 +2,9 @@ import sys, os
 from os import environ
 from flask import Flask
 from flask_api import FlaskAPI
-from .task_service import task_app
+
+sys.path.append(os.getcwd())
+from task_service import task_app
 
 app = FlaskAPI(__name__)
 # app = Flask(__name__)
