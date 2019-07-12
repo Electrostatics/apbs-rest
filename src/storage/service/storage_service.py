@@ -8,8 +8,8 @@ from flask import json
 from werkzeug import secure_filename
 from urllib3.exceptions import MaxRetryError
 # from PDB2PQR_web import app
-# import storageutils
-from . import storageutils
+# import storage_utils
+from . import storage_utils
 
 storage_app = Blueprint('storage_app', __name__)
 
@@ -24,8 +24,8 @@ MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
 MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
 JOB_BUCKET_NAME  = os.environ.get('MINIO_JOB_BUCKET', 'jobs')
 
-minioClient = storageutils.get_minio_client(MINIO_URL, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
-storageClient = storageutils.StorageClient(MINIO_URL, MINIO_CACHE_DIR, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
+minioClient = storage_utils.get_minio_client(MINIO_URL, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
+storageClient = storage_utils.StorageClient(MINIO_URL, MINIO_CACHE_DIR, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
 atexit.register(storageClient.clear_cache)
 
 @storage_app.route('/api/storage/<job_id>/<file_name>', methods=['GET', 'PUT', 'POST', 'DELETE'])
