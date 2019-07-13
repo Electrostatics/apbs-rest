@@ -1,7 +1,9 @@
-FROM python:2.7-alpine
+# FROM python:2.7-alpine
+FROM python:3.7
 WORKDIR /app
-COPY . ./
-RUN python -m pip install -r requirements.txt 
+COPY requirements.txt /app
+RUN python -m pip install -r requirements.txt gunicorn==19.9.0
+
         # && rm .env
         # && ls -la
 ENV STORAGE_CACHE_DIR="/app/.minio_cache" \
@@ -15,10 +17,14 @@ ENV STORAGE_CACHE_DIR="/app/.minio_cache" \
     FLASK_APP="main.py"
 RUN echo $FLASK_APP
 
+COPY . ./
+
 EXPOSE 5001
 
 # ENTRYPOINT [ "python" ]
 # CMD [ "main.py" ]
+# ENTRYPOINT [ "flask" ]
+# CMD [ "run" ]
 
-ENTRYPOINT [ "flask" ]
-CMD [ "run" ]
+ENTRYPOINT [ "gunicorn" ]
+CMD [ "-w", "4", "-b", "0.0.0.0:5001", "main:app" ]

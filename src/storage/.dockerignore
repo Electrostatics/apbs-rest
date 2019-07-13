@@ -1,0 +1,6 @@
+__pycache__
+*venv*
+*.http
+*.pyc
+.vscode
+.devcontainer

@@ -22,7 +22,7 @@ class StorageClient:
             data = self.__minio_client.get_object(bucket_name, object_name, request_headers=request_headers)
             data = data.read()
             # data = 'object retrieved from bucket'
-            print('object retrieved from bucket')
+            print('object retrieved from bucket: %s' % object_name)
             # object_path = save_path
 
         else:
@@ -32,7 +32,7 @@ class StorageClient:
                 data = fin.read()
 
             # data = 'object retrieved from cache'
-            print('object retrieved from cache')
+            print('object retrieved from cache: %s' % object_name)
 
         return data
 
@@ -49,7 +49,7 @@ class StorageClient:
             self.__minio_client.fget_object(bucket_name, object_name, save_path, request_headers=request_headers)
 
             # data = 'object retrieved from bucket'
-            print('object retrieved from bucket')
+            print('object retrieved from bucket: %s' % object_name)
             object_path = save_path
 
         else:
@@ -59,7 +59,7 @@ class StorageClient:
             #     data = fin.read()
 
             # data = 'object retrieved from cache'
-            print('object retrieved from cache')
+            print('object retrieved from cache: %s' % object_name)
 
         # return data
         return object_path
