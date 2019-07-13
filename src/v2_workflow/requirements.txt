@@ -1,0 +1,5 @@
+Flask==1.1.1
+Flask-Cors==3.0.8
+requests==2.22.0
+python-dotenv==0.10.2
+# mysql-connector-python==8.0.16

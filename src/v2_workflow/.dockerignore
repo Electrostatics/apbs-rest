@@ -1,0 +1,10 @@
+# Directories
+__pycache__
+*venv*/
+.vscode
+.devcontainer
+tests
+
+# Files
+*.pyc
+*.http
