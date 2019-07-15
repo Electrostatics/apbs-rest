@@ -35,6 +35,7 @@ PDB2PQR_web/pdb2pqr
 
 # Miscellaneous
 testing_site
+*.http
 *.pyc
 copied_from_build
 path_for_build
