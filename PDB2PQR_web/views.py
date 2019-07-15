@@ -75,9 +75,10 @@ def submit_pdb2pqr_json():
     if request.method == 'POST':
         # form_json
         # print(pp.pformat(request.form.to_dict(), indent=4, width=10))
-        pp.pprint(request.form.to_dict())
-        print(type(request.form))
-        print(type(request.form.to_dict()))
+
+        # pp.pprint(request.form.to_dict())
+        # print(type(request.form))
+        # print(type(request.form.to_dict()))
 
         redirectURL = main_cgi.mainCGI(request.form, request.files, STORAGE_HOST)
 
