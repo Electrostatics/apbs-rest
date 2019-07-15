@@ -12,3 +12,4 @@ legacy/apbs_cgi.py
 # Files
 *.pyc
 *.http
+.env

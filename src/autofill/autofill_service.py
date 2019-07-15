@@ -10,6 +10,10 @@ STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5001')
 
 autofill_app = Blueprint('autofill_app', __name__)
 
+@autofill_app.route('/', methods=['GET'])
+@autofill_app.route('/check', methods=['GET'])
+def is_alive():
+    return '', 200
 
 @autofill_app.route('/api/autofill/<job_id>/<job_type>', methods=['GET'])
 def send_autofill_info(job_id, job_type):
