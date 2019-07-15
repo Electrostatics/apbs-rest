@@ -82,11 +82,24 @@ def submit_pdb2pqr_json():
         # print(pp.pformat(request.form.to_dict(), indent=4, width=10))
 
         # pp.pprint(request.form.to_dict())
+        
+
+        '''
+        form_dict = loads(request.data)
+        print(type(form_dict))
+        pp.pprint(form_dict)
+        '''
+        # print(type(request.data))
+        # print(loads(request.data))
+        # print(type(loads(request.data)))
+
         # print(type(request.form))
         # print(type(request.form.to_dict()))
 
         # redirectURL = main_cgi.mainCGI(request.form, request.files, STORAGE_HOST)
+
         runner = pdb2pqr_runner.Runner(request.form, request.files, STORAGE_HOST)
+        # runner = pdb2pqr_runner.Runner(loads(request.data), request.files, STORAGE_HOST)
         redirectURL = runner.handle_pdb2pqr(STORAGE_HOST)
         # import legacy
         # from legacy.main_cgi import mainCGI
@@ -100,6 +113,7 @@ def submit_pdb2pqr_json():
         '''==========================================='''
 
         return redirect(redirectURL)
+        # return redirectURL
 
 @workflow_app.route('/submit/apbs/json', methods=['POST', 'OPTIONS'])
 def submit_apbs_json():
@@ -113,6 +127,9 @@ def submit_apbs_json():
 
     if request.method == 'POST':
         form = loads(request.data)['form']
+        print(pp.pformat(form, indent=4, width=10))
+        print()
+        print()
         for key in form.keys():
             if key == 'output_scalar':
                 for option in form[key]:
@@ -362,7 +379,8 @@ def upload_autofill():
     EXTENSION_WHITELIST = set(['pqr'])
     json_response = None
     http_status_response = None
-    app.config['UPLOAD_FOLDER'] = os.path.join(INSTALLDIR, TMPDIR)
+    # workflow_app.config['UPLOAD_FOLDER'] = os.path.join(INSTALLDIR, TMPDIR)
+    upload_folder = os.path.join(INSTALLDIR, TMPDIR)
 
     if request.method == 'POST':
         # print(dict(request.files).keys())
@@ -401,7 +419,8 @@ def upload_autofill():
                             [   new_job_id+'.pqr',
                                 new_job_id+'.in',
                                 new_job_id+'-input.p',
-                            ], app.config['UPLOAD_FOLDER'] )
+                            ], upload_folder )
+                            # ], app.config['UPLOAD_FOLDER'] )
 
                         json_response = {
                             'upload_status': 'Success',

@@ -18,9 +18,15 @@ from legacy.pdb2pqoldutil import redirector, setID
 from legacy.weboptions import WebOptions, WebOptionsError
 
 class Runner:
-    def __init__(self, form, files, storage_host):
-        self.starttime = None
-        self.job_id = None
+    def __init__(self, form, files, storage_host, job_id=None):
+        # self.starttime = None
+        # self.job_id = None
+
+        self.starttime = time.time()
+        if job_id is None:
+            self.job_id = setID(self.starttime)
+        else:
+            self.job_id = job_id
 
         try:
             self.weboptions = WebOptions(form, files)
@@ -165,6 +171,7 @@ class Runner:
         # Acquire job ID
         self.starttime = time.time()
         job_id = setID(self.starttime)
+        job_id = self.job_id
         # job_id = requests.get()
 
         # Prepare job
