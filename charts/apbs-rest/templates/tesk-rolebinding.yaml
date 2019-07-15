@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "apbsrest.fullname" . }}-resk
+  labels:
+    app: {{ template "apbsrest.name" . }}
+    chart: {{ template "apbsrest.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    service: tesk
+subjects:
+- kind: ServiceAccount
+  name: {{ template "apbsrest.fullname" . }}-tesk
+roleRef:
+  kind: Role
+  name: {{ template "apbsrest.fullname" . }}-tesk
+  apiGroup: rbac.authorization.k8s.io
