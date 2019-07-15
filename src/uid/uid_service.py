@@ -12,6 +12,12 @@ uid_gen = Blueprint('uid_gen', __name__)
         to start a workflow job.
 '''
 
+@uid_gen.route('/', methods=['GET'])
+@uid_gen.route('/check', methods=['GET'])
+def liveness():
+    """Probes server to check if alive"""
+    return '', 200
+
 @uid_gen.route('/api/uid', methods=['GET'])
 def uid_generator():
     """On GET, generate a unique ID string"""
