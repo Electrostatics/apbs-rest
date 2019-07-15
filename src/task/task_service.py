@@ -15,6 +15,11 @@ task_app = Blueprint('task_app', __name__)
 TMP_EXEC_HOST = getenv('TMP_EXEC_HOST', 'http://localhost:5005')
 END_STATES = ['complete', 'error', None]
 
+@task_app.route('/', methods=['GET'])
+@task_app.route('/check', methods=['GET'])
+def is_alive():
+    return '', 200
+
 @task_app.route('/api/task/<job_id>/<task_name>', methods=['GET', 'POST'])
 def task_action(job_id, task_name):
     response = None

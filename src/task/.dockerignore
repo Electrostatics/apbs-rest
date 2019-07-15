@@ -8,3 +8,4 @@ test
 # Files
 *.pyc
 *.http
+.env
