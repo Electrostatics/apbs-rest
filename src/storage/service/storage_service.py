@@ -28,6 +28,11 @@ minioClient = storage_utils.get_minio_client(MINIO_URL, MINIO_ACCESS_KEY, MINIO_
 storageClient = storage_utils.StorageClient(MINIO_URL, MINIO_CACHE_DIR, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
 atexit.register(storageClient.clear_cache)
 
+@storage_app.route('/', methods=['GET'])
+@storage_app.route('/check', methods=['GET'])
+def is_Alive():
+    return '', 200
+
 @storage_app.route('/api/storage/<job_id>/<file_name>', methods=['GET', 'PUT', 'POST', 'DELETE'])
 @storage_app.route('/api/storage/<job_id>', methods=['DELETE'])
 def storage_service(job_id, file_name=None):
@@ -55,9 +60,9 @@ def storage_service(job_id, file_name=None):
                 file_dir = os.path.dirname(file_path_in_cache)
                 return send_from_directory(file_dir, file_path_in_cache.split('/')[-1])
             except MaxRetryError:
-                return 'Error in retrieving file', 500
+                return 'Error in retrieving file\n', 500
             except:
-                return 'File %s does not exist' % file_name, 404
+                return 'File %s does not exist\n' % file_name, 404
         else:
             try:
                 file_str = storageClient.get_object(JOB_BUCKET_NAME, object_name)

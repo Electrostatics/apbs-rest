@@ -20,7 +20,6 @@ RUN echo $FLASK_APP
 COPY . ./
 
 EXPOSE 5001
-
 # ENTRYPOINT [ "python" ]
 # CMD [ "main.py" ]
 # ENTRYPOINT [ "flask" ]

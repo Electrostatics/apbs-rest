@@ -10,6 +10,8 @@ class StorageClient:
 
         if access_key and secret_key:
             self.__minio_client = get_minio_client(storage_url, access_key, secret_key)
+            if not self.__minio_client.bucket_exists('jobs'):
+                self.__minio_client.make_bucket('jobs')
 
         '''Utilize tempfile module in future'''
         if not os.path.exists(self.cache_path):

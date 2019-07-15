@@ -2,8 +2,8 @@ import sys, os
 from os import environ
 from flask import Flask
 from flask_cors import CORS
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 from service import storage_service
 
