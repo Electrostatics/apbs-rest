@@ -14,6 +14,11 @@ tmp_executor = Blueprint('tmp_executor', __name__)
 
 STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5000')
 
+@tmp_executor.route('/', methods=['GET'])
+@tmp_executor.route('/check', methods=['GET'])
+def is_alive():
+    return '', 200
+
 @tmp_executor.route('/api/exec/<job_id>/<task_name>', methods=['POST'])
 def execute_task(job_id, task_name):
     response = None

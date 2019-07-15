@@ -34,7 +34,8 @@ class Runner:
         self.job_id = None
         self.form = None
         self.infile_name = None
-        self.read_file_list = None
+        self.read_file_list = []
+        # self.read_file_list = None
 
 
         if infile_name is not None:
@@ -156,7 +157,10 @@ class Runner:
 
     def run_job(self, storage_host):
         job_id = self.job_id
-        infile_name = self.infile_name
+        if self.infile_name is not None:
+            infile_name = self.infile_name
+        else:
+            infile_name = 'apbsinput.in'
 
         currentdir = os.getcwd()
 

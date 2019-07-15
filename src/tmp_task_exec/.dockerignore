@@ -1,0 +1,15 @@
+# Directories
+__pycache__
+*venv*/
+.vscode
+.devcontainer
+tests
+
+# Existing symlinks
+legacy/src
+legacy/main.pyc
+
+# Files
+*.pyc
+*.http
+.env
