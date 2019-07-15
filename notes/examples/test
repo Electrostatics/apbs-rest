@@ -1,0 +1,10 @@
+minikube start
+
+kubectl create serviceaccount tiller --namespace kube-system
+kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+helm init --service-account=tiller --wait
+
+helm install charts/apbs-rest -n apbs-rest
+
+kubectl port-forward svc/apbs-rest-tesk 18080:80
+

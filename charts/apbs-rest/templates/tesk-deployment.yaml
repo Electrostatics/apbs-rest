@@ -1,0 +1,89 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "apbsrest.fullname" . }}-tesk
+  labels:
+    app: {{ template "apbsrest.name" . }}
+    chart: {{ template "apbsrest.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    service: tesk
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "apbsrest.name" . }}
+      release: {{ .Release.Name }}
+      service: tesk
+  template:
+    metadata:
+      labels:
+        app: {{ template "apbsrest.name" . }}
+        release: {{ .Release.Name }}
+        service: tesk
+    spec:
+      serviceAccountName: {{ template "apbsrest.fullname" . }}-tesk
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: TESK_API_TASKMASTER_IMAGE_VERSION
+            value: v0.6 #{ tesk.taskmaster_image_version }}
+          - name: TESK_API_TASKMASTER_FILER_IMAGE_VERSION
+            value: v0.6 #{ tesk.taskmaster_filer_image_version }}
+          - name: TESK_API_K8S_NAMESPACE
+            value: {{ .Release.Namespace }}
+          - name: TESK_API_TASKMASTER_SERVICE_ACCOUNT_NAME
+            value: {{ template "apbsrest.fullname" . }}-tesk
+          - name: TESK_API_TASKMASTER_FTP_SECRET_NAME
+            value: ftp-secret #{ tesk.taskmaster_ftp_secret_name }}
+          - name: TESK_API_AUTHORISATION_ENV_SUBGROUP
+            value: EBI #{ auth.env_subgroup }}
+          - name: SPRING_PROFILES_ACTIVE
+            value: noauth #{ auth.mode }}
+   
+          - name: TESK_API_TASKMASTER_ENVIRONMENT_HOST_BASE_PATH
+            value: /tmp #{ transfer.wes_base_path }}
+   
+          - name: TESK_API_TASKMASTER_ENVIRONMENT_CONTAINER_BASE_PATH
+            value: /transfer #{ transfer.tes_base_path }}
+   
+          - name: TESK_API_TASKMASTER_ENVIRONMENT_TRANSFER_PVC_NAME
+            value: transfer-pvc #{ transfer.pvc_name }}
+   
+          - name: TESK_API_TASKMASTER_DEBUG
+            value: "false" #"{ tesk.debug }}"
+   
+          - name: TESK_API_SWAGGER_OAUTH_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: oauth-client-secret
+                key: id
+                optional: true
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

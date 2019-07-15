@@ -1,0 +1,9 @@
+#get tasks
+curl localhost:18080/v1/tasks
+
+#submit test job
+curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '@job' localhost:18080/v1/tasks
+
+#view job
+curl 'localhost:18080/v1/tasks/task-54c7879e?view=FULL'
+
