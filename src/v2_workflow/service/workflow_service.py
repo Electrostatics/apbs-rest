@@ -12,6 +12,10 @@ workflow_app = Blueprint('workflow_app', __name__)
 END_STATES = ['complete', 'error', None]
 TASK_HOST = getenv('TASK_HOST')
 
+@workflow_app.route('/', methods=['GET'])
+@workflow_app.route('/check', methods=['GET'])
+def is_alive():
+    return '', 200
 
 @workflow_app.route('/api/workflow/<job_id>/<task_name>', methods=['GET', 'POST', 'OPTIONS'])
 @workflow_app.route('/api/workflow/<job_id>', methods=['GET', 'POST', 'OPTIONS'])
