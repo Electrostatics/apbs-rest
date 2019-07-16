@@ -1,10 +1,8 @@
 import sys, os
-sys.path.append(os.getcwd())
-
 from os import environ
 from flask import Flask
 from flask_cors import CORS
-from uid_service import uid_gen
+from service.uid_service import uid_gen
 
 app = Flask(__name__)
 CORS(app)
