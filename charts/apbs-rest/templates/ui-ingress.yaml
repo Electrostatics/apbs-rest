@@ -4,16 +4,14 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $fullName }}-ui
   labels:
     app: {{ template "apbsrest.name" . }}
     chart: {{ template "apbsrest.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-{{- with .Values.ingress.annotations }}
+    storage: ui
   annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
 spec:
 {{- if .Values.ingress.tls }}
   tls:
@@ -30,9 +28,9 @@ spec:
     - host: {{ . }}
       http:
         paths:
-          - path: {{ $ingressPath }}
+          - path: /
             backend:
-              serviceName: {{ $fullName }}
+              serviceName: {{ $fullName }}-ui
               servicePort: http
   {{- end }}
 {{- end }}

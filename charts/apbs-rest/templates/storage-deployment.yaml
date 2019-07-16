@@ -1,0 +1,67 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "apbsrest.fullname" . }}-storage
+  labels:
+    app: {{ template "apbsrest.name" . }}
+    chart: {{ template "apbsrest.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    service: storage
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "apbsrest.name" . }}
+      release: {{ .Release.Name }}
+      service: storage
+  template:
+    metadata:
+      labels:
+        app: {{ template "apbsrest.name" . }}
+        release: {{ .Release.Name }}
+        service: storage
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.storage.image.repository }}:{{ .Values.storage.image.tag }}"
+          imagePullPolicy: {{ .Values.storage.image.pullPolicy }}
+          env:
+          - name: FLASK_APP
+            value: "main.py"
+          - name: MINIO_URL
+            value: {{ template "apbsrest.fullname" . }}-minio
+#FIXME remove
+          - name: MINIO_CACHE_DIR
+            value: /app/.minio_cache
+#FIXME pull from secret
+          - name: MINIO_ACCESS_KEY
+            value: admin
+          - name: MINIO_SECRET_KEY
+            value: adminadmin
+          ports:
+            - name: http
+              containerPort: 5001
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /check
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /check
+              port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

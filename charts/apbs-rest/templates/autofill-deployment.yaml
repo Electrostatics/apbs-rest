@@ -1,0 +1,63 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "apbsrest.fullname" . }}-autofill
+  labels:
+    app: {{ template "apbsrest.name" . }}
+    chart: {{ template "apbsrest.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    service: autofill
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "apbsrest.name" . }}
+      release: {{ .Release.Name }}
+      service: autofill
+  template:
+    metadata:
+      labels:
+        app: {{ template "apbsrest.name" . }}
+        release: {{ .Release.Name }}
+        service: autofill
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.autofill.image.repository }}:{{ .Values.autofill.image.tag }}"
+          imagePullPolicy: {{ .Values.autofill.image.pullPolicy }}
+          env:
+          - name: FLASK_APP
+            value: "main.py"
+          - name: STORAGE_HOST
+            value: http://{{ template "apbsrest.fullname" . }}-storage
+          - name: ID_HOST
+            value: http://{{ template "apbsrest.fullname" . }}-id
+          - name: FLASK_RUN_PORT
+            value: "5006"
+          ports:
+            - name: http
+              containerPort: 5006
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /check
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /check
+              port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
