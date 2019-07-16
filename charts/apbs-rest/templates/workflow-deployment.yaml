@@ -1,0 +1,59 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "apbsrest.fullname" . }}-workflow
+  labels:
+    app: {{ template "apbsrest.name" . }}
+    chart: {{ template "apbsrest.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    service: workflow
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "apbsrest.name" . }}
+      release: {{ .Release.Name }}
+      service: workflow
+  template:
+    metadata:
+      labels:
+        app: {{ template "apbsrest.name" . }}
+        release: {{ .Release.Name }}
+        service: workflow
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.workflow.image.repository }}:{{ .Values.workflow.image.tag }}"
+          imagePullPolicy: {{ .Values.workflow.image.pullPolicy }}
+          env:
+          - name: FLASK_APP
+            value: "main.py"
+          - name: TASK_HOST
+            value: http://{{ template "apbsrest.fullname" . }}-task
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /check
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /check
+              port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

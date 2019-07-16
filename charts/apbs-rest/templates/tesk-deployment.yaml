@@ -25,8 +25,8 @@ spec:
       serviceAccountName: {{ template "apbsrest.fullname" . }}-tesk
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.tesk.image.repository }}:{{ .Values.tesk.image.tag }}"
+          imagePullPolicy: {{ .Values.tesk.image.pullPolicy }}
           env:
           - name: TESK_API_TASKMASTER_IMAGE_VERSION
             value: v0.6 #{ tesk.taskmaster_image_version }}

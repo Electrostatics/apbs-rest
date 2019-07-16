@@ -4,10 +4,59 @@
 
 replicaCount: 1
 
-image:
-  repository: eu.gcr.io/tes-wes/tesk-api
-  tag: v0.4.2
-  pullPolicy: IfNotPresent
+tesk:
+  image:
+    repository: eu.gcr.io/tes-wes/tesk-api
+    tag: v0.4.2
+    pullPolicy: IfNotPresent
+
+ui:
+  image:
+    repository: electrostatics/apbs-ui
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+task:
+  image:
+    repository: electrostatics/apbs-task
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+autofill:
+  image:
+    repository: electrostatics/apbs-autofill
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+id:
+  image:
+    repository: electrostatics/apbs-uid
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+storage:
+  image:
+    repository: electrostatics/apbs-storage
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+workflow:
+  image:
+    repository: electrostatics/apbs-workflow
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+minio:
+  image:
+    repository: minio/minio
+    tag: RELEASE.2019-07-10T00-34-56Z
+    pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
