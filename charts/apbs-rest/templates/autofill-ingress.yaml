@@ -4,13 +4,13 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}-task
+  name: {{ $fullName }}-autofill
   labels:
     app: {{ template "apbsrest.name" . }}
     chart: {{ template "apbsrest.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    storage: task
+    storage: autofill
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /api/autofill/$1
 spec:
@@ -31,7 +31,7 @@ spec:
         paths:
           - path: /autofill/(.*)
             backend:
-              serviceName: {{ $fullName }}-task
+              serviceName: {{ $fullName }}-autofill
               servicePort: http
   {{- end }}
 {{- end }}
