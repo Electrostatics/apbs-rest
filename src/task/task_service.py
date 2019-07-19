@@ -16,7 +16,7 @@ TMP_EXEC_HOST = getenv('TMP_EXEC_HOST', 'http://localhost:5005')
 END_STATES = ['complete', 'error', None]
 
 @task_app.route('/', methods=['GET'])
-@task_app.route('/check', methods=['GET'])
+@task_app.route('/check/', methods=['GET'])
 def is_alive():
     return '', 200
 
