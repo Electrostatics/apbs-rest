@@ -5,13 +5,13 @@ from shutil import rmtree
 import os, hashlib, sys
 
 class StorageClient:
-    def __init__(self, storage_url, cache_dir_path, access_key=None, secret_key=None):
+    def __init__(self, storage_url, cache_dir_path, access_key=None, secret_key=None, job_bucket_name='jobs'):
         self.cache_path = os.path.abspath(cache_dir_path)
 
         if access_key and secret_key:
             self.__minio_client = get_minio_client(storage_url, access_key, secret_key)
-            if not self.__minio_client.bucket_exists('jobs'):
-                self.__minio_client.make_bucket('jobs')
+            if not self.__minio_client.bucket_exists(job_bucket_name):
+                self.__minio_client.make_bucket(job_bucket_name)
 
         '''Utilize tempfile module in future'''
         if not os.path.exists(self.cache_path):

@@ -22,7 +22,7 @@ class StorageUtilsTest(unittest.TestCase):
         docker_client = docker.from_env()
         # docker_client.images.pull('minio/minio:latest')
         self.minio_container = docker_client.containers.run(
-                                    'minio/minio:latest', 
+                                    'minio/minio:RELEASE.2019-07-10T00-34-56Z', 
                                     'server /data',
                                     name=self.minio_name,
                                     ports={'9000/tcp':PORT},
@@ -33,10 +33,11 @@ class StorageUtilsTest(unittest.TestCase):
                                     }
                                 )
 
-        self.storage_client = storage_utils.StorageClient(   MINIO_URL,
+        self.storage_client = storage_utils.StorageClient(  MINIO_URL,
                                                             STORAGE_CACHE_DIR,
                                                             access_key=MINIO_ACCESS_KEY,
-                                                            secret_key=MINIO_SECRET_KEY
+                                                            secret_key=MINIO_SECRET_KEY,
+                                                            job_bucket_name=MINIO_JOB_BUCKET
                                                         )
 
         
@@ -53,7 +54,7 @@ class StorageUtilsTest(unittest.TestCase):
             fout.write(b'hello world\n')
 
         self.minio_client = storage_utils.get_minio_client(MINIO_URL, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
-        self.minio_client.make_bucket(MINIO_JOB_BUCKET)
+        # self.minio_client.make_bucket(MINIO_JOB_BUCKET)
 
     def tearDown(self):
         # del self.minio_client
