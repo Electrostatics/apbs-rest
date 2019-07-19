@@ -66,8 +66,8 @@ def storage_service(job_id, file_name=None):
         else:
             try:
                 file_str = storageClient.get_object(JOB_BUCKET_NAME, object_name)
-                file_str_json = { object_name: file_str }
-                response = make_response(JSONEncoder().encode(file_str_json))
+                file_str_json = { object_name: file_str.decode('utf-8') }
+                # response = make_response(JSONEncoder().encode(file_str_json))
                 response = make_response( dumps(file_str_json) )
                 response.headers['Content-Type'] = 'application/json'
                 http_response_code = 200
@@ -78,7 +78,9 @@ def storage_service(job_id, file_name=None):
                 response.headers['Content-Type'] = 'application/json'
                 http_response_code = 500
                 # return response, 500
-            except:
+            except Exception as e:
+                # import traceback
+                # json_string = {object_name: None, 'error': str(e), 'traceback': traceback.format_exc()}
                 json_string = {object_name: None}
                 response = make_response(dumps(json_string))
                 response.headers['Content-Type'] = 'application/json'
