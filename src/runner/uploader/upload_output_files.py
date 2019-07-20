@@ -1,4 +1,4 @@
-from sys import argv
+# from sys import argv
 from os import getenv, path, listdir
 from requests import post
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
         # Upload file data to storage service
         object_name = '%s/%s' % (JOB_ID, file_name)
         files = {'file_data': open('%s/%s' % (UPLOAD_DIR, file_name) , 'rb')}
-        response = post('%s/api/storage/%s' % (STORAGE_HOST, object_name), files=files)
+        response = post('%s/%s' % (STORAGE_HOST, object_name), files=files)
 
         if response.status_code >= 500:
             raise ConnectionError('File %s could not be uploaded. Returned HTTP code %d' % (file_name, response.status_code))
