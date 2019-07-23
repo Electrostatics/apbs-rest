@@ -7,7 +7,7 @@ from os import getenv, getcwd
 from requests import get, post
 
 path.append(getcwd())
-import task_utils
+from . import task_utils
 # from task import task_utils
 
 task_app = Blueprint('task_app', __name__)
@@ -87,6 +87,11 @@ def task_action(job_id, task_name):
                 'error': 'invalid task'
             }
         else:
+
+            '''
+                Handler for when we use the tmp_task_exec service.
+                To be replaced by TESK service
+            '''
             if task_name == 'apbs':
                 # print('checking ')
                 if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
@@ -117,7 +122,14 @@ def task_action(job_id, task_name):
                 # Send task to placeholder executor service
                 post('%s/api/exec/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
                 
-                
+            '''
+                Handler for using the TESK service.
+                When finished, remove the handler above.
+            '''
+            if task_name == 'apbs':
+                pass
+            elif task_name == 'pdb2pqr':
+                pass
 
             response = { 
                 'accepted': f'task {task_name} accepted. Processing...'

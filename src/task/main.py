@@ -3,8 +3,7 @@ from os import environ
 from flask import Flask
 from flask_api import FlaskAPI
 
-sys.path.append(os.getcwd())
-from task_service import task_app
+from service.task_service import task_app
 
 app = FlaskAPI(__name__)
 # app = Flask(__name__)
