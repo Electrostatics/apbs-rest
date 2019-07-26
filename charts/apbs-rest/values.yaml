@@ -24,6 +24,13 @@ task:
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
+teskproxy:
+  image:
+    repository: electrostatics/apbs-tesk-proxy
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
 autofill:
   image:
     repository: electrostatics/apbs-autofill

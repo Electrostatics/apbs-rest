@@ -1,43 +1,43 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "apbsrest.fullname" . }}-task
+  name: {{ template "apbsrest.fullname" . }}-tesk-proxy
   labels:
     app: {{ template "apbsrest.name" . }}
     chart: {{ template "apbsrest.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    service: task
+    service: tesk-proxy
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: {{ template "apbsrest.name" . }}
       release: {{ .Release.Name }}
-      service: task
+      service: tesk-proxy
   template:
     metadata:
       labels:
         app: {{ template "apbsrest.name" . }}
         release: {{ .Release.Name }}
-        service: task
+        service: tesk-proxy
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.task.image.repository }}:{{ .Values.task.image.tag }}"
-          imagePullPolicy: {{ .Values.task.image.pullPolicy }}
+          image: "{{ .Values.teskproxy.image.repository }}:{{ .Values.teskproxy.image.tag }}"
+          imagePullPolicy: {{ .Values.teskproxy.image.pullPolicy }}
           env:
           - name: FLASK_APP
             value: "main.py"
           - name: STORAGE_HOST
             value: http://{{ template "apbsrest.fullname" . }}-storage
-          - name: TMP_EXEC_HOST
-            value: http://{{ template "apbsrest.fullname" . }}-tesk-proxy
+          - name: TESK_HOST
+            value: http://{{ template "apbsrest.fullname" . }}-tesk
           - name: FLASK_RUN_PORT
-            value: "5004"
+            value: "5007"
           ports:
             - name: http
-              containerPort: 5004
+              containerPort: 5007
               protocol: TCP
           livenessProbe:
             httpGet:
