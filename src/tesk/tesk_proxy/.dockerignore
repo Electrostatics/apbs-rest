@@ -1,0 +1,17 @@
+# Directories
+__pycache__
+*venv*/
+.vscode
+.devcontainer
+tests
+
+# Existing symlinks
+legacy/src
+legacy/apbs_cgi.py
+
+# Files
+*.pyc
+*.http
+.env
+.dockerignore
+Dockerfile

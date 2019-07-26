@@ -1,0 +1,16 @@
+{
+    "name": "PDB2PQR: {{job_id}}",
+    "executors": [
+      {
+        "image": "electrostatics/pdb2pqr-tesk:latest",
+        "command": [ 
+          "bash", "-c", 
+          "echo 'running' > pdb2pqr_status && date +%s.%N > pdb2pqr_start_time && {{object_list}} pdb2pqr {{args}} > pdb2pqr_stdout.txt 2> pdb2pqr_stderr.txt && date +%s.%N > pdb2pqr_end_time && ../upload_results.sh pdb2pqr {{output_basename}}"
+        ],
+        "env": {
+          "JOB_ID": "{{job_id}}",
+          "STORAGE_HOST": "http://apbs-rest-storage"
+        }
+      }
+    ]
+  }

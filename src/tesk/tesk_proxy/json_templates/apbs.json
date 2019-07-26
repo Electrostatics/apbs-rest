@@ -1,0 +1,16 @@
+{
+    "name": "APBS: {{job_id}}",
+    "executors": [
+      {
+        "image": "electrostatics/apbs-tesk:latest",
+        "command": [ 
+          "bash", "-c", 
+          "echo 'running' > apbs_status && date +%s.%N > apbs_start_time && {{object_list}} apbs {{infile}} > apbs_stdout.txt 2> apbs_stderr.txt && date +%s.%N > apbs_end_time && ../upload_results.sh apbs"
+        ],
+        "env": {
+          "JOB_ID": "{{job_id}}",
+          "STORAGE_HOST": "http://apbs-rest-storage"
+        }
+      }
+    ]
+  }
