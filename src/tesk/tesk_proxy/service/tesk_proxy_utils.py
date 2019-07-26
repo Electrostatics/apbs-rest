@@ -28,27 +28,29 @@ def send_to_storage_service(storage_host, job_id, file_list, local_upload_dir):
     pass
 
 def apbs_json_config(job_id, command_line_args, storage_host):
-        apbs_json = loads( open(os.path.join(os.getcwd(), 'json_templates', 'apbs.json')).read() )
-        apbs_json['name'] = apbs_json['name'].replace(b'{{job_id}}', job_id)
+    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', 'apbs.json')).read() 
+    apbs_json = loads( json_template_str )
+    apbs_json['name'] = apbs_json['name'].replace(b'{{job_id}}', job_id)
 
-        json_command = apbs_json['executors'][0]['command'][2]
-        json_command = json_command.replace(b'{{infile}}', command_line_args)
+    json_command = apbs_json['executors'][0]['command'][2]
+    json_command = json_command.replace(b'{{infile}}', command_line_args)
 
-        wget_str = ''
-        download_list = ['1a1p.pqr', 'apbsinput.in']
-        for file_name in download_list:
-            wget_str += 'wget %s/api/storage/%s/%s' % (storage_host, job_id, file_name)
-            wget_str += ' && '
-        json_command = json_command.replace(b'{{object_list}}', wget_str)
+    wget_str = ''
+    download_list = ['1a1p.pqr', 'apbsinput.in']
+    for file_name in download_list:
+        wget_str += 'wget %s/api/storage/%s/%s' % (storage_host, job_id, file_name)
+        wget_str += ' && '
+    json_command = json_command.replace(b'{{object_list}}', wget_str)
 
-        apbs_json['executors'][0]['command'][2] = json_command
-        apbs_json['executors'][0]['env']['JOB_ID'] = job_id
-        apbs_json['executors'][0]['env']['STORAGE_HOST'] = storage_host
+    apbs_json['executors'][0]['command'][2] = json_command
+    apbs_json['executors'][0]['env']['JOB_ID'] = job_id
+    apbs_json['executors'][0]['env']['STORAGE_HOST'] = storage_host
 
-        return apbs_json
+    return apbs_json
 
 def pdb2pqr_json_config(job_id, command_line_args, storage_host):
-    pdb2pqr_json = loads( open(os.path.join(os.getcwd(), 'json_templates', 'pdb2pqr.json')).read() )
+    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', 'pdb2pqr.json')).read()
+    pdb2pqr_json = loads( json_template_str )
     pdb2pqr_json['name'] = pdb2pqr_json['name'].replace(b'{{job_id}}', job_id)
 
     # Insert PDB2PQR command line arguments

@@ -163,10 +163,15 @@ class Runner:
         else:
             infile_name = 'apbsinput.in'
 
+        
+        # Write the start time to a file, before posting to TESK
+        with open(os.path.join(INSTALLDIR, TMPDIR, job_id, 'apbs_start_time'), 'w') as fout:
+            fout.write( str(time.time()) )
+
         # set the APBS status to running, write to disk, upload
         with open(os.path.join(INSTALLDIR, TMPDIR, job_id, 'apbs_status'), 'w') as fout:
             fout.write('running\n')
-        upload_list = ['apbs_status']
+        upload_list = ['apbs_status', 'apbs_start_time']
         tesk_proxy_utils.send_to_storage_service(storage_host, job_id, upload_list, os.path.join(INSTALLDIR, TMPDIR))
 
         # TESK request headers

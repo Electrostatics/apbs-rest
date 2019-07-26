@@ -115,10 +115,14 @@ class Runner:
         with open(os.path.join(INSTALLDIR, TMPDIR, job_id, self.weboptions.pdbfilename), 'w') as fout:
             fout.write(self.weboptions.pdbfilestring)
 
+        # Write the start time to a file, before posting to TESK
+        with open(os.path.join(INSTALLDIR, TMPDIR, job_id, 'pdb2pqr_start_time'), 'w') as fout:
+            fout.write( str(time.time()) )
+
         # set the PDB2PQR status to running, write to disk, upload
         with open(os.path.join(INSTALLDIR, TMPDIR, job_id, 'pdb2pqr_status'), 'w') as fout:
             fout.write('running\n')
-        upload_list = [self.weboptions.pdbfilename, 'pdb2pqr_status']
+        upload_list = [self.weboptions.pdbfilename, 'pdb2pqr_status', 'pdb2pqr_start_time']
         tesk_proxy_utils.send_to_storage_service(storage_host, job_id, upload_list, os.path.join(INSTALLDIR, TMPDIR))
 
         # TESK request headers
