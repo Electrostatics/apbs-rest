@@ -1,12 +1,24 @@
 {
   "name": "Hello World",
   "description": "Hello World, inspired by Funnel's most basic example",
+  "volumes": [
+    "/test"
+  ],
   "executors": [
+    {
+      "image": "busybox",
+      "command": [
+        "/bin/sh",
+        "-c",
+        "echo hi there > /test/test.txt"
+      ]
+    },
     {
       "image": "alpine",
       "command": [
-        "echo",
-        "TESK says: Hello World"
+        "/bin/sh",
+        "-c",
+        "cat /test/test.txt"
       ]
     }
   ]

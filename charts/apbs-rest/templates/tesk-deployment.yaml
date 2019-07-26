@@ -43,14 +43,14 @@ spec:
           - name: SPRING_PROFILES_ACTIVE
             value: noauth #{ auth.mode }}
    
-          - name: TESK_API_TASKMASTER_ENVIRONMENT_HOST_BASE_PATH
-            value: /tmp #{ transfer.wes_base_path }}
+#          - name: TESK_API_TASKMASTER_ENVIRONMENT_HOST_BASE_PATH
+#            value: /tmp #{ transfer.wes_base_path }}
    
-          - name: TESK_API_TASKMASTER_ENVIRONMENT_CONTAINER_BASE_PATH
-            value: /transfer #{ transfer.tes_base_path }}
+#          - name: TESK_API_TASKMASTER_ENVIRONMENT_CONTAINER_BASE_PATH
+#            value: /transfer #{ transfer.tes_base_path }}
    
-          - name: TESK_API_TASKMASTER_ENVIRONMENT_TRANSFER_PVC_NAME
-            value: transfer-pvc #{ transfer.pvc_name }}
+#          - name: TESK_API_TASKMASTER_ENVIRONMENT_TRANSFER_PVC_NAME
+#            value: transfer-pvc #{ transfer.pvc_name }}
    
           - name: TESK_API_TASKMASTER_DEBUG
             value: "false" #"{ tesk.debug }}"
@@ -65,14 +65,14 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+#          livenessProbe:
+#            httpGet:
+#              path: /
+#              port: http
+#          readinessProbe:
+#            httpGet:
+#              path: /
+#              port: http
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
