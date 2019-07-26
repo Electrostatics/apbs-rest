@@ -97,7 +97,7 @@ def task_action(job_id, task_name):
                 if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
                     data = request.data
                     if 'filename' in data:
-                        post('%s/api/exec/%s/%s?infile=true' % (TMP_EXEC_HOST, job_id, task_name), json=data)
+                        post('%s/api/tesk/%s/%s?infile=true' % (TMP_EXEC_HOST, job_id, task_name), json=data)
                     else:
                         '''throw some error here'''
                         pass
@@ -115,12 +115,12 @@ def task_action(job_id, task_name):
 
                     # Send task to placeholder executor service
                     # TODO: Build Kubernetes execotor service to replace this
-                    post('%s/api/exec/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
+                    post('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
 
             elif task_name == 'pdb2pqr':
                 form = request.data
                 # Send task to placeholder executor service
-                post('%s/api/exec/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
+                post('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
                 
             '''
                 Handler for using the TESK service.
