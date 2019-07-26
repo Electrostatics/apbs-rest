@@ -91,7 +91,7 @@ def send_to_storage_service(storage_host, job_id, file_list, local_upload_dir):
         response = requests.post(url, files=files)
         print('    status code: '+str(response.status_code))
         
-    stdout.write(u'...uploading done \u2713\n\n')
+    stdout.write(u'...uploading done\n\n')
     # stdout.write('  done\n\n')
 
     pass

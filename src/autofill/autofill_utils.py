@@ -52,7 +52,7 @@ def send_to_storage_service(storage_host, job_id, file_list, local_upload_dir):
             successful_upload.append(False)
             
         
-    sys.stdout.write(u'...uploading done \u2713\n\n')
+    sys.stdout.write(u'...uploading done\n\n')
     # stdout.write('  done\n\n')
     
     return successful_upload
