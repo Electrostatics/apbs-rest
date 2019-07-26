@@ -1,5 +1,5 @@
 # Python virtual environments
-venv
+venv*
 venv2
 venv_py2
 venv_py3
