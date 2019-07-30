@@ -29,7 +29,7 @@ if __name__ == "__main__":
         object_name = '%s/%s' % (JOB_ID, file_name)
         response = get('%s/%s/%s?json=true' % (STORAGE_HOST, JOB_ID, file_name))
         if response.status_code == 404:
-            raise ConnectionError('File %s found for the JOB_ID %s. Returned HTTP code %d' % (file_name, JOB_ID, response.status_code))
+            raise ConnectionError('File %s not found for the JOB_ID %s. Returned HTTP code %d' % (file_name, JOB_ID, response.status_code))
         elif response.status_code >= 500:
             raise ConnectionError('Server-side error. Returned HTTP code %d' % (response.status_code))
 

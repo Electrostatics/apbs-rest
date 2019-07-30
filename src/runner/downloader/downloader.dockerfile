@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7-alpine
 WORKDIR /app
 
 COPY requirements.txt ./
@@ -8,5 +8,4 @@ COPY . ./
 ENV APP_RUN_DIR="/app/run"
 
 WORKDIR /app/run
-ENTRYPOINT [ "python" ]
-CMD [ "../download_input_files.py" ]
+ENTRYPOINT [ "python" , "../download_input_files.py" ]
