@@ -1,0 +1,31 @@
+{
+    "name": "PDB2PQR: {{job_id}}",
+    "volumes": [ "/app/run" ],
+    "executors": [
+      {
+        "image": "electrostatics/apbs-downloader:latest",
+        "command": [ "python", "../download_input_files.py" ],
+        "env": {
+          "JOB_ID": "{{job_id}}",
+          "STORAGE_HOST": "{{storage_host}}"
+        }
+      },
+      {
+        "image": "electrostatics/pdb2pqr-bin:latest",
+        "command": [ "../pdb2pqr-linux-bin64-2.1.1/pdb2pqr" ],
+        "stdout": "/app/run/pdb2pqr_stdout.txt",
+        "stderr": "/app/run/pdb2pqr_stderr.txt"
+      },
+      {
+        "image": "electrostatics/apbs-uploader:latest",
+        "command": [ 
+          "sh", "-c",
+          "../generate_final_status.sh pdb2pqr {{output_basename}} && python ../upload_output_files.py"
+        ],
+        "env": {
+          "JOB_ID": "{{job_id}}",
+          "STORAGE_HOST": "{{storage_host}}"
+        }
+      }
+    ]
+  }

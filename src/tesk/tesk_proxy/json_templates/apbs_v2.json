@@ -1,0 +1,31 @@
+{
+    "name": "APBS: {{job_id}}",
+    "volumes": [ "/app/run" ],
+    "executors": [
+      {
+        "image": "electrostatics/apbs-downloader:latest",
+        "command": [ "python", "../download_input_files.py" ],
+        "env": {
+          "JOB_ID": "{{job_id}}",
+          "STORAGE_HOST": "{{storage_host}}"
+        }
+      },
+      {
+        "image": "electrostatics/apbs-bin:latest",
+        "command": [ "apbs", "{{infile}}" ],
+        "stdout": "/app/run/apbs_stdout.txt",
+        "stderr": "/app/run/apbs_stderr.txt"
+      },
+      {
+        "image": "electrostatics/apbs-uploader:latest",
+        "command": [ 
+          "sh", "-c",
+          "../generate_final_status.sh apbs && python ../upload_output_files.py"
+        ],
+        "env": {
+          "JOB_ID": "{{job_id}}",
+          "STORAGE_HOST": "{{storage_host}}"
+        }
+      }
+    ]
+  }

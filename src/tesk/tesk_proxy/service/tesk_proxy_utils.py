@@ -2,6 +2,10 @@ from __future__ import print_function
 import os, sys, requests
 from sys import stdout
 from json import loads
+try:
+    from io import StringIO
+except:
+    from StringIO import StringIO
 
 def send_to_storage_service(storage_host, job_id, file_list, local_upload_dir):
     if sys.version_info[0] == 2:
@@ -21,58 +25,82 @@ def send_to_storage_service(storage_host, job_id, file_list, local_upload_dir):
 
         response = requests.post(url, files=files)
         print('    status code: '+str(response.status_code))
-        
     stdout.write(u'...uploading done\n\n')
+    stdout.flush()
     # stdout.write('  done\n\n')
 
     pass
 
-def apbs_json_config(job_id, command_line_args, storage_host):
-    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', 'apbs.json')).read() 
-    apbs_json = loads( json_template_str )
-    apbs_json['name'] = apbs_json['name'].replace(b'{{job_id}}', job_id)
+def apbs_extract_input_files(job_id, infile_name, storage_host):
+    object_name = "%s/%s" % (job_id, infile_name)
+    url = '%s/api/storage/%s?json=true' % (storage_host, object_name)
+    response = requests.get(url)
+    infile_text = response.json()[object_name]
 
-    json_command = apbs_json['executors'][0]['command'][2]
-    json_command = json_command.replace(b'{{infile}}', command_line_args)
+    # Read only the READ section of infile, 
+    # extracting out the files needed for APBS
+    READ_start = False
+    READ_end = False
+    file_list = []
+    for whole_line in StringIO(u'%s' % infile_text):
+        line = whole_line.strip()
+        for arg in line.split():
+            # print(line.split())
+            if arg.upper() == 'READ':
+                READ_start = True
+            elif arg.upper() == 'END':
+                READ_end = True
+            else:
+                file_list.append(arg)
 
-    wget_str = ''
-    download_list = ['1a1p.pqr', 'apbsinput.in']
-    for file_name in download_list:
-        wget_str += 'wget %s/api/storage/%s/%s' % (storage_host, job_id, file_name)
-        wget_str += ' && '
-    json_command = json_command.replace(b'{{object_list}}', wget_str)
+            if READ_start and READ_end:
+                break
+        if READ_start and READ_end:
+            break
 
-    apbs_json['executors'][0]['command'][2] = json_command
-    apbs_json['executors'][0]['env']['JOB_ID'] = job_id
-    apbs_json['executors'][0]['env']['STORAGE_HOST'] = storage_host
+    # Slice list to only include files and nothing else in READ section
+    file_list = file_list[2:]
+    return file_list
 
-    return apbs_json
+# def apbs_json_config(job_id, command_line_args, storage_host):
+def apbs_json_config(job_id, infile_name, storage_host):
+    # Load job template JSON string; insert job_id and storage_host into
+    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', 'apbs_v2.json')).read() 
+    json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
+    json_template_str = json_template_str.replace(b'{{storage_host}}', '%s/api/storage' % storage_host)
+    # json_template_str = json_template_str.replace(b'{{infile}}', command_line_args)
+    json_template_str = json_template_str.replace(b'{{infile}}', infile_name)
+
+    # Append required download files to downloader container
+    # infile_name = 'apbsinput.in'
+    download_list = apbs_extract_input_files(job_id, infile_name, storage_host)
+    download_list = download_list + [infile_name]
+    json_dict = loads(json_template_str)
+    container_command = json_dict['executors'][0]['command']
+    json_dict['executors'][0]['command'] = container_command + download_list
+
+    return json_dict
 
 def pdb2pqr_json_config(job_id, command_line_args, storage_host):
-    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', 'pdb2pqr.json')).read()
-    pdb2pqr_json = loads( json_template_str )
-    pdb2pqr_json['name'] = pdb2pqr_json['name'].replace(b'{{job_id}}', job_id)
-
-    # Insert PDB2PQR command line arguments
-    json_command = pdb2pqr_json['executors'][0]['command'][2]
-    json_command = json_command.replace(b'{{args}}', command_line_args)
-
-    arg_list = command_line_args.split()
-
-    # Construct wget list
-    download_list = [arg_list[-2]]
-    wget_str = ''
-    for file_name in download_list:
-        wget_str += 'wget %s/api/storage/%s/%s' % (storage_host, job_id, file_name)
-        wget_str += ' && '
-    json_command = json_command.replace(b'{{object_list}}', wget_str)
+    # Load job template JSON string; insert job_id and storage_host into
+    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', 'pdb2pqr_v2.json')).read()
+    json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
+    json_template_str = json_template_str.replace(b'{{storage_host}}', '%s/api/storage' % storage_host)
 
     # Get pqr file basename, insert as upload_results.sh argument
-    pqr_basename_prefix = os.path.splitext(arg_list[-1])[0]
-    json_command = json_command.replace(b'{{output_basename}}', pqr_basename_prefix)
+    arg_list = command_line_args.split()
+    pdb_filename = arg_list[-2]
+    # json_template_str = json_template_str.replace(b'{{output_basename}}', os.path.splitext(pdb_filename)[0] )
+    json_template_str = json_template_str.replace(b'{{output_basename}}', job_id )
 
-    pdb2pqr_json['executors'][0]['command'][2] = json_command
-    pdb2pqr_json['executors'][0]['env']['JOB_ID'] = job_id
-    pdb2pqr_json['executors'][0]['env']['STORAGE_HOST'] = storage_host
+    # Insert PDB2PQR command line arguments
+    json_dict = loads(json_template_str)
+    json_command = json_dict['executors'][1]['command']
+    json_dict['executors'][1]['command'] = json_command + arg_list
 
-    return pdb2pqr_json
+    # Construct list of files for download container
+    download_list = [pdb_filename]
+    container_command = json_dict['executors'][0]['command']
+    json_dict['executors'][0]['command'] = container_command + download_list
+
+    return json_dict

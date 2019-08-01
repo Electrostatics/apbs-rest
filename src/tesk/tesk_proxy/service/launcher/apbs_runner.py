@@ -109,6 +109,10 @@ class Runner:
             # apbsOptions = fieldStorageToDict(form)
             apbsOptions = self.apbsOptions
 
+            # Extracts PQR file name from the '*.in' file within storage bucket
+            pqrFileName = tesk_proxy_utils.apbs_extract_input_files(self.job_id, self.job_id+'.in', storage_host)[0]
+            apbsOptions['pqrFileName'] = pqrFileName
+
             pqrFileCreator(apbsOptions)
 
             aoFile = open('%s%s%s/%s-ao' % (INSTALLDIR, TMPDIR, job_id, job_id),'w')
@@ -119,10 +123,9 @@ class Runner:
             # taken from apbsExec()
 
             # Copies PQR file to temporary directory
-            pqrFileName = form["pdb2pqrid"] + '.pqr'
+            # pqrFileName = form["pdb2pqrid"] + '.pqr'
             #shutil.copyfile('../pdb2pqr/tmp/%s' % pqrFileName, './tmp/%s/%s' % (job_id, pqrFileName))
             
-
             # Removes water from molecule if requested by the user
             try:
                 if form["removewater"] == "on":
@@ -171,7 +174,8 @@ class Runner:
         # set the APBS status to running, write to disk, upload
         with open(os.path.join(INSTALLDIR, TMPDIR, job_id, 'apbs_status'), 'w') as fout:
             fout.write('running\n')
-        upload_list = ['apbs_status', 'apbs_start_time']
+        print('infile name is: '+infile_name)
+        upload_list = ['apbs_status', 'apbs_start_time', infile_name]
         tesk_proxy_utils.send_to_storage_service(storage_host, job_id, upload_list, os.path.join(INSTALLDIR, TMPDIR))
 
         # TESK request headers

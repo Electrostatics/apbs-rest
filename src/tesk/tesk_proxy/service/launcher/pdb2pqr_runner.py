@@ -104,7 +104,8 @@ class Runner:
         
 
         # Retrieve information about the PDB file and command line arguments
-        self.weboptions.pdbfilename = self.weboptions.pdbfilename+'.pdb'
+        # self.weboptions.pdbfilename = self.weboptions.pdbfilename+'.pdb' # add pdb extension to pdbfilename
+        self.weboptions.pqrfilename = job_id+'.pqr' # make pqr name prefix the job_id
         command_line_args = self.weboptions.getCommandLine()
         if '--summary' in command_line_args:
             command_line_args = command_line_args.replace('--summary', '')

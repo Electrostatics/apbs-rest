@@ -32,8 +32,9 @@ def submit_tesk_action(job_id, task_name):
         if task_name.lower() in ['apbs', 'pdb2pqr']:
             if task_name == 'apbs':
                 if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
-                    # runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, infile_name=infile_name)
-                    pass
+                    infile_name = request.json['filename']
+                    runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, infile_name=infile_name)
+                    redirectURL = runner.start(STORAGE_HOST, TESK_HOST)
                 else:
                     form = request.json
                     for key in form.keys():
