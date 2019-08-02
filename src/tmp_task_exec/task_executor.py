@@ -2,7 +2,7 @@ from __future__ import print_function
 from flask import request, Blueprint, redirect
 import os, time
 # import task_utils
-from . import executor_utils
+import executor_utils
 from launcher import pdb2pqr_runner, apbs_runner
 
 try:

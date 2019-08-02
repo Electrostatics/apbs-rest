@@ -25,18 +25,20 @@ RUN python scons/scons.py install
 # stage 2 - config and deploy Flask app
 # FROM python:2.7-alpine
 WORKDIR /app
-COPY . /app
+COPY requirements.txt /app
+RUN python -m pip install -r requirements.txt
 # COPY --from=apbs_pdb2pqr-build /app/apbs_build ./apbs_build
 # COPY --from=apbs_pdb2pqr-build /app/pdb2pqr_build ./pdb2pqr_build
 # RUN cp  ./src/pdb2pqr_build_materials/main_cgi.py \
 #         ./src/pdb2pqr_build_materials/querystatus.py \
 #         ./src/pdb2pqr_build_materials/apbs_cgi.py ./pdb2pqr_build
 
+COPY . /app
 WORKDIR /app/legacy
-RUN ln -s ../builds/pdb2pqr/src
+RUN ln -s ../builds/pdb2pqr/src \
+    && ln -s ../builds/pdb2pqr/main.pyc
 
 WORKDIR /app
-RUN python -m pip install -r requirements.txt
 RUN ls -la /app/legacy
 # RUN export FLASK_APP=server.py
 # RUN export FLASK_DEBUG=1

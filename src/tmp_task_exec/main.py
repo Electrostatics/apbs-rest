@@ -3,7 +3,7 @@ from os import environ
 # sys.path.append(os.getcwd())
 from flask import Flask
 from flask_api import FlaskAPI
-from .task_executor import tmp_executor
+from task_executor import tmp_executor
 
 # sys.path.append('/' + os.path.join(*os.getcwd().split('/')[:-2]) + "/pdb2pqr_build")
 PDB2PQR_BUILD_DIR = os.getenv('PDB2PQR_BUILD_DIR')

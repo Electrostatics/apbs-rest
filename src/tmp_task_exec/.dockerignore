@@ -12,4 +12,4 @@ legacy/main.pyc
 # Files
 *.pyc
 *.http
-.env
+# .env
