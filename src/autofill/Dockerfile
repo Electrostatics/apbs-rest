@@ -22,7 +22,7 @@ RUN ln -s ../builds/pdb2pqr/src
 COPY apbs_cgi.py .
 
 WORKDIR /app
-RUN rm /app/legacy/*.pyc
+RUN rm /app/legacy/*.pyc /app/apbs_cgi.py
 
 # ENV FLASK_APP=server.py
 # ENV FLASK_DEBUG=1
