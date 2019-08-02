@@ -1219,9 +1219,55 @@ def unpickleVars(pdb2pqrID):
     """ Converts instance pickle from PDB2PQR into a dictionary for APBS """
     apbsOptions = {}
     #pfile = open("/home/samir/public_html/pdb2pqr/tmp/%s-input.p" % pdb2pqrID, 'r')
-    pfile = open("%s%s%s/%s-input.p" % (INSTALLDIR, TMPDIR, pdb2pqrID, pdb2pqrID), 'r')
-    inputObj = pickle.load(pfile)
-    pfile.close()
+    try:
+        pfile = open("%s%s%s/%s-input.p" % (INSTALLDIR, TMPDIR, pdb2pqrID, pdb2pqrID), 'r')
+        print(pfile.read())
+        pfile.seek(0)
+        print('pickling')
+        sys.stdout.flush()
+        inputObj = pickle.load(pfile)
+        print('pickling finished. Closing pfile')
+        sys.stdout.flush()
+        pfile.close()
+        print('pfile closed')
+        sys.stdout.flush()
+    except IOError:
+        from requests import get
+        storage_host = os.getenv('STORAGE_HOST')
+        object_name = '%s/%s-input.p' % (pdb2pqrID, pdb2pqrID)
+        
+        print('object name: %s' % object_name)
+        print('getting data from server')
+        sys.stdout.flush()
+
+        # Get *-input.p file then insert into StringIO bugfer variable pfile
+        response = get('%s/api/storage/%s?json=true' % (storage_host, object_name))
+        # response = get('%s/api/storage/%s' % (storage_host, object_name))
+        json_response = response.json()
+        # json_response = response.content
+        # try:
+        #     os.makedirs('%s%s%s' % (INSTALLDIR, TMPDIR, pdb2pqrID))
+        # except:
+        #     pass
+        # with open("%s%s%s/%s-input.p" % (INSTALLDIR, TMPDIR, pdb2pqrID, pdb2pqrID), 'w') as fout:
+        #     fout.write(json_response)
+        # pfile = open("%s%s%s/%s-input.p" % (INSTALLDIR, TMPDIR, pdb2pqrID, pdb2pqrID), 'r')
+        # print('%s content:' % object_name)
+        # print(json_response[object_name])
+        # sys.stdout.flush()
+        pfile_str = str(json_response[object_name])
+        pfile_str.replace('src.inputgen', 'app.legacy.src.inputgen')
+        print('String item pfile_str instantiated')
+        # print(type(pfile_str))
+        sys.stdout.flush()
+        
+        print('pickling pfile_str')
+        sys.stdout.flush()
+        # inputObj = pickle.load(pfile)
+        inputObj = pickle.loads(pfile_str)
+        print('pickling finished')
+        sys.stdout.flush()
+
     myElec = inputObj.elecs[0]
 
     apbsOptions['pqrname'] = pdb2pqrID+'.pqr'
