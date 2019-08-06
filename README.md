@@ -4,21 +4,11 @@
 **Tested using build of APBS-PDB2PQR through Ubuntu**
 
 ## Table of Contents
-* [Preface](##Preface)
 * [System Requirements](##System-Requirements)
 * [Getting Started](##Getting-Started)
+* [For Developers](##For-Developers)
 <!-- * [Setup](##Setup)
 * [Execution](##Execution) -->
-
-## Preface
-This repository serves as the backend interface for an overhauled PDB2PQR web server.  As such, the code contained herein serves as **one of three** components necessary to fully operate the website.  The frontend interface and APBS-PDB2PQR software should be cloned and built separately.  Links to both are below, respectively:
-* [apbs-web](https://github.com/Eo300/apbs-web) (front-end)
-  * After cloning to your desired location, use the ```npm run build``` command to build a production-ready version of the latest build
-  * [**UPDATE**] With a recent move to Dockerize this component, building this frontend component may not be necessary as the build would exist in it's own container
-* [apbs-pdb2pqr](https://github.com/Electrostatics/apbs-pdb2pqr)  
-  * You will need to build APBS and PDB2PQR since both are used for the job functions of the website
-
-For both of the above, feel free to clone them in a location of your choosing, though I did so outside of this repository to avoid confusion within Git. 
 
 ## System Requirements
 ### Users
@@ -88,6 +78,29 @@ helm status apbs-rest
 
 Finally, you should be able to navigate to apbs.127.0.0.1.xip.io or apbs.$(minikube ip).xip.io in your browser and navigate the APBS-REST homepage.
 
+## For Developers
+
+### Preface
+This repository serves as the backend interface for an overhauled APBS web server.  As such, the code contained herein serves as **one of two** components necessary to develop on the website:
+* [apbs-web](https://github.com/Eo300/apbs-web) (front-end)
+  * After cloning to your desired location, use the ```npm run dev``` command to run a development server with the defined environment variables.
+  * [**UPDATE**] With a recent move to Dockerize this component, building this frontend component may not be necessary as the build would exist in it's own container
+* [apbs-pdb2pqr](https://github.com/Electrostatics/apbs-pdb2pqr)  
+  * You will need to build APBS and PDB2PQR depending on which service you plan to develop for, as some use the legacy code via symlinks
+
+For both of the above, feel free to clone them in a location of your choosing, though it's recommended to be done outside of this repository to avoid confusion with Git checking for file changes.
+
+### Microservices
+
+All the microservices live within the src directory. A list of all the services used within the Helm chart are as follows:
+- [autofill](src/autofill) *
+- [storage](src/storage)
+- [task](src/task)
+- [tesk-proxy](src/tesk)
+- [uid](src/uid)
+- [workflow](src/v2_workflow)
+
+\* Some services are dependent on legacy code from the original apbs-pdb2pqr repository.  Thus, you'd need to have a APBS/PDB2PQR build somewhere on your system and specific paths symlinked to the respective service.  Details are available within the respective README files per service.
 
 <!-- ## Setup
 ### Initiate Python virtualenv "./venv/"  
