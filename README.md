@@ -93,14 +93,14 @@ For both of the above, feel free to clone them in a location of your choosing, t
 ### Microservices
 
 All the microservices live within the src directory. A list of all the services used within the Helm chart are as follows:
-- [autofill](src/autofill) *
+- [autofill](src/autofill)<sup>1</sup>
 - [storage](src/storage)
 - [task](src/task)
 - [tesk-proxy](src/tesk)
 - [uid](src/uid)
 - [workflow](src/v2_workflow)
 
-\* Some services are dependent on legacy code from the original apbs-pdb2pqr repository.  Thus, you'd need to have a APBS/PDB2PQR build somewhere on your system and specific paths symlinked to the respective service.  Details are available within the respective README files per service.
+<sup>1</sup> Some services are dependent on legacy code from the original apbs-pdb2pqr repository.  Thus, you'd need to have a APBS/PDB2PQR build somewhere on your system and specific paths symlinked to the respective service.  Details are available within the respective README files per service.
 
 <!-- ## Setup
 ### Initiate Python virtualenv "./venv/"  
