@@ -22,6 +22,8 @@ All of the above along with...
 - [Python 3.6+](https://www.python.org/downloads/)
 - [Python 2.7](https://www.python.org/downloads/release/python-2716/)
     - for development on services using legacy PDB2PQR code
+- [Docker](https://docs.docker.com/install/)
+    - Certain tests require this as they utilize the [Docker SDK for Python](https://docker-py.readthedocs.io/en/stable/)
 
 ## Getting Started
 
