@@ -56,3 +56,15 @@ def send_to_storage_service(storage_host, job_id, file_list, local_upload_dir):
     # stdout.write('  done\n\n')
     
     return successful_upload
+
+
+"""
+Functions lifted from apbs-pdb2pqr repo
+"""
+
+# from apbs-pdb2pqr/pdb2pqr/src/utilities.py
+def getPQRBaseFileName(filename):
+    root, ext = os.path.splitext(filename)
+    if ext.lower() == '.pqr':
+        return root
+    return filename

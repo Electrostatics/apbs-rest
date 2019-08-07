@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 from legacy import apbs_cgi
 from legacy.src import psize, inputgen
 from legacy.src.aconf import INSTALLDIR, TMPDIR
-import os, json
+import os, json, requests
 import autofill_utils
 
 STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5001')
@@ -24,7 +24,17 @@ def send_autofill_info(job_id, job_type):
 
     if job_type == 'apbs' and job_id:
         response_id = autofill_utils.get_new_id() # id num so frontend knows to refill fields
-        json_response_dict = apbs_cgi.unpickleVars(job_id)
+
+        # json_response_dict = apbs_cgi.unpickleVars(job_id)
+
+        # object_name = job_id/job_id.json
+        # requests get job_id.json
+        # load contents[object_name] into json_response_dict
+        object_name = '%s/%s.json' % (job_id, job_id)
+        r = requests.get('%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name))
+        input_data = r.json()[object_name]
+        json_response_dict = json.loads(input_data)
+        
         json_response_dict['response_id'] = response_id
         # print(type(json_response_dict))
         # print(type(json_response_dict['dime']))
