@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 from legacy import apbs_cgi
 from legacy.src import psize, inputgen
 from legacy.src.aconf import INSTALLDIR, TMPDIR
-import os, json, requests
+import os, sys, json, requests
 import autofill_utils
 
 STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5001')
@@ -30,7 +30,7 @@ def send_autofill_info(job_id, job_type):
         # object_name = job_id/job_id.json
         # requests get job_id.json
         # load contents[object_name] into json_response_dict
-        object_name = '%s/%s.json' % (job_id, job_id)
+        object_name = '%s/%s-input.json' % (job_id, job_id)
         r = requests.get('%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name))
         input_data = r.json()[object_name]
         json_response_dict = json.loads(input_data)
@@ -64,50 +64,56 @@ def parse_upload(job_id, job_type):
         print(request)
         try:
             print(request.files.keys())
-            files = request.files['file']
-            if files:
-                filename = secure_filename(files.filename)
-                # filename = 
-                mime_type = files.content_type
 
-                if files and autofill_utils.allowed_file(files.filename, EXTENSION_WHITELIST):
-                    print("passed whitelist")
-                    new_job_id = autofill_utils.get_new_id()  
-                    tmp_dir_path = os.path.join(INSTALLDIR, TMPDIR)
-                    job_dir_path = os.path.join(tmp_dir_path, new_job_id)
-                    upload_path  = os.path.join(job_dir_path, '%s.pqr' % (new_job_id) )
-                    if not os.path.exists(job_dir_path):
-                        print("passed does_exists()")
-                        os.makedirs(job_dir_path)
-                        files.save(upload_path)
+            if job_type == 'apbs':
+                files = request.files['file']
+                if files:
+                    filename = secure_filename(files.filename)
+                    # filename = 
+                    mime_type = files.content_type
 
-                        # Lifted from main_cgi.py APBS handler, line 626
-                        method = "mg-auto"
-                        size = psize.Psize()
-                        size.parseInput(upload_path)
-                        size.runPsize(upload_path)
-                        async = 0 # No async files here!
-                        myinput = inputgen.Input(upload_path, size, method, async, potdx=True)
-                        myinput.printInputFiles()
-                        myinput.dumpPickle()
-                        # return autofill(new_job_id, 'apbs')
-                        
-                        autofill_utils.send_to_storage_service( STORAGE_HOST, new_job_id, 
-                            [   new_job_id+'.pqr',
-                                new_job_id+'.in',
-                                new_job_id+'-input.p',
-                            ], upload_folder )
-                            # ], app.config['UPLOAD_FOLDER'] )
+                    if files and autofill_utils.allowed_file(files.filename, EXTENSION_WHITELIST):
+                        print("passed whitelist")
+                        new_job_id = autofill_utils.get_new_id()  
+                        tmp_dir_path = os.path.join(INSTALLDIR, TMPDIR)
+                        job_dir_path = os.path.join(tmp_dir_path, new_job_id)
+                        upload_path  = os.path.join(job_dir_path, '%s.pqr' % (new_job_id) )
+                        if not os.path.exists(job_dir_path):
+                            print("passed does_exists()")
+                            os.makedirs(job_dir_path)
+                            files.save(upload_path)
 
-                        json_response = {
-                            'upload_status': 'Success',
-                            'job_id': new_job_id,
-                        }
-                        http_status_response = 201
+                            # Lifted from main_cgi.py APBS handler, line 626
+                            method = "mg-auto"
+                            size = psize.Psize()
+                            size.parseInput(upload_path)
+                            size.runPsize(upload_path)
+                            async = 0 # No async files here!
+                            myinput = inputgen.Input(upload_path, size, method, async, potdx=True)
+                            myinput.printInputFiles()
+                            # myinput.dumpPickle()
 
-                        # json_response = apbs_cgi.unpickleVars(new_job_id)
-                else:
-                    raise Exception('File must be a PQR file')
+                            apbsOptions_dict = autofill_utils.inputgenToJSON(myinput, new_job_id)
+                            input_json_name = '%s/%s-input.json' % (job_dir_path, new_job_id)
+                            json.dump(apbsOptions_dict, open(input_json_name, 'w'))
+                            # return autofill(new_job_id, 'apbs')
+                            
+                            autofill_utils.send_to_storage_service( STORAGE_HOST, new_job_id, 
+                                [   new_job_id+'.pqr',
+                                    new_job_id+'.in',
+                                    new_job_id+'-input.json',
+                                ], upload_folder )
+                                # ], app.config['UPLOAD_FOLDER'] )
+
+                            json_response = {
+                                'upload_status': 'Success',
+                                'job_id': new_job_id,
+                            }
+                            http_status_response = 201
+
+                            # json_response = apbs_cgi.unpickleVars(new_job_id)
+                    else:
+                        raise Exception('File must be a PQR file')
 
         except Exception as e:
             # json_response = 'failed: %s' % (e)

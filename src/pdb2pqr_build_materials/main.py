@@ -858,7 +858,7 @@ def pickleToJSON(outpath):
     apbsOptions['writeIonAccessibilityKappaMap'] = False
 
     # dump to json file
-    fout_json = open("%s.json" % (root_name), 'w')
+    fout_json = open("%s-input.json" % (root_name), 'w')
     fout_json.write( json.dumps(apbsOptions) )
     fout_json.close()
 
