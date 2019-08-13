@@ -80,7 +80,7 @@ class Runner:
 
     def run_job(self, job_id, storage_host, tesk_host):
         # print(self.weboptions.pdbfilestring)
-        pdblist, errlist = readPDB(self.weboptions.pdbfile)
+        # pdblist, errlist = readPDB(self.weboptions.pdbfile)
 
         currentdir = os.getcwd()
         os.chdir("/")
@@ -91,10 +91,10 @@ class Runner:
         # os.close(2) # two lines are necessary
 
 
-        pqrpath = '%s%s%s/%s.pqr' % (INSTALLDIR, TMPDIR, job_id, job_id)
+        # pqrpath = '%s%s%s/%s.pqr' % (INSTALLDIR, TMPDIR, job_id, job_id)
 
-        orig_stdout = sys.stdout
-        orig_stderr = sys.stderr
+        # orig_stdout = sys.stdout
+        # orig_stderr = sys.stderr
         # sys.stdout = open('%s%s%s/pdb2pqr_stdout.txt' % (INSTALLDIR, TMPDIR, job_id), 'w')
         # sys.stderr = open('%s%s%s/pdb2pqr_stderr.txt' % (INSTALLDIR, TMPDIR, job_id), 'w')
         
@@ -102,20 +102,33 @@ class Runner:
         if self.weboptions.runoptions.get('ph_calc_method', '') == 'pdb2pka':
             run_arguements['ph_calc_options']['output_dir']='%s%s%s/pdb2pka_output' % (INSTALLDIR, TMPDIR, job_id)
         
-
         # Retrieve information about the PDB file and command line arguments
-        if os.path.splitext(self.weboptions.pdbfilename)[1] != '.pdb':
-            self.weboptions.pdbfilename = self.weboptions.pdbfilename+'.pdb' # add pdb extension to pdbfilename
+        if self.weboptions.user_did_upload:
+            upload_list = ['pdb2pqr_status', 'pdb2pqr_start_time']
+        else:
+            if os.path.splitext(self.weboptions.pdbfilename)[1] != '.pdb':
+                self.weboptions.pdbfilename = self.weboptions.pdbfilename+'.pdb' # add pdb extension to pdbfilename
+                # Write the PDB file contents to disk
+                with open(os.path.join(INSTALLDIR, TMPDIR, job_id, self.weboptions.pdbfilename), 'w') as fout:
+                    fout.write(self.weboptions.pdbfilestring)
+                    upload_list = [self.weboptions.pdbfilename, 'pdb2pqr_status', 'pdb2pqr_start_time']
         self.weboptions.pqrfilename = job_id+'.pqr' # make pqr name prefix the job_id
         command_line_args = self.weboptions.getCommandLine()
         if '--summary' in command_line_args:
             command_line_args = command_line_args.replace('--summary', '')
         print(command_line_args)
         print(self.weboptions.pdbfilename)
-
-        # Write the PDB file contents to disk
-        with open(os.path.join(INSTALLDIR, TMPDIR, job_id, self.weboptions.pdbfilename), 'w') as fout:
-            fout.write(self.weboptions.pdbfilestring)
+        
+        if self.weboptions.user_did_upload:
+            upload_list = ['pdb2pqr_status', 'pdb2pqr_start_time']
+        else:
+            if os.path.splitext(self.weboptions.pdbfilename)[1] != '.pdb':
+                self.weboptions.pdbfilename = self.weboptions.pdbfilename+'.pdb' # add pdb extension to pdbfilename
+            print(self.weboptions.pdbfilename)
+            # Write the PDB file contents to disk
+            with open(os.path.join(INSTALLDIR, TMPDIR, job_id, self.weboptions.pdbfilename), 'w') as fout:
+                fout.write(self.weboptions.pdbfilestring)
+            upload_list = [self.weboptions.pdbfilename, 'pdb2pqr_status', 'pdb2pqr_start_time']
 
         # Write the start time to a file, before posting to TESK
         with open(os.path.join(INSTALLDIR, TMPDIR, job_id, 'pdb2pqr_start_time'), 'w') as fout:
@@ -124,7 +137,7 @@ class Runner:
         # set the PDB2PQR status to running, write to disk, upload
         with open(os.path.join(INSTALLDIR, TMPDIR, job_id, 'pdb2pqr_status'), 'w') as fout:
             fout.write('running\n')
-        upload_list = [self.weboptions.pdbfilename, 'pdb2pqr_status', 'pdb2pqr_start_time']
+
         tesk_proxy_utils.send_to_storage_service(storage_host, job_id, upload_list, os.path.join(INSTALLDIR, TMPDIR))
 
         # TESK request headers
@@ -139,15 +152,17 @@ class Runner:
 
         url = tesk_host + '/v1/tasks/'
         print(url)
+        
+        #TODO: create handler in case of non-200 response
         response = requests.post(url, headers=headers, json=pdb2pqr_json)
         
         print(response.content)
         return
 
-        exit(0)
+        # exit(0)
 
-        from service.legacy.main import runPDB2PQR
-        # """
+        # from service.legacy.main import runPDB2PQR
+        """
         header, lines, missedligands = runPDB2PQR(pdblist, 
                                                     self.weboptions.ff,
                                                     outname = pqrpath,
@@ -225,10 +240,10 @@ class Runner:
                 tesk_proxy_utils.send_to_storage_service(storage_host, job_id, file_list, os.path.join(INSTALLDIR, TMPDIR))
             except Exception as err:
                 with open('storage_err', 'a+') as fin:
-                    fin.write(err)
+                    # fin.write(err)
         # sys.stdout.close()
-        # sys.stderr.close()
-        # """
+        sys.stderr.close()
+        """
 
 
     def start(self, storage_host, tesk_host):

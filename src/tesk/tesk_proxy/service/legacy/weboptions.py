@@ -33,15 +33,20 @@ class WebOptions(object):
         
         if form.has_key("PDBID") and form["PDBID"] and form["PDBSOURCE"] == 'ID':
             self.pdbfile = utilities.getPDBFile(form["PDBID"])
+            self.user_did_upload = False
             if self.pdbfile is None:
                 raise WebOptionsError('The pdb ID provided is invalid.')
             self.pdbfilestring = self.pdbfile.read()
             self.pdbfile = StringIO(self.pdbfilestring)
             self.pdbfilename = form["PDBID"]
-        elif files.has_key("PDB") and files["PDB"].filename and form["PDBSOURCE"] == 'UPLOAD':
-            self.pdbfilestring = files["PDB"].stream.read()
-            self.pdbfile = StringIO(self.pdbfilestring)
-            self.pdbfilename = sanitizeFileName(files["PDB"].filename)
+        # elif files.has_key("PDB") and files["PDB"].filename and form["PDBSOURCE"] == 'UPLOAD':
+        # elif files.has_key("PDB") and files["PDB"].filename and form["PDBSOURCE"] == 'UPLOAD':
+        elif form['PDBSOURCE'] == 'UPLOAD' and form['PDBFILE'] != '':
+            # self.pdbfilestring = files["PDB"].stream.read()
+            self.user_did_upload = True
+            # self.pdbfile = StringIO(self.pdbfilestring)
+            # self.pdbfilename = sanitizeFileName(files["PDB"].filename) # pass filename through client
+            self.pdbfilename = sanitizeFileName(form['PDBFILE']) # pass filename through client
             print("filename: "+self.pdbfilename)
         else:
             raise WebOptionsError('You need to specify a pdb ID or upload a pdb file.')
@@ -77,18 +82,21 @@ class WebOptions(object):
         self.otheroptions['whitespace'] = form.has_key("WHITESPACE")
         
         if self.ff == 'user':
-            if form.has_key("USERFF") and form["USERFF"].filename:
-                self.userfffilename = sanitizeFileName(form["USERFF"].filename)
-                self.userffstring = form["USERFF"]
-                self.runoptions['userff'] = StringIO(form["USERFF"])
+            # if form.has_key("USERFF") and form["USERFF"].filename:
+            # self.userfffilename = sanitizeFileName(form["USERFF"].filename)
+            if form.has_key("USERFFFILE") and form["USERFFFILE"] != "":
+                self.userfffilename = sanitizeFileName(form["USERFFFILE"])
+                # self.userffstring = form["USERFF"]
+                self.runoptions['userff'] = StringIO(form["USERFFFILE"])
             else:
                 text = "A force field file must be provided if using a user created force field."
                 raise WebOptionsError(text)
                 
-            if form.has_key("USERNAMES") and form["USERNAMES"].filename:
-                self.usernamesfilename = sanitizeFileName(form["USERNAMES"].filename)
-                self.usernamesstring = form["USERNAMES"]
-                self.runoptions['usernames'] = StringIO(form["USERNAMES"])
+            # if form.has_key("USERNAMES") and form["USERNAMES"].filename:
+            if form.has_key("NAMESFILE") and form["NAMESFILE"] != "":
+                self.usernamesfilename = sanitizeFileName(form["NAMESFILE"])
+                # self.usernamesstring = form["USERNAMES"]
+                self.runoptions['usernames'] = StringIO(form["NAMESFILE"])
             else:
                 text = "A names file must be provided if using a user created force field."
                 raise WebOptionsError(text)

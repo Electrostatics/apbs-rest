@@ -71,4 +71,6 @@ def submit_tesk_action(job_id, task_name):
             
     # import pprint as pp
     # pp.pprint(response)
+
+    sys.stdout.flush()
     return response, http_status

@@ -93,13 +93,28 @@ def pdb2pqr_json_config(job_id, command_line_args, storage_host):
     # json_template_str = json_template_str.replace(b'{{output_basename}}', os.path.splitext(pdb_filename)[0] )
     json_template_str = json_template_str.replace(b'{{output_basename}}', job_id )
 
+    # Extract user forcefield, user names, and ligand files; prepare download list for container
+    download_list = []
+    for arg in arg_list:
+        if '--userff' in arg:
+            userff_filename = arg.split('=')[1]
+            download_list.append(userff_filename)
+        elif '--usernames' in arg:
+            usernames_filename = arg.split('=')[1]
+            download_list.append(usernames_filename)
+        elif '--ligand' in arg:
+            ligand_filename = arg.split('=')[1]
+            download_list.append()
+    
+
     # Insert PDB2PQR command line arguments
     json_dict = loads(json_template_str)
     json_command = json_dict['executors'][1]['command']
     json_dict['executors'][1]['command'] = json_command + arg_list
 
     # Construct list of files for download container
-    download_list = [pdb_filename]
+    # download_list = [pdb_filename]
+    download_list.append(pdb_filename)
     container_command = json_dict['executors'][0]['command']
     json_dict['executors'][0]['command'] = container_command + download_list
 
