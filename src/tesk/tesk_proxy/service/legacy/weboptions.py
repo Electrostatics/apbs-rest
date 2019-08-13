@@ -114,14 +114,17 @@ class WebOptions(object):
             self.ff != 'parse':
             raise WebOptionsError('Neutral N-terminus and C-terminus require the PARSE forcefield.')
         
-        if form.has_key("LIGAND") and form['LIGAND'].filename:
-            self.ligandfilename=sanitizeFileName(form["LIGAND"].filename)
-            ligandfilestring = form["LIGAND"]
+        # if form.has_key("LIGAND") and form['LIGAND'].filename:
+            # self.ligandfilename=sanitizeFileName(form["LIGAND"].filename)
+        if form.has_key("LIGANDFILE") and form['LIGANDFILE'] != '':
+            self.ligandfilename=sanitizeFileName(form["LIGANDFILE"])
+            # ligandfilestring = form["LIGAND"]
             # for Windows and Mac style newline compatibility for pdb2pka
-            ligandfilestring = ligandfilestring.replace('\r\n', '\n')
-            self.ligandfilestring = ligandfilestring.replace('\r', '\n')
+            # ligandfilestring = ligandfilestring.replace('\r\n', '\n')
+            # self.ligandfilestring = ligandfilestring.replace('\r', '\n')
             
-            self.runoptions['ligand'] = StringIO(self.ligandfilestring)
+            # self.runoptions['ligand'] = StringIO(self.ligandfilestring)
+            self.runoptions['ligand'] = StringIO(form["LIGANDFILE"])
             
         if self.pdbfilename[-4:]==".pdb":
             self.pqrfilename = "%s.pqr" % self.pdbfilename[:-4]

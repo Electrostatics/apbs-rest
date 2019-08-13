@@ -104,7 +104,7 @@ def pdb2pqr_json_config(job_id, command_line_args, storage_host):
             download_list.append(usernames_filename)
         elif '--ligand' in arg:
             ligand_filename = arg.split('=')[1]
-            download_list.append()
+            download_list.append(ligand_filename)
     
 
     # Insert PDB2PQR command line arguments
