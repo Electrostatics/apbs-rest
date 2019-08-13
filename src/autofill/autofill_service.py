@@ -115,6 +115,19 @@ def parse_upload(job_id, job_type):
                     else:
                         raise Exception('File must be a PQR file')
 
+            elif job_type == 'pdb2pqr':
+                files = request.files['file']
+                is_successful_upload = autofill_utils.handle_pdb2pqr_upload(files, job_id, STORAGE_HOST)
+                if is_successful_upload:
+                    json_response = {
+                        'upload_status': 'Success',
+                        # 'job_id': new_job_id,
+                    }                    
+                    http_status_response = 201
+                else:
+                    raise Exception('Upload failed')
+
+
         except Exception as e:
             # json_response = 'failed: %s' % (e)
             print(e)

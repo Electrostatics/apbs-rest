@@ -5,10 +5,10 @@ from json import loads, dumps
 from flask import request
 from werkzeug.utils import secure_filename
 
-def handle_pdb(upload_file, job_id, storage_host):
+def handle_pdb2pqr_upload(upload_file, job_id, storage_host):
     if upload_file:
         file_name = secure_filename(upload_file.filename)
-        if allowed_file(file_name, ['pdb']):
+        if allowed_file(file_name, ['pdb', 'dat','names', 'mol2']):
             pdb_stream = upload_file.stream
             files = {'file_data': pdb_stream}
             url = '%s/api/storage/%s/%s' % (storage_host, job_id, file_name)
