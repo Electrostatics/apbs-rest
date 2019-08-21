@@ -3,7 +3,7 @@
     "volumes": [ "/app/run" ],
     "executors": [
       {
-        "image": "electrostatics/apbs-downloader:latest",
+        "image": "electrostatics/apbs-downloader:stable",
         "command": [ "python", "../download_input_files.py" ],
         "env": {
           "JOB_ID": "{{job_id}}",
@@ -11,13 +11,13 @@
         }
       },
       {
-        "image": "electrostatics/apbs-bin:latest",
+        "image": "electrostatics/apbs-bin:1.5",
         "command": [ "apbs", "{{infile}}" ],
         "stdout": "/app/run/apbs_stdout.txt",
         "stderr": "/app/run/apbs_stderr.txt"
       },
       {
-        "image": "electrostatics/apbs-uploader:latest",
+        "image": "electrostatics/apbs-uploader:stable",
         "command": [ 
           "sh", "-c",
           "../generate_final_status.sh apbs && python ../upload_output_files.py"
