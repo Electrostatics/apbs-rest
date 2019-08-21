@@ -3,10 +3,10 @@
 *This project is a work in progress. Stability not guaranteed.*
 
 ## Table of Contents
-* [System Requirements](##System-Requirements)
-* [Getting Started](##Getting-Started)
-* [For Developers](##For-Developers)
-* [Uninstall from Cluster](##Uninstall-from-Cluster)
+* [System Requirements](#system-requirements)
+* [Getting Started](#getting-started)
+* [For Developers](#for-developers)
+* [Uninstall from Cluster](#uninstall-from-cluster)
 <!-- * [Setup](##Setup)
 * [Execution](##Execution) -->
 
