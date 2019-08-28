@@ -172,3 +172,8 @@ def get_minio_client(minio_url, access_key, secret_key):
                         secret_key=secret_key,
                         secure=False)
     return minioClient
+
+def get_request_options(response, methods_array):
+    response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
+    response.headers['Access-Control-Allow-Methods'] = methods_array
+    return response

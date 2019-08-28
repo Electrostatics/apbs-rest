@@ -33,7 +33,7 @@ atexit.register(storageClient.clear_cache)
 def is_Alive():
     return '', 200
 
-@storage_app.route('/api/storage/<job_id>/<file_name>', methods=['GET', 'PUT', 'POST', 'DELETE'])
+@storage_app.route('/api/storage/<job_id>/<file_name>', methods=['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'])
 @storage_app.route('/api/storage/<job_id>', methods=['DELETE'])
 def storage_service(job_id, file_name=None):
     # def storage_service(job_id, file_name=None):
@@ -130,3 +130,11 @@ def storage_service(job_id, file_name=None):
         storageClient.remove_objects(JOB_BUCKET_NAME, object_list)
 
         return 'Success', 204
+
+    elif request.method == 'OPTIONS':
+        options = ['GET', 'PUT', 'POST', 'DELETE']
+        response = make_response()
+        response = storage_utils.get_request_options(response, options)
+        http_response_code = 204
+        
+        return response, http_response_code
