@@ -144,7 +144,7 @@ class Runner:
         headers = {}
         headers['Content-Type'] = 'application/json'
         headers['Accept'] = 'application/json'
-        pdb2pqr_json = tesk_proxy_utils.pdb2pqr_json_config(job_id, command_line_args, storage_host)
+        pdb2pqr_json = tesk_proxy_utils.pdb2pqr_json_config(job_id, command_line_args, storage_host, os.path.join(INSTALLDIR, TMPDIR))
 
 
         from pprint import pprint

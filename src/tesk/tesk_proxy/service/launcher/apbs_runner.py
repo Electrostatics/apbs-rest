@@ -182,7 +182,7 @@ class Runner:
         headers = {}
         headers['Content-Type'] = 'application/json'
         headers['Accept'] = 'application/json'
-        apbs_json = tesk_proxy_utils.apbs_json_config(job_id, infile_name, storage_host)
+        apbs_json = tesk_proxy_utils.apbs_json_config(job_id, infile_name, storage_host, os.path.join(INSTALLDIR, TMPDIR))
 
         from pprint import pprint
         pprint(apbs_json)

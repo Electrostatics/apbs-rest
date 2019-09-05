@@ -48,6 +48,32 @@ def get_endtime(jobid, task_name):
 
     return endtime
 
+def get_input_files(jobid, task_name):
+    input_files = None
+
+    object_name = '%s/%s_input_files' % (jobid, task_name)
+    inputfile_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    response = requests.get( inputfile_url )
+
+    if response.status_code == 200:
+        obj_content = loads(response.content)[object_name]
+        input_files = obj_content.split()
+    
+    return input_files
+
+
+def get_output_files(jobid, task_name):
+    output_files = None
+
+    object_name = '%s/%s_output_files' % (jobid, task_name)
+    outputfile_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    response = requests.get( outputfile_url )
+
+    if response.status_code == 200:
+        obj_content = loads(response.content)[object_name]
+        output_files = obj_content.split()
+    
+    return output_files
 
 def get_jobstatus_state(jobid, task_name):
     job_status = None

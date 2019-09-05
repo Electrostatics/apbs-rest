@@ -29,7 +29,17 @@ def send_to_storage_service(storage_host, job_id, file_list, local_upload_dir):
     stdout.flush()
     # stdout.write('  done\n\n')
 
-    pass
+def export_input_file_list(file_list, job_id, prefix, job_dir):
+    output_name = '%s_input_files' % (prefix)
+    output_name_path = '%s/%s' % (job_dir, output_name)
+    fout = open(output_name_path, 'w')
+    
+    for name in file_list:
+        fout.write('%s/%s\n' % (job_id, name))
+    fout.close()
+    print('Input file written to: %s' % output_name_path)
+
+    return output_name
 
 def apbs_extract_input_files(job_id, infile_name, storage_host):
     object_name = "%s/%s" % (job_id, infile_name)
@@ -63,7 +73,7 @@ def apbs_extract_input_files(job_id, infile_name, storage_host):
     return file_list
 
 # def apbs_json_config(job_id, command_line_args, storage_host):
-def apbs_json_config(job_id, infile_name, storage_host):
+def apbs_json_config(job_id, infile_name, storage_host, local_upload_dir):
     # Load job template JSON string; insert job_id and storage_host into
     json_template_str = open(os.path.join(os.getcwd(), 'json_templates', 'apbs_v2.json')).read() 
     json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
@@ -79,9 +89,14 @@ def apbs_json_config(job_id, infile_name, storage_host):
     container_command = json_dict['executors'][0]['command']
     json_dict['executors'][0]['command'] = container_command + download_list
 
+    # Export and upload list of input files
+    job_dir = '%s%s' % (local_upload_dir, job_id)
+    inputfile_list_name = export_input_file_list(download_list, job_id, 'apbs', job_dir)
+    send_to_storage_service(storage_host, job_id, [inputfile_list_name], local_upload_dir)
+
     return json_dict
 
-def pdb2pqr_json_config(job_id, command_line_args, storage_host):
+def pdb2pqr_json_config(job_id, command_line_args, storage_host, local_upload_dir):
     # Load job template JSON string; insert job_id and storage_host into
     json_template_str = open(os.path.join(os.getcwd(), 'json_templates', 'pdb2pqr_v2.json')).read()
     json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
@@ -117,5 +132,10 @@ def pdb2pqr_json_config(job_id, command_line_args, storage_host):
     download_list.append(pdb_filename)
     container_command = json_dict['executors'][0]['command']
     json_dict['executors'][0]['command'] = container_command + download_list
+
+    # Export and upload list of input files
+    job_dir = '%s%s' % (local_upload_dir, job_id)
+    inputfile_list_name = export_input_file_list(download_list, job_id, 'pdb2pqr', job_dir)
+    send_to_storage_service(storage_host, job_id, [inputfile_list_name], local_upload_dir)
 
     return json_dict

@@ -32,6 +32,8 @@ def task_action(job_id, task_name):
             run_state  = None
             start_time = None
             end_time   = None
+            input_files  = []
+            output_files = []
             response   = {}
             wait_on_task = False
 
@@ -41,28 +43,35 @@ def task_action(job_id, task_name):
                     wait_on_task = True
 
             # NOTE: can later optimize to only get end_time if state isn't 'running'
-            start_time  = task_utils.get_starttime(job_id, task_name)
-            end_time    = task_utils.get_endtime(job_id, task_name)
+            start_time   = task_utils.get_starttime(job_id, task_name)
+            end_time     = task_utils.get_endtime(job_id, task_name)
             run_state, progress = task_utils.get_jobstatus_info(job_id, task_name)
+            input_files  = task_utils.get_input_files(job_id, task_name)
+            output_files = task_utils.get_output_files(job_id, task_name)
 
             if run_state not in END_STATES and wait_on_task:
                 while run_state not in END_STATES:
                     time.sleep(1)
                     run_state = task_utils.get_jobstatus_state(job_id, task_name)
-                start_time  = task_utils.get_starttime(job_id, task_name)
-                end_time    = task_utils.get_endtime(job_id, task_name)
+                start_time   = task_utils.get_starttime(job_id, task_name)
+                end_time     = task_utils.get_endtime(job_id, task_name)
                 run_state, progress = task_utils.get_jobstatus_info(job_id, task_name)
+                input_files  = task_utils.get_input_files(job_id, task_name)
+                output_files = task_utils.get_output_files(job_id, task_name)
+
 
             response['jobid'] = job_id
+            response['jobtype'] = task_name
             if run_state is None:
                 response['error'] = 'Task does not exist'
                 
             response[task_name] = {
-                'status':    run_state,
-                # 'files':     progress[1:],
-                'files':     progress,
-                'startTime': start_time,
-                'endTime':   end_time
+                'status':      run_state,
+                'files':       progress,
+                'inputFiles':  input_files,
+                'outputFiles': output_files,
+                'startTime':   start_time,
+                'endTime':     end_time
             }
 
             http_status = 200

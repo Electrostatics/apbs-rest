@@ -137,22 +137,9 @@ def parse_upload(job_id, job_type):
     ''' Prepare response to API request '''
     response = make_response(json.dumps(json_response))
     # response.headers['Content-Type'] = 'application/json'
+
     if request.method == 'OPTIONS':
-        # response = json_response
-        # json_response = 'this is OPTIONS'
-        # print('this is OPTIONS')
-        # print(response)
         response = autofill_utils.get_request_options(response, 'POST')
-        # response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
-        # response.headers['Access-Control-Allow-Methods'] = 'POST'
         http_status_response = 204
         
-    # if request.referrer:
-    #     # Add origin header to response if origin is in whitelist
-    #     request_origin_url = request.referrer.split('?')[0]
-    #     if request_origin_url in ORIGIN_WHITELIST:
-    #         print(request_origin_url)
-    #         cleared_domain = request_origin_url[:request_origin_url.index('/apbs')]
-    #         response.headers['Access-Control-Allow-Origin'] = cleared_domain
-
     return response, http_status_response

@@ -60,6 +60,7 @@ then
   for file in $output_basename*
   do
     echo $JOB_ID/${file} >> ${task_name}_status
+    echo $JOB_ID/${file} >> ${task_name}_output_files
   done
   
 elif [ ${task_name} = 'apbs' ]
@@ -74,17 +75,25 @@ then
   echo 'Writing apbs_status'
 
   echo 'complete'           >> ${task_name}_status
+
+  # Record the input files
   echo $JOB_ID/apbsinput.in >> ${task_name}_status
   echo $JOB_ID/$pqr_name    >> ${task_name}_status
+
+  # Record the output files
   echo $JOB_ID/io.mc        >> ${task_name}_status
-  
+  echo $JOB_ID/io.mc        >> ${task_name}_output_files
+
   for file in *.dx
   do
     echo $JOB_ID/${file} >> ${task_name}_status
+    echo $JOB_ID/${file} >> ${task_name}_output_files
   done
 
   echo $JOB_ID/apbs_stdout.txt >> ${task_name}_status
   echo $JOB_ID/apbs_stderr.txt >> ${task_name}_status
+  echo $JOB_ID/apbs_stdout.txt >> ${task_name}_output_files
+  echo $JOB_ID/apbs_stderr.txt >> ${task_name}_output_files
 fi
 
 cd $cur_dir
