@@ -41,11 +41,16 @@ def submit_workflow_request(job_id, task_name=None):
                 workflow_name = task_name
 
             task_params = request_json['form']
-            http_status_code = 202
+            # http_status_code = 202
+
+            # If task_params includes a 'filename' field, use of APBS infile is assumed
+            infile_url_query = ''
+            if 'filename' in task_params and workflow_name == 'apbs':
+                infile_url_query = '?infile=true'
             
             # Send the appropriate task parameters to the Task Service
             print(f"sending workflow '{workflow_name}' for job '{job_id}' to the task service")
-            task_response = post('%s/api/task/%s/%s' % (TASK_HOST, job_id, workflow_name), json=task_params)
+            task_response = post('%s/api/task/%s/%s%s' % (TASK_HOST, job_id, workflow_name, infile_url_query), json=task_params)
             if task_response.status_code == 202:
                 http_status_code = task_response.status_code
                 response = task_response.json()
