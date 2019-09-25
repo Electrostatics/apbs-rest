@@ -5,11 +5,12 @@ from json import JSONEncoder, loads, dumps
 from flask import request, send_from_directory, make_response, Response, Blueprint
 # from flask.json import json_encoder, json_decoder
 from flask import json
-from werkzeug import secure_filename
+from werkzeug import secure_filename, FileStorage
 from urllib3.exceptions import MaxRetryError
 # from PDB2PQR_web import app
 # import storage_utils
 from . import storage_utils
+from io import BytesIO
 
 storage_app = Blueprint('storage_app', __name__)
 
@@ -99,7 +100,24 @@ def storage_service(job_id, file_name=None):
         EXTENSION_WHITELIST = set(['pqr', 'pdb', 'in', 'p'])
         # pp.pprint(dict(request.files))
         # pp.pprint(request.form['job_id'])
-        file_data = request.files['file_data']
+
+        # pp.pprint(request.files.keys())
+        print('request.files keys:')
+        for key in request.files.keys():
+            print('  ', key)
+        try:
+            file_data = request.files['file_data']
+            # print(type(file_data), flush=True)
+        except:
+            # file_data = BytesIO(request.data)
+            # print(request.data.decode('utf-8'))
+
+            file_data = FileStorage(
+                stream=BytesIO(request.data),
+                filename=file_name,
+            )
+            # print(type(file_data))
+
         if file_data.filename:
             file_name = secure_filename(file_data.filename)
             if file_data.filename and file_name:
@@ -109,7 +127,6 @@ def storage_service(job_id, file_name=None):
             #     storageClient.put_object(JOB_BUCKET_NAME, object_name, file_data)
             # elif not allowed_file(file_name, EXTENSION_WHITELIST):
             #     return 'Unsupported media type', 415
-
 
         # time.sleep(1)
         return 'Success', 201
