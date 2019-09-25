@@ -1,3 +1,4 @@
+from flask import request
 import os, time, sys
 import requests
 try:
@@ -5,17 +6,146 @@ try:
 except:
     from json import loads
 
+TMP_EXEC_HOST = os.getenv('TMP_EXEC_HOST', 'http://localhost:5005')
 STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5001')
 STORAGE_URL  = os.environ.get('STORAGE_URL' , 'http://localhost:5001/storage')
 
 END_STATES = ['complete', 'error']
+
+class TaskHandler:
+    def __init__(self):
+        pass
+    
+    def get(self, job_id, task_name):
+        if task_name in ['apbs', 'pdb2pqr']:
+            progress   = None
+            run_state  = None
+            start_time = None
+            end_time   = None
+            input_files  = []
+            output_files = []
+            response   = {}
+            wait_on_task = False
+
+            if 'wait' in request.args.keys():
+                if request.args['wait'].lower() == 'true':
+                    # return {'args': request.args['wait']}
+                    wait_on_task = True
+
+            # NOTE: can later optimize to only get end_time if state isn't 'running'
+            start_time   = get_starttime(job_id, task_name)
+            end_time     = get_endtime(job_id, task_name)
+            run_state, progress = get_jobstatus_info(job_id, task_name)
+            input_files  = get_input_files(job_id, task_name)
+            output_files = get_output_files(job_id, task_name)
+
+            if run_state not in END_STATES and wait_on_task:
+                while run_state not in END_STATES:
+                    time.sleep(1)
+                    run_state = get_jobstatus_state(job_id, task_name)
+                start_time   = get_starttime(job_id, task_name)
+                end_time     = get_endtime(job_id, task_name)
+                run_state, progress = get_jobstatus_info(job_id, task_name)
+                input_files  = get_input_files(job_id, task_name)
+                output_files = get_output_files(job_id, task_name)
+
+
+            response['jobid'] = job_id
+            response['jobtype'] = task_name
+            if run_state is None:
+                response['error'] = 'Task does not exist'
+                
+            response[task_name] = {
+                'status':      run_state,
+                'files':       progress,
+                'inputFiles':  input_files,
+                'outputFiles': output_files,
+                'startTime':   start_time,
+                'endTime':     end_time
+            }
+
+            http_status = 200
+            # return response, 200
+        else:
+            response = {
+                'status': None,
+                'error': f"task type '{task_name}' does not exist or is not implemented"
+            }
+            http_status = 404
+            # return response, 404
+
+        return response, http_status        
+
+    def post(self, job_id, task_name):
+        available_tasks = ['apbs', 'pdb2pqr']
+        http_status = 202
+
+        if task_name not in available_tasks:
+            http_status = 400
+            response = { 
+                'error': 'invalid task'
+            }
+        else:
+
+            '''
+                Handler for when we use the tmp_task_exec service.
+                To be replaced by TESK service
+            '''
+            if task_name == 'apbs':
+                # print('checking ')
+                if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
+                    data = request.data
+                    if 'filename' in data:
+                        requests.post('%s/api/tesk/%s/%s?infile=true' % (TMP_EXEC_HOST, job_id, task_name), json=data)
+                    else:
+                        '''throw some error here'''
+                        # TODO: error handler here
+                        pass
+
+                else:
+                    form = request.data
+                    for key in form.keys():
+                        # unravels output parameters from form
+                        if key == 'output_scalar':
+                            for option in form[key]:
+                                form[option] = option
+                            form.pop('output_scalar')
+                        else:
+                            form[key] = str(form[key])
+
+                    # Send task to placeholder executor service
+                    # TODO: Build Kubernetes execotor service to replace this
+                    requests.post('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
+
+            elif task_name == 'pdb2pqr':
+                form = request.data
+                # Send task to placeholder executor service
+                print('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name))
+                post_response = requests.post('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
+                print('tesk proxy response', post_response.status_code)
+                
+            '''
+                Handler for using the TESK service.
+                When finished, remove the handler above.
+            '''
+            if task_name == 'apbs':
+                pass
+            elif task_name == 'pdb2pqr':
+                pass
+
+            response = { 
+                'accepted': f'task {task_name} accepted. Processing...'
+            }
+
+        return response, http_status
 
 def get_starttime(jobid, task_name):
     """Returns the start time for the specified job id and type"""
     starttime = None
 
     object_name = '%s/%s_start_time' % (jobid, task_name)
-    starttime_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    # starttime_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    starttime_url = '%s/%s?json=true' % (STORAGE_URL, object_name)
     response = requests.get( starttime_url )
     if response.status_code == 200:
         status_str = response.content
@@ -33,7 +163,8 @@ def get_endtime(jobid, task_name):
     endtime = None
 
     object_name = '%s/%s_end_time' % (jobid, task_name)
-    endtime_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    # endtime_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    endtime_url = '%s/%s?json=true' % (STORAGE_URL, object_name)
     response = requests.get( endtime_url )
     if response.status_code == 200 and get_jobstatus_state(jobid, task_name) in END_STATES:
         status_str = response.content
@@ -49,10 +180,11 @@ def get_endtime(jobid, task_name):
     return endtime
 
 def get_input_files(jobid, task_name):
-    input_files = None
+    input_files = []
 
     object_name = '%s/%s_input_files' % (jobid, task_name)
-    inputfile_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    # inputfile_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    inputfile_url = '%s/%s?json=true' % (STORAGE_URL, object_name)
     response = requests.get( inputfile_url )
 
     if response.status_code == 200:
@@ -63,10 +195,11 @@ def get_input_files(jobid, task_name):
 
 
 def get_output_files(jobid, task_name):
-    output_files = None
+    output_files = []
 
     object_name = '%s/%s_output_files' % (jobid, task_name)
-    outputfile_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    # outputfile_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    outputfile_url = '%s/%s?json=true' % (STORAGE_URL, object_name)
     response = requests.get( outputfile_url )
 
     if response.status_code == 200:
@@ -79,7 +212,8 @@ def get_jobstatus_state(jobid, task_name):
     job_status = None
 
     object_name = '%s/%s_status' % (jobid, task_name)
-    status_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    # status_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    status_url = '%s/%s?json=true' % (STORAGE_URL, object_name)
     response = requests.get( status_url )
     if response.status_code == 200:
         status_str = response.content
@@ -100,7 +234,8 @@ def get_jobstatus_info(jobid, task_name):
     job_progress = []
 
     object_name = '%s/%s_status' % (jobid, task_name)
-    status_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    # status_url = '%s/api/storage/%s?json=true' % (STORAGE_HOST, object_name)
+    status_url = '%s/%s?json=true' % (STORAGE_URL, object_name)
     # print('status_url: \n    %s'%status_url)
     response = requests.get( status_url )
     if response.status_code == 200:
