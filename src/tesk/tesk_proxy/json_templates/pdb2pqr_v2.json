@@ -1,6 +1,10 @@
 {
     "name": "PDB2PQR: {{job_id}}",
     "volumes": [ "/app/run" ],
+    "tags":{
+      "JOB_ID": "{{job_id}}",
+      "JOB_TYPE": "pdb2pqr"
+    },
     "executors": [
       {
         "image": "electrostatics/apbs-downloader:stable",
