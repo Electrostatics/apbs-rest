@@ -29,7 +29,7 @@ node_modules
 PDB2PQR_web/build
 
 # PDB2PQR build directories
-pdb2pqr
+# pdb2pqr
 pdb2pqr_build
 PDB2PQR_web/pdb2pqr
 
