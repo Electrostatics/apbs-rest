@@ -1,5 +1,5 @@
 from __future__ import print_function
-import os, sys, requests
+import os, sys, logging, requests
 from sys import stdout
 from json import loads
 try:
@@ -96,7 +96,7 @@ def apbs_json_config(job_id, infile_name, storage_host, local_upload_dir):
 
     return json_dict
 
-def pdb2pqr_json_config(job_id, command_line_args, storage_host, local_upload_dir):
+def pdb2pqr_json_config(job_id, command_line_args, storage_host, local_upload_dir, pqr_name=None):
     # Load job template JSON string; insert job_id and storage_host into
     json_template_str = open(os.path.join(os.getcwd(), 'json_templates', 'pdb2pqr_v2.json')).read()
     json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
@@ -106,7 +106,13 @@ def pdb2pqr_json_config(job_id, command_line_args, storage_host, local_upload_di
     arg_list = command_line_args.split()
     pdb_filename = arg_list[-2]
     # json_template_str = json_template_str.replace(b'{{output_basename}}', os.path.splitext(pdb_filename)[0] )
-    json_template_str = json_template_str.replace(b'{{output_basename}}', job_id )
+    logging.info('pqr filename: %s' % pqr_name)
+    logging.info('type(pqr_name): %s' % type(pqr_name))
+    if isinstance(pqr_name, unicode) and len(pqr_name) > 0:
+        logging.info('os.path.splitext(pqr_name)[0]: %s' % os.path.splitext(pqr_name)[0])
+        json_template_str = json_template_str.replace(b'{{output_basename}}', os.path.splitext(pqr_name)[0] )
+    else:
+        json_template_str = json_template_str.replace(b'{{output_basename}}', job_id )
 
     # Extract user forcefield, user names, and ligand files; prepare download list for container
     download_list = []

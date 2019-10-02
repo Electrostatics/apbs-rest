@@ -191,8 +191,8 @@ func StartWorkflow(jobid string, workflowType string, formObj interface{}) {
 	// 	Form     form   `json:"form"`
 	// }
 
-	workflowURL := fmt.Sprintf("%s/workflow/%s/apbs", APBSUrl, jobid)
-	statusURL := fmt.Sprintf("%s/jobstatus?jobtype=apbs&jobid=%s", APBSUrl, jobid)
+	workflowURL := fmt.Sprintf("%s/workflow/%s/%s", APBSUrl, jobid, workflowType)
+	statusURL := fmt.Sprintf("%s/jobstatus?jobtype=%s&jobid=%s", APBSUrl, workflowType, jobid)
 
 	// prepare
 	// infileObject := fmt.Sprintf("%s/%s", jobid, path.Base(infileName))
@@ -225,26 +225,48 @@ func StartWorkflow(jobid string, workflowType string, formObj interface{}) {
 // WaitForExecution : waits for execution to complete for job, returns end status of job
 // func WaitForExecution(jobid string) []string {
 func WaitForExecution(jobid string) JobStatus {
-	wait := true
+	var returnedStatus JobStatus
+	// wait := true
+	wait := false
 	workflowURL := fmt.Sprintf("%s/workflow/%s/apbs?wait=%t", APBSUrl, jobid, wait)
 
 	fmt.Println()
 	fmt.Printf("Waiting for job to complete.\n")
 
-	resp, err := http.Get(workflowURL)
-	time.Sleep(1)
-	resp, err = http.Get(workflowURL)
-	CheckErr(err)
+	if wait {
+		resp, err := http.Get(workflowURL)
+		time.Sleep(1 * time.Second)
+		resp, err = http.Get(workflowURL)
+		CheckErr(err)
 
-	body, err := ioutil.ReadAll(resp.Body)
-	CheckErr(err)
+		body, err := ioutil.ReadAll(resp.Body)
+		CheckErr(err)
 
-	println(workflowURL)
-	println(string(body))
+		println(workflowURL)
+		println(string(body))
 
-	var returnedStatus JobStatus
-	err = json.Unmarshal(body, &returnedStatus)
-	CheckErr(err)
+		err = json.Unmarshal(body, &returnedStatus)
+		CheckErr(err)
+
+	} else {
+		jobState := "nil"
+		counter := 0
+		for jobState != "complete" {
+			fmt.Printf("Counter: %d", counter)
+
+			resp, err := http.Get(workflowURL)
+			body, err := ioutil.ReadAll(resp.Body)
+			CheckErr(err)
+			err = json.Unmarshal(body, &returnedStatus)
+			CheckErr(err)
+			jobState = returnedStatus.Apbs.Status
+
+			time.Sleep(time.Second)
+			fmt.Printf("\r")
+			counter++
+		}
+		fmt.Println()
+	}
 
 	return returnedStatus
 }
@@ -259,7 +281,7 @@ func WaitForExecutionPDB2PQR(jobid string) JobStatusPDB2PQR {
 	fmt.Printf("Waiting for job to complete.\n")
 
 	resp, err := http.Get(workflowURL)
-	time.Sleep(1)
+	time.Sleep(time.Second)
 	resp, err = http.Get(workflowURL)
 	CheckErr(err)
 
