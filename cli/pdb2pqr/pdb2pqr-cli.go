@@ -281,10 +281,10 @@ func commandLineToForm(c commandLine) form {
 
 // FormCLI : struct encapsulating the JSON format of the PDB2PQR form
 type FormCLI struct {
-	invokeMethod string                 `json:"invoke_ethod"`
-	pdbName      string                 `json:"pdb_name"`
-	pqrName      string                 `json:"pqr_name"`
-	flags        map[string]interface{} `json:"flags"`
+	InvokeMethod string                 `json:"invoke_ethod"`
+	PdbName      string                 `json:"pdb_name"`
+	PqrName      string                 `json:"pqr_name"`
+	Flags        map[string]interface{} `json:"flags"`
 }
 
 func main() {
@@ -304,6 +304,7 @@ func main() {
 	// jobid = "devTestPdb2pqr"
 
 	flag.Parse()
+	// TODO: consider whether to print licensing flag from old binaries
 
 	// Check version flag
 	if Options.version {
@@ -320,9 +321,9 @@ func main() {
 		return
 	}
 
-	// Check mandatory flags for valid input
+	// TODO: Check mandatory flags for valid input
 
-	// Check optional flags for valid input
+	// TODO: Check optional flags for valid input
 
 	// get input PDB filename and output PQR filename
 	inputName := flag.Arg(0)

@@ -41,6 +41,8 @@ type JobStatus struct {
 	} `json:"apbs"`
 }
 
+// TODO: need to improve APBS status JSON structure not have "apbs" or "pdb2pqr" as a key
+
 // JobStatusPDB2PQR : structure of the same-named JSON object
 type JobStatusPDB2PQR struct {
 	JobID   string `json:"jobid"`
@@ -274,26 +276,62 @@ func WaitForExecution(jobid string) JobStatus {
 // WaitForExecutionPDB2PQR : waits for execution to complete for job, returns end status of job
 // func WaitForExecution(jobid string) []string {
 func WaitForExecutionPDB2PQR(jobid string) JobStatusPDB2PQR {
-	wait := true
+	var returnedStatus JobStatusPDB2PQR
+	wait := false //true
 	workflowURL := fmt.Sprintf("%s/workflow/%s/pdb2pqr?wait=%t", APBSUrl, jobid, wait)
 
 	fmt.Println()
 	fmt.Printf("Waiting for job to complete.\n")
 
-	resp, err := http.Get(workflowURL)
-	time.Sleep(time.Second)
-	resp, err = http.Get(workflowURL)
-	CheckErr(err)
+	if wait {
+		resp, err := http.Get(workflowURL)
+		time.Sleep(1 * time.Second)
+		resp, err = http.Get(workflowURL)
+		CheckErr(err)
 
-	body, err := ioutil.ReadAll(resp.Body)
-	CheckErr(err)
+		body, err := ioutil.ReadAll(resp.Body)
+		CheckErr(err)
 
-	println(workflowURL)
-	println(string(body))
+		println(workflowURL)
+		println(string(body))
 
-	var returnedStatus JobStatusPDB2PQR
-	err = json.Unmarshal(body, &returnedStatus)
-	CheckErr(err)
+		err = json.Unmarshal(body, &returnedStatus)
+		CheckErr(err)
+
+	} else {
+		jobState := "nil"
+		counter := 0
+		for jobState != "complete" {
+			fmt.Printf("Counter: %d", counter)
+
+			resp, err := http.Get(workflowURL)
+			body, err := ioutil.ReadAll(resp.Body)
+			CheckErr(err)
+			err = json.Unmarshal(body, &returnedStatus)
+			CheckErr(err)
+			jobState = returnedStatus.Pdb2pqr.Status
+
+			time.Sleep(time.Second)
+			fmt.Printf("\r")
+			counter++
+		}
+		fmt.Println()
+	}
+
+	// resp, err := http.Get(workflowURL)
+	// time.Sleep(time.Second)
+	// resp, err = http.Get(workflowURL)
+	// CheckErr(err)
+
+	// body, err := ioutil.ReadAll(resp.Body)
+	// CheckErr(err)
+
+	// println(workflowURL)
+	// println(string(body))
+
+	// var returnedStatus JobStatusPDB2PQR
+	// err = json.Unmarshal(body, &returnedStatus)
+	// CheckErr(err)
 
 	return returnedStatus
 }

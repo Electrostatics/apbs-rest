@@ -67,6 +67,8 @@ func main() {
 	flag.StringVar(&jobid, "id", rest.GetNewID(), "Specify custom job identifier for execution. Defaults to randomly generated ID.")
 	// jobid = "devTest"
 
+	// TODO: consider whether to print licensing flag from old binaries
+
 	// Check command line arguments
 	flag.Parse()
 	if flag.NArg() < 1 {
