@@ -1,0 +1,5 @@
+{
+    "ff": ["amber", "charmm", "parse", "tyl06", "peoepb", "swanson"],
+    "ffout": ["amber", "charmm", "parse", "tyl06", "peoepb", "swanson"],
+    "ph-calc-method": ["PROPKA", "PDB2PKA"]
+}

@@ -27,7 +27,7 @@ const UploadSuccessCode = 201
 // WorkflowSuccessCode : HTTP status for successful workflow submission
 const WorkflowSuccessCode = 202
 
-// JobStatus : structure of the same-named JSON object
+// JobStatus : structure of the same-named JSON object.
 type JobStatus struct {
 	JobID   string `json:"jobid"`
 	JobType string `json:"jobtype"`
@@ -43,7 +43,7 @@ type JobStatus struct {
 
 // TODO: need to improve APBS status JSON structure not have "apbs" or "pdb2pqr" as a key
 
-// JobStatusPDB2PQR : structure of the same-named JSON object
+// JobStatusPDB2PQR : structure of the same-named JSON object.
 type JobStatusPDB2PQR struct {
 	JobID   string `json:"jobid"`
 	JobType string `json:"jobtype"`
@@ -57,13 +57,13 @@ type JobStatusPDB2PQR struct {
 	} `json:"pdb2pqr"`
 }
 
-// Workflow : structure used to submit a workflow request
+// Workflow : structure used to submit a workflow request.
 type Workflow struct {
 	Workflow string      `json:"workflow"`
 	Form     interface{} `json:"form"`
 }
 
-// GetInstallURL : retrieves the address of the local APBS-REST installation
+// GetInstallURL : retrieves the address of the local APBS-REST installation.
 func GetInstallURL() string {
 	url := "apbs.127.0.0.1.xip.io"
 
@@ -73,21 +73,22 @@ func GetInstallURL() string {
 	return url
 }
 
-// CheckErr : performs obligatory error check
+// CheckErr : performs obligatory error check.
 func CheckErr(err error) {
 	if err != nil {
 		panic(err)
 	}
 }
 
-// PrintUsageError : prints usage error given incorrect invocation
+// PrintUsageError : prints usage error given incorrect invocation.
 // func PrintUsageError(program string, message string) {
 func PrintUsageError(programName string, printOptions func(), message ...string) {
 	programName = strings.ToLower(programName)
 	if programName == "apbs" {
 		os.Stderr.WriteString("USAGE: apbs [--options] <filename>.in\n\n")
 	} else if programName == "pdb2pqr" {
-		os.Stderr.WriteString("USAGE: pdb2pqr [--options] --ff=<forcefield> <input-path> <output-path>\n\n")
+		// os.Stderr.WriteString("USAGE: pdb2pqr [--options] --ff=<forcefield> <input-path> <output-path>\n\n")
+		os.Stderr.WriteString("USAGE: pdb2pqr [--options] [--<forcefield option>] <input-path> <output-path>\n\n")
 	}
 
 	// if message != "" {
@@ -111,7 +112,7 @@ func PrintUsageError(programName string, printOptions func(), message ...string)
 
 }
 
-// GetNewID : obtains a newly generated id from APBS services
+// GetNewID : obtains a newly generated id from APBS services.
 func GetNewID() string {
 	idServiceURL := APBSUrl + "/id/"
 
@@ -135,7 +136,17 @@ func GetNewID() string {
 	return jsonObj["job_id"].(string)
 }
 
-// FileExists : checks if file exists and that it is not a directory
+// StringInList : returns true if *value* is in *list*; returns false otherwise.
+func StringInList(value string, list []string) bool {
+	for _, listVal := range list {
+		if value == listVal {
+			return true
+		}
+	}
+	return false
+}
+
+// FileExists : checks if file exists and that it is not a directory.
 // snippet extracted from: https://golangcode.com/check-if-a-file-exists/
 func FileExists(name string) bool {
 	info, err := os.Stat(name)
@@ -145,7 +156,7 @@ func FileExists(name string) bool {
 	return !info.IsDir()
 }
 
-// SendSingleFile : uploads a single file to APBS storage service
+// SendSingleFile : uploads a single file to APBS storage service.
 func SendSingleFile(fileName string, objectName string) (string, int) {
 	storageURL := fmt.Sprintf("%s/storage/%s", APBSUrl, objectName)
 
@@ -165,7 +176,7 @@ func SendSingleFile(fileName string, objectName string) (string, int) {
 	return content, status
 }
 
-// UploadFilesToStorage : upload files to APBS storage service
+// UploadFilesToStorage : upload files to APBS storage service.
 func UploadFilesToStorage(fileList []string, jobid string) {
 	storageURL := APBSUrl + "/storage/"
 
@@ -185,7 +196,7 @@ func UploadFilesToStorage(fileList []string, jobid string) {
 	fmt.Println("Uploading finished. Files sent to", storageURL)
 }
 
-// StartWorkflow : send the request to start the APBS workflow job
+// StartWorkflow : send the request to start the APBS workflow job.
 // func StartWorkflow(infileName string, jobid string, workflowType string, formObj interface{}) {
 func StartWorkflow(jobid string, workflowType string, formObj interface{}) {
 	// type workflow struct {
@@ -224,7 +235,7 @@ func StartWorkflow(jobid string, workflowType string, formObj interface{}) {
 	fmt.Printf("  View status:   %s\n", statusURL)
 }
 
-// WaitForExecution : waits for execution to complete for job, returns end status of job
+// WaitForExecution : waits for execution to complete for job, returns end status of job.
 // func WaitForExecution(jobid string) []string {
 func WaitForExecution(jobid string) JobStatus {
 	var returnedStatus JobStatus
@@ -273,7 +284,7 @@ func WaitForExecution(jobid string) JobStatus {
 	return returnedStatus
 }
 
-// WaitForExecutionPDB2PQR : waits for execution to complete for job, returns end status of job
+// WaitForExecutionPDB2PQR : waits for execution to complete for job, returns end status of job.
 // func WaitForExecution(jobid string) []string {
 func WaitForExecutionPDB2PQR(jobid string) JobStatusPDB2PQR {
 	var returnedStatus JobStatusPDB2PQR
@@ -301,6 +312,9 @@ func WaitForExecutionPDB2PQR(jobid string) JobStatusPDB2PQR {
 	} else {
 		jobState := "nil"
 		counter := 0
+		println("I guess we're using modules now???")
+		println("This is real confusing, ngl")
+		println("Ok modules are making some more sense")
 		for jobState != "complete" {
 			fmt.Printf("Counter: %d", counter)
 
@@ -336,7 +350,7 @@ func WaitForExecutionPDB2PQR(jobid string) JobStatusPDB2PQR {
 	return returnedStatus
 }
 
-// DownloadFile : download a file given a specified filename and jobid
+// DownloadFile : download a file given a specified filename and jobid.
 func DownloadFile(fileName string, jobid string) {
 	downloadURL := fmt.Sprintf("%s/storage/%s/%s", APBSUrl, jobid, fileName)
 

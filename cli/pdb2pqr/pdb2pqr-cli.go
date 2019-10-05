@@ -8,11 +8,17 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 
 	flag "github.com/spf13/pflag"
-
-	"../rest"
+	"github.com/Electrostatics/apbs-rest/cli/rest"
 )
+
+type config struct {
+	Ff           []string `json:"ff"`
+	Ffout        []string `json:"ffout"`
+	PhCalcMethod []string `json:"ph-calc-method"`
+}
 
 type commandLine struct {
 	OptionsFlagSet *flag.FlagSet
@@ -168,6 +174,18 @@ func (c *commandLine) JSON() map[string]interface{} {
 	return jsonMap
 }
 
+func (c *commandLine) HasMandatoryFlags() bool {
+	allValid := true
+	if c.forcefield == "" && c.userForcefield == "" && c.keepClean == false {
+		allValid = false
+	}
+	return allValid
+}
+
+func (c *commandLine) CheckOptionalFlags() {
+
+}
+
 func (c *commandLine) PrintHelpMessage() {
 	// var f *flag.Flag
 	var flagArray []string
@@ -184,8 +202,8 @@ func (c *commandLine) PrintHelpMessage() {
 	printHelpLine(flagArray, 2)
 	fmt.Println()
 
-	// Manditory options
-	fmt.Println("  Manditory options:")
+	// Mandatory options
+	fmt.Println("  Mandatory options:")
 	flagArray = []string{"ff", "userff", "clean"}
 	printHelpLine(flagArray, 4)
 	fmt.Println()
@@ -303,7 +321,17 @@ func main() {
 
 	// jobid = "devTestPdb2pqr"
 
+	// Parse all flags
 	flag.Parse()
+
+	// Load information for available forcefields and pH calculation methods
+	// TODO: figure out a way around depending on the path (maybe try using an explicitely declared imported Go struct)
+	var configInfo config
+	// configData, err := ioutil.ReadFile("pdb2pqr-config.json")
+	// rest.CheckErr(err)
+	// err = json.Unmarshal(configData, &configInfo)
+	// rest.CheckErr(err)
+
 	// TODO: consider whether to print licensing flag from old binaries
 
 	// Check version flag
@@ -321,7 +349,28 @@ func main() {
 		return
 	}
 
-	// TODO: Check mandatory flags for valid input
+	// Check mandatory flags for valid input
+	if !Options.HasMandatoryFlags() {
+		flagArray := []string{"ff", "userff", "clean"}
+		MissingFlagMessage := "One of the manditory options was not specified."
+		rest.PrintUsageError("pdb2pqr", func() { printHelpLine(flagArray, 4) }, MissingFlagMessage)
+		fmt.Println()
+		os.Exit(2)
+	} else {
+		if Options.userForcefield != "" {
+			if !rest.FileExists(Options.userForcefield) {
+				errorMessage := fmt.Sprintf("File does not exist: %s", Options.userForcefield)
+				rest.PrintUsageError("PDB2PQR", func() {}, errorMessage)
+				os.Exit(2)
+			}
+		} else if Options.forcefield != "" {
+			if !rest.StringInList(strings.ToLower(Options.forcefield), configInfo.Ff) {
+				// errorMessage := fmt.Sprintf("-ff: invalid option '%s'\nPlease choose among the following: %v", Options.forcefield, configInfo.Ff)
+				// rest.PrintUsageError("PDB2PQR", func() {}, errorMessage)
+				// os.Exit(2)
+			}
+		}
+	}
 
 	// TODO: Check optional flags for valid input
 

@@ -12,6 +12,8 @@ status_ubuntu_venv
 
 # Test-related
 src/storage/test
+cli/tests/output
+cli/tests/test-output
 
 # Related cloned repositories
 apbs-pdb2pqr
