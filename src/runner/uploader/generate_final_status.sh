@@ -6,6 +6,7 @@ task_name=$1
 upload_dir=/app/_upload
 
 # mkdir _upload
+# TODO: tar, gzip, then copy over pdb2pka_output directory; Perhaps delegate to the PDB2PQR container
 cp * $upload_dir
 
 cd $upload_dir

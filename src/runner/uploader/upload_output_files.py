@@ -22,7 +22,15 @@ if __name__ == "__main__":
     if STORAGE_HOST is None: raise EnvironmentValueError('STORAGE_HOST')
 
     print('Uploading...')
-    for file_name in listdir(UPLOAD_DIR):
+    upload_files = listdir(UPLOAD_DIR)
+
+    # Move status file to end if it is not already. Addresses race condition of status-file uploading before output-file, causing error in CLI
+    for file_name in upload_files:
+        if file_name.endswith('_status') and upload_files.index(file_name) != len(upload_files)-1:
+            upload_files.append(upload_files.pop(upload_files.index(file_name)))
+            break
+
+    for file_name in upload_files:
         print('   %s' % file_name)
 
         # Upload file data to storage service
