@@ -28,7 +28,7 @@ URL="http://localhost:8000"
 #This is used for the web interface to pdb2pqr. Provide an absolute path. Relative paths and ~ usually will not work correctly.
 
 #APBS=""
-# APBS="/app/builds/apbs/bin/apbs"
+APBS="/app/builds/apbs/bin/apbs"
 
 
 #OPAL service URL

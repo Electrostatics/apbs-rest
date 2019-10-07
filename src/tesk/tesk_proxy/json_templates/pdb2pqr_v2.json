@@ -15,7 +15,7 @@
         }
       },
       {
-        "image": "electrostatics/pdb2pqr-bin:source",
+        "image": "electrostatics/pdb2pqr-bin:latest",
         "command": [ "/app/builds/pdb2pqr/pdb2pqr.py" ],
         "stdout": "/app/run/pdb2pqr_stdout.txt",
         "stderr": "/app/run/pdb2pqr_stderr.txt"
