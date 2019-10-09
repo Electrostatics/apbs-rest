@@ -14,7 +14,7 @@
 
 ## System Requirements
 ### Users
-To simply run the suite as a user, the following software is required
+To run the suite as a user, the following software must be installed/activated:
 - [Helm](https://helm.sh/) 
 - A Kubernetes engine such as...
     - [Minikube (recommended)](https://kubernetes.io/docs/tasks/tools/install-minikube/)
