@@ -18,7 +18,7 @@ To simply run the suite as a user, the following software is required
 - [Helm](https://helm.sh/) 
 - A Kubernetes engine such as...
     - [Minikube (recommended)](https://kubernetes.io/docs/tasks/tools/install-minikube/)
-    - [Docker Desktop (includes Kubernetes)]()
+    - [Docker Desktop (includes Kubernetes)](https://www.docker.com/products/docker-desktop)
 ### Developers
 All of the above along with...
 - [Python 3.6+](https://www.python.org/downloads/)
