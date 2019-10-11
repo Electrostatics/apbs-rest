@@ -1,0 +1,173 @@
+import requests, json, uuid, pprint
+import prepare_tests
+import common_assertions
+
+APBS_URL = 'http://apbs.127.0.0.1.xip.io'
+apbs_adapter = requests.adapters.HTTPAdapter(max_retries=3)
+
+def test_liveness():
+    # ID service
+    r_slash = requests.get('%s/id/' % APBS_URL)
+    r_check = requests.get('%s/id/check' % APBS_URL)
+    assert r_slash.status_code == 200
+    assert r_check.status_code == 200
+    # r_slash = requests.get('%s/storage/' % APBS_URL)
+    # r_check = requests.get('%s/task/check' % APBS_URL)
+    # assert r_slash.status_code == 200
+    # assert r_check.status_code == 200
+
+def test_id_service():
+    '''
+        GET:
+            /id
+                Success: 200
+            /id/
+                Success: 200
+    '''
+    url = '%s/id' % APBS_URL
+    # session = requests.Session()
+    # session.mount('%s/id/' % APBS_URL, apbs_adapter)
+    # response = session.get('%s/id/' % APBS_URL)
+    ''' /id '''
+    response = requests.get(url)
+    assert response.status_code == 200
+    json_dict = json.loads(response.content)
+    assert len(json_dict.keys()) == 1
+    assert 'job_id' in json_dict
+
+    ''' /id/ '''
+    response = requests.get('%s/' % url)
+    assert response.status_code == 200
+    json_dict = json.loads(response.content)
+    assert len(json_dict.keys()) == 1
+    assert 'job_id' in json_dict
+
+def test_storage_service():
+    '''
+        Methods: GET, POST, DELETE, OPTIONS
+    '''
+    job_id = 'pytest-%s' % uuid.uuid4().hex[:8]
+    url = '%s/storage' % APBS_URL
+    object_name = 'sample_text.txt'
+
+    req_url = '%s/%s/%s' % (url, job_id, object_name)
+    # print(req_url)
+
+    # GET: nonexistent file
+    response = requests.get(req_url)
+    body = response.content.decode('utf-8')
+    assert response.status_code == 404
+    assert body == 'File %s does not exist\n' % object_name
+
+    # POST: new file, name it 'sample_text.txt'
+    response = requests.post(req_url, data='hello world')
+    assert response.status_code == 201
+
+    # GET: file 'sample_text.txt'
+    response = requests.get(req_url)
+    body = response.content.decode('utf-8')
+    assert response.status_code == 200
+    # assert body == 'hello worrrld'
+
+    # DELETE: file 'sample_text.txt'
+    response = requests.delete(req_url)
+    assert response.status_code == 204
+
+    #TODO: DELETE: entire job_id directory
+    #TODO: DELETE: nonexistent file
+    #TODO: DELETE: nonexistent job_id contents
+
+    # OPTIONS: available options within response header
+    response = requests.options(req_url)
+    assert response.status_code == 204
+    assert response.headers['Access-Control-Allow-Headers'] == 'x-requested-with'
+    assert response.headers['Access-Control-Allow-Methods'] == str(['GET', 'PUT', 'POST', 'DELETE'])
+
+def test_task_service():
+    job_id = 'pytest-%s' % uuid.uuid4().hex[:8]
+    task_url = '%s/task' % APBS_URL
+    pdb_id = '1a1p'
+
+    try:
+        # GET: nonexistent task for valid taskname
+        dummy_job_id = 'nonsense_id'
+        # url = '%s/%s/pdb2pqr' % (task_url, dummy_job_id)
+        print('%s/%s/pdb2pqr' % (task_url, dummy_job_id))
+        response = requests.get('%s/%s/pdb2pqr' % (task_url, dummy_job_id))
+        assert response.status_code == 200
+        assert 'Content-Type' in response.headers.keys() and response.headers['Content-Type'] == 'application/json'
+        json_dict = json.loads(response.content)
+
+        assert json_dict['jobtype'] in json_dict.keys()
+        assert set(['jobtype', 'error', 'jobid', json_dict['jobtype']]) == json_dict.keys()
+        assert set(['status', 'startTime', 'endTime', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()
+        
+        #TODO: GET: nonexistent task for invalid taskname
+        response = requests.get('%s/%s/nonexistent_task_name' % (task_url, dummy_job_id))
+        assert response.status_code == 404
+        assert 'Content-Type' in response.headers.keys() and response.headers['Content-Type'] == 'application/json'
+        json_dict = json.loads(response.content)
+        assert set(['error', 'status']) == json_dict.keys()
+        assert json_dict['status'] == None
+
+        #TODO: POST: invalid taskname
+        # url = '%s/%s/nonexistent_task_name' % (task_url, dummy_job_id)
+        params = prepare_tests.prepare_task_v1('nonexistent_task_name', '1a1p')
+        response = requests.post('%s/%s/nonexistent_task_name' % (task_url, dummy_job_id), json=params)
+        assert response.status_code == 400
+        assert 'Content-Type' in response.headers.keys() and response.headers['Content-Type'] == 'application/json'
+        json_dict = json.loads(response.content)
+        assert 'error' in json_dict.keys()
+
+        ''' 
+            PDB2PQR
+        '''
+        #TODO: POST: PDB2PQR task
+        params = prepare_tests.prepare_task_v1('pdb2pqr', pdb_id='1a1p')
+        response = requests.post('%s/%s/pdb2pqr' % (task_url, job_id), json=params)
+        assert response.status_code == 202
+        json_dict = json.loads(response.content)
+        assert 'accepted' in json_dict.keys()
+
+        # GET: check status of running task
+        # GET: check status of running task (long-poll)
+        # GET: check status of completed task
+        common_assertions.assert_task_status(task_url, job_id, 'pdb2pqr')
+        
+        # Remove contents from bucket
+        requests.delete('%s/storage/%s' % (APBS_URL, job_id)) 
+
+        ''' 
+            APBS
+        '''
+        #TODO: POST: APBS task
+        infile_name = '1a1p.in'
+        with open('../sample_input/1a1p.in', 'r') as fin:
+            apbs_infile_data = fin.read()
+            response = requests.post('%s/storage/%s/1a1p.in' % (APBS_URL, job_id), data=apbs_infile_data)
+            assert response.status_code == 201
+        with open('../sample_input/1a1p.pqr', 'r') as fin:
+            apbs_pqr_data = fin.read()
+            response = requests.post('%s/storage/%s/1a1p.pqr' % (APBS_URL, job_id), data=apbs_pqr_data)
+            assert response.status_code == 201
+        params = prepare_tests.prepare_task_v1('apbs', infile_name=infile_name)
+        response = requests.post('%s/%s/apbs?infile=true' % (task_url, job_id), json=params)
+        assert response.status_code == 202
+        json_dict = json.loads(response.content)
+        assert 'accepted' in json_dict.keys()
+        
+        # GET: check status of running task
+        # GET: check status of running task (long-poll)
+        # GET: check status of completed task
+        common_assertions.assert_task_status(task_url, job_id, 'apbs')
+
+
+    finally:
+        # Remove contents of the job_id from bucket
+        requests.delete('%s/storage/%s' % (APBS_URL, job_id))
+
+def test_workflow_service():
+    pass
+
+def test_autofill_service():
+    pass
