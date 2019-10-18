@@ -29,6 +29,8 @@ spec:
           env:
           - name: FLASK_APP
             value: "main.py"
+          - name: STORAGE_URL
+            value: http://{{ template "apbsrest.fullname" . }}-storage/api/storage
           - name: STORAGE_HOST
             value: http://{{ template "apbsrest.fullname" . }}-storage
           - name: TMP_EXEC_HOST
