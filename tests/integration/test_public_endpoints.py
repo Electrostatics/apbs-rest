@@ -1,4 +1,4 @@
-import requests, json, uuid, pprint
+import requests, json, uuid, pprint, tarfile, os
 import prepare_tests
 import common_assertions
 
@@ -15,6 +15,10 @@ def test_liveness():
     # r_check = requests.get('%s/task/check' % APBS_URL)
     # assert r_slash.status_code == 200
     # assert r_check.status_code == 200
+
+    # Main website
+    response = requests.get(APBS_URL)
+    assert response.status_code == 200
 
 def test_id_service():
     '''
@@ -50,6 +54,7 @@ def test_storage_service():
     url = '%s/storage' % APBS_URL
     object_name = 'sample_text.txt'
 
+    job_id_url = '%s/%s' % (url, job_id)
     req_url = '%s/%s/%s' % (url, job_id, object_name)
     # print(req_url)
 
@@ -69,11 +74,25 @@ def test_storage_service():
     assert response.status_code == 200
     # assert body == 'hello worrrld'
 
+    #TODO: GET: all files for nonexistent job_id file
+    # GET: all files for specific job_id file; should return a tarfile
+    response = requests.get( job_id_url )
+    print("job_id_url:", job_id_url)
+    tarfile_name = 'sample_tar.tar.gz'
+    # assert os.path.exists(tarfile_name) == False
+    assert response.status_code == 200
+    with open(tarfile_name, 'wb') as fout:
+        print(type(response.content))
+        fout.write(response.content)
+    assert tarfile.is_tarfile(tarfile_name) == True
+    os.remove(tarfile_name)
+
     # DELETE: file 'sample_text.txt'
     response = requests.delete(req_url)
     assert response.status_code == 204
 
     #TODO: DELETE: entire job_id directory
+    # response = requests.delete( job_id_url )
     #TODO: DELETE: nonexistent file
     #TODO: DELETE: nonexistent job_id contents
 
@@ -81,7 +100,7 @@ def test_storage_service():
     response = requests.options(req_url)
     assert response.status_code == 204
     assert response.headers['Access-Control-Allow-Headers'] == 'x-requested-with'
-    assert response.headers['Access-Control-Allow-Methods'] == str(['GET', 'PUT', 'POST', 'DELETE'])
+    assert response.headers['Access-Control-Allow-Methods'] == str(['GET', 'POST', 'DELETE'])
 
 def test_task_service():
     job_id = 'pytest-%s' % uuid.uuid4().hex[:8]
@@ -102,7 +121,7 @@ def test_task_service():
         assert set(['jobtype', 'error', 'jobid', json_dict['jobtype']]) == json_dict.keys()
         assert set(['status', 'startTime', 'endTime', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()
         
-        #TODO: GET: nonexistent task for invalid taskname
+        # GET: nonexistent task for invalid taskname
         response = requests.get('%s/%s/nonexistent_task_name' % (task_url, dummy_job_id))
         assert response.status_code == 404
         assert 'Content-Type' in response.headers.keys() and response.headers['Content-Type'] == 'application/json'
@@ -110,7 +129,7 @@ def test_task_service():
         assert set(['error', 'status']) == json_dict.keys()
         assert json_dict['status'] == None
 
-        #TODO: POST: invalid taskname
+        # POST: invalid taskname
         # url = '%s/%s/nonexistent_task_name' % (task_url, dummy_job_id)
         params = prepare_tests.prepare_task_v1('nonexistent_task_name', '1a1p')
         response = requests.post('%s/%s/nonexistent_task_name' % (task_url, dummy_job_id), json=params)
