@@ -2,15 +2,29 @@ package main
 
 import (
 	"bufio"
-	"flag"
-	"fmt"
+	"log"
+
+	// "flag"
+
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
 
-	"../rest"
+	"github.com/Electrostatics/apbs-rest/cli/rest"
+	flag "github.com/spf13/pflag"
+	// "../rest"
 )
+
+type commandLine struct {
+	jobid         string
+	inputFilename string
+
+	// System Options
+	version bool
+	help    bool
+	debug   bool
+}
 
 // form structure for workflow submission
 type form struct {
@@ -61,16 +75,27 @@ func ExtractReadFiles(inputContents string) []string {
 }
 
 func main() {
+	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
+	var command commandLine
+
 	// debugPtr := flag.Bool("debug", false, "Print debug statements to standard output")
 	// Get new job ID if user doesn't specify one
 	var jobid string
-	flag.StringVar(&jobid, "id", rest.GetNewID(), "Specify custom job identifier for execution. Defaults to randomly generated ID.")
+
+	// flag.StringVar(&jobid, "id", rest.GetNewID(), "Specify custom job identifier for execution. Defaults to randomly generated ID.")
+	flag.StringVar(&command.jobid, "id", rest.GetNewID(), "Specify custom job identifier for execution. Defaults to randomly generated ID.")
+	flag.BoolVar(&command.debug, "debug", false, "Print additional information to stdout.")
 	// jobid = "devTest"
 
 	// TODO: consider whether to print licensing flag from old binaries
 
 	// Check command line arguments
 	flag.Parse()
+	jobid = command.jobid
+	if !command.debug {
+		log.SetOutput(ioutil.Discard)
+	}
+
 	if flag.NArg() < 1 {
 		rest.PrintUsageError("APBS", flag.PrintDefaults, "Not enough arguments: APBS input file required")
 		// panic("Not enough arguments: APBS input file required")
@@ -86,12 +111,12 @@ func main() {
 		// Read input file contents to string
 		data, err := ioutil.ReadFile(apbsFileName)
 		if err != nil {
-			fmt.Print(err)
+			log.Print(err)
 		}
 		inputFileContents := string(data)
 
 		readFileNames := ExtractReadFiles(inputFileContents)
-		fmt.Println("File names extracted from", apbsFileName, ":\n", readFileNames)
+		log.Println("File names extracted from", apbsFileName, ":\n", readFileNames)
 
 		// Join input file and READ block files within same list
 		allInputFiles = append(allInputFiles, apbsFileName)
@@ -99,12 +124,12 @@ func main() {
 			allInputFiles = append(allInputFiles, name)
 		}
 
-		fmt.Println() // empty line
-		fmt.Println(jobid)
+		log.Println() // empty line
+		log.Println(jobid)
 
 		// Upload input files to storage service
 		rest.UploadFilesToStorage(allInputFiles, jobid)
-		fmt.Println() // empty line
+		log.Println() // empty line
 
 		// Build submission form
 		formObj := &form{
@@ -115,15 +140,15 @@ func main() {
 
 		// Wait for completion, get final status
 		finalStatus := rest.WaitForExecution(jobid)
-		fmt.Printf("Job complete.\n\n")
+		log.Printf("Job complete.\n\n")
 
 		// Download output files
-		fmt.Printf("Downloading output files:\n")
+		log.Printf("Downloading output files:\n")
 		for _, file := range finalStatus.Apbs.OutputFiles {
-			fmt.Printf("  %s\n", path.Base(file))
+			log.Printf("  %s\n", path.Base(file))
 			rest.DownloadFile(path.Base(file), jobid)
 		}
-		fmt.Printf("Finished.\n")
+		log.Printf("Finished.\n")
 
 		// Print apbs_output to stdout
 		data, err = ioutil.ReadFile("apbs_stdout.txt")
@@ -135,5 +160,6 @@ func main() {
 		rest.CheckErr(err)
 		os.Stderr.WriteString(string(data))
 
+		// TODO: Cleanout job files from cluster
 	}
 }
