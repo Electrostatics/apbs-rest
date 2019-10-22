@@ -2,7 +2,7 @@ from __future__ import print_function
 from minio import Minio
 from minio.error import ResponseError
 from shutil import rmtree
-import os, hashlib, sys
+import os, hashlib, sys, tarfile
 
 class StorageClient:
     def __init__(self, storage_url, cache_dir_path, access_key=None, secret_key=None, job_bucket_name='jobs'):
@@ -86,7 +86,8 @@ class StorageClient:
                                                     metadata=metadata)
             return etag_str
         except ResponseError as err:
-            sys.stderr.write(err)
+            print(err, file=sys.stderr)
+            return None
 
     def remove_objects(self, bucket_name, objects_iter):
         try:
@@ -99,7 +100,7 @@ class StorageClient:
                 print("Deletion Error: {}".format(del_err), file=sys.stderr)
         except ResponseError as err:
             print(err, file=sys.stderr)
-        pass
+            raise
 
     def list_objects(self, bucket_name, prefix=None, recursive=False):
         object_list = self.__minio_client.list_objects(bucket_name,
@@ -165,6 +166,20 @@ class StorageClient:
         else:
             return False
     
+    def gzip_job_files(self, bucket_name, job_id):
+        ''' Bundles all files of a job_id '''
+        tarfile_path = '%s/%s/%s.tar.gz' % (self.cache_path, job_id, job_id)
+        all_objects = self.list_objects(bucket_name, prefix=job_id, recursive=True)
+        tar = tarfile.open(tarfile_path, 'w:gz')
+
+        # Add files to tar archive
+        for obj in all_objects:
+            file_path = self.fget_object(bucket_name, obj.object_name)
+            if file_path is not None:
+                tar.add(file_path, arcname=os.path.basename(file_path))
+        tar.close()
+
+        return tarfile_path
 
 def get_minio_client(minio_url, access_key, secret_key):
     minioClient= Minio( minio_url,

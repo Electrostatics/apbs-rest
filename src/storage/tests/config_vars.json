@@ -1,0 +1,10 @@
+{
+    "PORT":              9090,
+    "MINIO_IMAGE_TAG":  "RELEASE.2019-07-10T00-34-56Z",
+    "MINIO_ACCESS_KEY":  "xxx",
+    "MINIO_SECRET_KEY":  "yyyyyyyy",
+    "MINIO_JOB_BUCKET":  "jobs",
+    "STORAGE_CACHE_DIR": ".minio_cache",
+
+    "TMP_DIR":"devTest"
+}

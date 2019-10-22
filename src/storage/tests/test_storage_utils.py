@@ -2,27 +2,29 @@ import unittest
 from minio import Minio
 from minio.error import ResponseError
 from os import environ, mkdir, path, rmdir, remove, getcwd, stat
-from shutil import rmtree
-import hashlib, docker
+from shutil import rmtree, copyfile
+import json, hashlib, docker, tarfile
 from service import storage_utils
 
-PORT = '9001'
-MINIO_URL=f'localhost:{PORT}'
-MINIO_ACCESS_KEY='xxx'
-MINIO_SECRET_KEY='yyyyyyyy'
-MINIO_JOB_BUCKET='jobs'
-STORAGE_CACHE_DIR='.minio_cache'
+CONFIG = json.load(open('tests/config_vars.json', 'r'))
+MINIO_URL=f'localhost:{CONFIG["PORT"]}'
 
+PORT = CONFIG["PORT"]
+MINIO_ACCESS_KEY = CONFIG["MINIO_ACCESS_KEY"]
+MINIO_SECRET_KEY = CONFIG["MINIO_SECRET_KEY"]
+MINIO_JOB_BUCKET = CONFIG["MINIO_JOB_BUCKET"]
+STORAGE_CACHE_DIR = CONFIG["STORAGE_CACHE_DIR"]
+MINIO_IMAGE_TAG = CONFIG["MINIO_IMAGE_TAG"]
 
 class StorageUtilsTest(unittest.TestCase):
     def setUp(self):
         # Start MinIO docker container
         # Create test job bucket
         self.minio_name = 'test_storage_utils'
-        docker_client = docker.from_env()
+        self.docker_client = docker.from_env()
         # docker_client.images.pull('minio/minio:latest')
-        self.minio_container = docker_client.containers.run(
-                                    'minio/minio:RELEASE.2019-07-10T00-34-56Z', 
+        self.minio_container = self.docker_client.containers.run(
+                                    'minio/minio:%s' % MINIO_IMAGE_TAG, 
                                     'server /data',
                                     name=self.minio_name,
                                     ports={'9000/tcp':PORT},
@@ -67,8 +69,10 @@ class StorageUtilsTest(unittest.TestCase):
 
         # shutdown and remove container
         self.minio_container.stop()
+        self.minio_container.wait()
+        # self.minio_container.reload()
         self.minio_container.remove()
-        pass
+        self.docker_client.close()
 
     def test_put_object(self):
         '''
@@ -104,7 +108,7 @@ class StorageUtilsTest(unittest.TestCase):
         # Assert
         self.assertEqual(control_md5, test_md5)
 
-    def test_get_object(self):
+    def test_fget_object(self):
         '''
             Control
                 - put file in bucket with control client
@@ -151,6 +155,36 @@ class StorageUtilsTest(unittest.TestCase):
         # print(control_md5)
         # print(test_md5)
         self.assertEqual(control_md5, test_md5)
+
+    def test_gzip_job_files(self):
+        '''
+            Assert
+                - check that path returned is a TAR file
+                - files extracted are the flies expected
+        '''
+        num_files = 5
+        job_dir = path.join(self.storage_client.cache_path, self.test_dir)
+        expected_files = []
+        extracted_files = []
+
+        # Duplicate test file so we have multiple items to archive
+        for n in range(num_files):
+            copy_name = 'test/test_copy_%d.txt' % n
+            # Upload to minio
+            with open(self.test_file, 'rb') as data:
+                self.minio_client.put_object(MINIO_JOB_BUCKET, copy_name, data, stat(self.test_file).st_size)
+            expected_files.append(path.basename(copy_name))
+        
+        # Get tarfile 
+        mkdir(job_dir)
+        tar_path = self.storage_client.gzip_job_files(MINIO_JOB_BUCKET, self.test_dir)
+        with tarfile.open(tar_path, 'r:gz') as tarfin:
+            for tarinfo in tarfin:
+                extracted_files.append(tarinfo.name)
+
+        # Assert
+        self.assertTrue(tarfile.is_tarfile(tar_path))
+        self.assertSetEqual(set(expected_files), set(extracted_files))
 
     # @unittest.expectedFailure
     def test_remove_objects(self):
@@ -218,7 +252,7 @@ class StorageUtilsTest(unittest.TestCase):
 
 def main():
     docker_client = docker.from_env()
-    docker_client.images.pull('minio/minio:latest')
+    docker_client.images.pull('minio/minio:%s' % MINIO_IMAGE_TAG)
     unittest.main()
 
 if __name__ == "__main__":
