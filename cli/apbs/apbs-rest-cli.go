@@ -160,7 +160,7 @@ func main() {
 		rest.CheckErr(err)
 		os.Stderr.WriteString(string(data))
 
-		// TODO: Cleanout job files from cluster and stdout/stderr from local
-		// rest.DeleteServerJobDirectory(jobid)
+		// Cleanout job files from cluster and stdout/stderr from local
+		rest.DeleteServerJobDirectory(jobid) // TODO: run this at exit if anything is uploaded
 	}
 }

@@ -438,7 +438,7 @@ func main() {
 	// flag.PrintDefaults()
 
 	// TODO: Cleanout job files from cluster and stdout/stderr from local
-	// rest.DeleteServerJobDirectory(Options.jobid)
+	rest.DeleteServerJobDirectory(Options.jobid) // TODO: run this at exit if anything is uploaded
 	// err = os.Remove("pdb2pqr_stdout.txt")
 	// rest.CheckErr(err)
 	// err = os.Remove("pdb2pqr_stderr.txt")

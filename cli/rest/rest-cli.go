@@ -391,3 +391,25 @@ func DownloadFile(fileName string, jobid string) {
 	CheckErr(err)
 
 }
+
+// DeleteServerJobDirectory : deletes all server-side contents of the given jobid
+func DeleteServerJobDirectory(jobid string) {
+	APBSUrl := GetInstallURL()
+	// deleteURL :=
+
+	client := &http.Client{}
+
+	deleteURL := fmt.Sprintf("%s/storage/%s", APBSUrl, jobid)
+
+	req, err := http.NewRequest("DELETE", deleteURL, nil)
+	CheckErr(err)
+
+	resp, err := client.Do(req)
+	CheckErr(err)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != DeletionSuccessCode {
+		message := fmt.Sprintf("Error in deleting contents of jobid %s. Response code: %d", jobid, resp.StatusCode)
+		panic(message)
+	}
+}
