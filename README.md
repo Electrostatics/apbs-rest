@@ -17,8 +17,12 @@
 To run the suite as a user, the following software must be installed/activated:
 - [Helm](https://helm.sh/) 
 - A Kubernetes engine such as...
-    - [Minikube (recommended)](https://kubernetes.io/docs/tasks/tools/install-minikube/)
-    - [Docker Desktop (includes Kubernetes)](https://www.docker.com/products/docker-desktop)
+    - [Minikube (recommended for Linux users, available on Windows)](https://kubernetes.io/docs/tasks/tools/install-minikube/)
+    - [Docker Desktop (includes Kubernetes)](https://www.docker.com/products/docker-desktop)<br/>
+    *Windows 10 Users: Docker Desktop uses Hyper-V for virtualization. This is only available for users of Windows 10 Pro or above (Enterprise, Education, etc.)*
+
+**Additional guidance for potential roadblocks coming soon.**<br/><br/>
+    
 ### Developers
 All of the above along with...
 - [Python 3.6+](https://www.python.org/downloads/)
@@ -31,7 +35,7 @@ All of the above along with...
 
 ## Getting Started
 
-### TL;DR
+### TL;DR (for those who want copy+paste)
 - Docker Desktop (Windows/Mac)
     ```shell
     kubectl create serviceaccount tiller --namespace kube-system
@@ -52,8 +56,13 @@ All of the above along with...
     helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
     ```
 
+- Uninstall
+    ```shell
+    helm delete --purge apbs-rest
+    ```
 
-### Start Application as a User
+
+### Full Instructions for User Installation
 
 After installing Kubernetes and Helm to your system, you should have access to ```kubectl``` and ```helm``` commands. This can be confirmed via running ```kubectl version``` and ```helm version``` in the shell.
 
@@ -84,7 +93,7 @@ Between downloading the relevant images/activating the application, full install
 helm status apbs-rest
 ```
 
-Finally, you should be able to navigate to apbs.127.0.0.1.xip.io or apbs.$(minikube ip).xip.io in your browser and navigate the APBS-REST homepage.
+Finally, you should be able to navigate to **apbs.127.0.0.1.xip.io** or **apbs.$(minikube ip).xip.io** in your browser and navigate the APBS-REST homepage.
 
 <hr/>
 
