@@ -120,7 +120,8 @@ All the microservices live within the src directory. A list of all the services 
 - [uid](src/uid)
 - [workflow](src/v2_workflow)
 
-<sup>1</sup> Some services are dependent on legacy code from the original apbs-pdb2pqr repository.  Thus, you'd need to have a APBS/PDB2PQR build somewhere on your system and specific paths symlinked to the respective service.  Details are available within the respective README files per service.
+<sup>1</sup> Some services are dependent on legacy code from the original apbs-pdb2pqr repository.  Thus, you'd need to have a APBS/PDB2PQR build somewhere on your system and specific paths symlinked to the respective service.
+<!-- Details are available within the respective README files per service. -->
 
 <hr/>
 
