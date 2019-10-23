@@ -1,0 +1,101 @@
+# Default values for apbsrest.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+tesk:
+  image:
+    repository: eu.gcr.io/tes-wes/tesk-api
+    tag: v0.4.2
+    pullPolicy: IfNotPresent
+
+ui:
+  image:
+    repository: electrostatics/apbs-ui
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+task:
+  image:
+    repository: electrostatics/apbs-task
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+teskproxy:
+  image:
+    repository: electrostatics/apbs-tesk-proxy
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+autofill:
+  image:
+    repository: electrostatics/apbs-autofill
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+id:
+  image:
+    repository: electrostatics/apbs-uid
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+storage:
+  image:
+    repository: electrostatics/apbs-storage
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+workflow:
+  image:
+    repository: electrostatics/apbs-workflow
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+minio:
+  image:
+    repository: minio/minio
+    tag: RELEASE.2019-07-10T00-34-56Z
+    pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
