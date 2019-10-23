@@ -56,7 +56,7 @@ All of the above along with...
     helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
     ```
 
-- Uninstall
+- Uninstall **[(warning)](#uninstall-from-cluster)**
     ```shell
     helm delete --purge apbs-rest
     ```
