@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	flag "github.com/spf13/pflag"
 	"github.com/Electrostatics/apbs-rest/cli/rest"
+	flag "github.com/spf13/pflag"
 )
 
 type config struct {
@@ -311,6 +311,15 @@ func main() {
 	var Options commandLine
 	// var helpFlag bool
 
+	// Check if pdb2pqr_stdout.txt and pdb2pqr_stderr.txt exist
+	// TODO: utilize temp directory to store downloads
+	if rest.FileExists("pdb2pqr_stdout.txt") || rest.FileExists("pdb2pqr_stderr.txt") {
+		/*
+			os.Stderr.WriteString("Files 'pdb2pqr_stdout.txt' and/or 'pdb2pqr_stderr.txt' exist in current directory. Please rename/move/delete these files.")
+			os.Exit(1)
+		*/
+	}
+
 	apbsURL = rest.GetInstallURL()
 	println(apbsURL)
 	Options.Init()
@@ -358,7 +367,7 @@ func main() {
 		os.Exit(2)
 	} else {
 		if Options.userForcefield != "" {
-			if !rest.FileExists(Options.userForcefield) {
+			if !rest.FileExists(Options.userForcefield) { // check file existence if using user forcefield
 				errorMessage := fmt.Sprintf("File does not exist: %s", Options.userForcefield)
 				rest.PrintUsageError("PDB2PQR", func() {}, errorMessage)
 				os.Exit(2)
@@ -427,4 +436,11 @@ func main() {
 	// fmt.Println(Options.forcefield)
 	// fmt.Println(Options.apbsInput)
 	// flag.PrintDefaults()
+
+	// TODO: Cleanout job files from cluster and stdout/stderr from local
+	// rest.DeleteServerJobDirectory(Options.jobid)
+	// err = os.Remove("pdb2pqr_stdout.txt")
+	// rest.CheckErr(err)
+	// err = os.Remove("pdb2pqr_stderr.txt")
+	// rest.CheckErr(err)
 }

@@ -16,7 +16,7 @@ import (
 )
 
 // APBSUrl : Url for the APBS-Rest service
-const APBSUrl = "http://apbs.127.0.0.1.xip.io"
+// const APBSUrl = "http://apbs.127.0.0.1.xip.io"
 
 // DownloadSuccessCode : HTTP status for successful download
 const DownloadSuccessCode = 200
@@ -26,6 +26,9 @@ const UploadSuccessCode = 201
 
 // WorkflowSuccessCode : HTTP status for successful workflow submission
 const WorkflowSuccessCode = 202
+
+// DeletionSuccessCode : HTTP status for successful deletion
+const DeletionSuccessCode = 204
 
 // JobStatus : structure of the same-named JSON object.
 type JobStatus struct {
@@ -65,10 +68,17 @@ type Workflow struct {
 
 // GetInstallURL : retrieves the address of the local APBS-REST installation.
 func GetInstallURL() string {
-	url := "apbs.127.0.0.1.xip.io"
+	// url := "apbs.127.0.0.1.xip.io"
+
+	url, isEnvSet := os.LookupEnv("APBS_HOST")
 
 	// prepend 'http://' to satisfy protocol requirement
-	url = fmt.Sprintf("http://%s", url)
+	if isEnvSet {
+		url = fmt.Sprintf("http://%s", url)
+	} else {
+		os.Stderr.WriteString("APBS_HOST environment variable not set (example: 'apbs.127.0.0.1.xip.io')\n")
+		os.Exit(1)
+	}
 
 	return url
 }
@@ -114,6 +124,7 @@ func PrintUsageError(programName string, printOptions func(), message ...string)
 
 // GetNewID : obtains a newly generated id from APBS services.
 func GetNewID() string {
+	APBSUrl := GetInstallURL()
 	idServiceURL := APBSUrl + "/id/"
 
 	// Get new job ID
@@ -158,6 +169,7 @@ func FileExists(name string) bool {
 
 // SendSingleFile : uploads a single file to APBS storage service.
 func SendSingleFile(fileName string, objectName string) (string, int) {
+	APBSUrl := GetInstallURL()
 	storageURL := fmt.Sprintf("%s/storage/%s", APBSUrl, objectName)
 
 	fin, err := os.Open(fileName)
@@ -178,6 +190,7 @@ func SendSingleFile(fileName string, objectName string) (string, int) {
 
 // UploadFilesToStorage : upload files to APBS storage service.
 func UploadFilesToStorage(fileList []string, jobid string) {
+	APBSUrl := GetInstallURL()
 	storageURL := APBSUrl + "/storage/"
 
 	fmt.Printf("Sending files to storage (id: %s):\n", jobid)
@@ -199,6 +212,7 @@ func UploadFilesToStorage(fileList []string, jobid string) {
 // StartWorkflow : send the request to start the APBS workflow job.
 // func StartWorkflow(infileName string, jobid string, workflowType string, formObj interface{}) {
 func StartWorkflow(jobid string, workflowType string, formObj interface{}) {
+	APBSUrl := GetInstallURL()
 	// type workflow struct {
 	// 	Workflow string `json:"workflow"`
 	// 	Form     form   `json:"form"`
@@ -238,6 +252,8 @@ func StartWorkflow(jobid string, workflowType string, formObj interface{}) {
 // WaitForExecution : waits for execution to complete for job, returns end status of job.
 // func WaitForExecution(jobid string) []string {
 func WaitForExecution(jobid string) JobStatus {
+	APBSUrl := GetInstallURL()
+
 	var returnedStatus JobStatus
 	// wait := true
 	wait := false
@@ -287,6 +303,8 @@ func WaitForExecution(jobid string) JobStatus {
 // WaitForExecutionPDB2PQR : waits for execution to complete for job, returns end status of job.
 // func WaitForExecution(jobid string) []string {
 func WaitForExecutionPDB2PQR(jobid string) JobStatusPDB2PQR {
+	APBSUrl := GetInstallURL()
+
 	var returnedStatus JobStatusPDB2PQR
 	wait := false //true
 	workflowURL := fmt.Sprintf("%s/workflow/%s/pdb2pqr?wait=%t", APBSUrl, jobid, wait)
@@ -312,11 +330,8 @@ func WaitForExecutionPDB2PQR(jobid string) JobStatusPDB2PQR {
 	} else {
 		jobState := "nil"
 		counter := 0
-		println("I guess we're using modules now???")
-		println("This is real confusing, ngl")
-		println("Ok modules are making some more sense")
 		for jobState != "complete" {
-			fmt.Printf("Counter: %d", counter)
+			fmt.Printf("Status check count: %d", counter)
 
 			resp, err := http.Get(workflowURL)
 			body, err := ioutil.ReadAll(resp.Body)
@@ -352,6 +367,7 @@ func WaitForExecutionPDB2PQR(jobid string) JobStatusPDB2PQR {
 
 // DownloadFile : download a file given a specified filename and jobid.
 func DownloadFile(fileName string, jobid string) {
+	APBSUrl := GetInstallURL()
 	downloadURL := fmt.Sprintf("%s/storage/%s/%s", APBSUrl, jobid, fileName)
 
 	// Get file contents from storage service
