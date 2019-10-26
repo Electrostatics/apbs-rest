@@ -15,6 +15,7 @@ if __name__ == "__main__":
 
     # Remove dead pods from cluster
     if output:
+        output = output.decode('utf-8')
         for line in output.split('\n'):
             spl_line = line.split()
             if len(spl_line) > 0:
@@ -22,4 +23,5 @@ if __name__ == "__main__":
                 command = 'kubectl delete pods %s' % spl_line[0]
                 p3 = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
                 output, err = p3.communicate()
+                output = output.decode('utf-8')
                 print(output.strip())
