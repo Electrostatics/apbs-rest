@@ -24,6 +24,7 @@ def submit_tesk_action(job_id, task_name):
     http_status = None
 
     if request.method == 'GET':
+        #TODO: Get task status from execution service (TESK/Batch)
         pass
     elif request.method == 'POST':
         '''

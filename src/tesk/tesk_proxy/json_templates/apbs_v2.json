@@ -3,7 +3,7 @@
     "volumes": [ "/app/run" ],
     "executors": [
       {
-        "image": "electrostatics/apbs-downloader:stable",
+        "image": "electrostatics/apbs-downloader:latest",
         "command": [ "python", "../download_input_files.py" ],
         "env": {
           "JOB_ID": "{{job_id}}",
@@ -17,7 +17,7 @@
         "stderr": "/app/run/apbs_stderr.txt"
       },
       {
-        "image": "electrostatics/apbs-uploader:stable",
+        "image": "electrostatics/apbs-uploader:latest",
         "command": [ 
           "sh", "-c",
           "../generate_final_status.sh apbs && python ../upload_output_files.py"
