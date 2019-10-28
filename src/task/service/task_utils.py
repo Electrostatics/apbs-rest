@@ -88,19 +88,26 @@ class TaskHandler:
         else:
 
             '''
-                Handler for when we use the tmp_task_exec service.
-                To be replaced by TESK service
+                Handler for using the TESK service.
+                TODO: provide better checks for status codes/errors
             '''
             if task_name == 'apbs':
                 # print('checking ')
                 if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
                     data = request.data
                     if 'filename' in data:
-                        requests.post('%s/api/tesk/%s/%s?infile=true' % (TMP_EXEC_HOST, job_id, task_name), json=data)
+                        post_response = requests.post('%s/api/tesk/%s/%s?infile=true' % (TMP_EXEC_HOST, job_id, task_name), json=data)
+                        if post_response.status_code == 500:
+                            http_status = post_response.status_code
+                            response = {
+                                'error': 'There was an error within the service. Please try again later'
+                            }
                     else:
-                        '''throw some error here'''
-                        # TODO: error handler here
-                        pass
+                        '''Construct error response'''
+                        http_status = 400
+                        response = {
+                            'error': "missing key 'filename' in JSON request"
+                        }
 
                 else:
                     form = request.data
@@ -114,7 +121,6 @@ class TaskHandler:
                             form[key] = str(form[key])
 
                     # Send task to placeholder executor service
-                    # TODO: Build Kubernetes execotor service to replace this
                     requests.post('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
 
             elif task_name == 'pdb2pqr':
@@ -124,18 +130,12 @@ class TaskHandler:
                 post_response = requests.post('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
                 print('tesk proxy response', post_response.status_code)
                 
-            '''
-                Handler for using the TESK service.
-                When finished, remove the handler above.
-            '''
-            if task_name == 'apbs':
-                pass
-            elif task_name == 'pdb2pqr':
-                pass
 
-            response = { 
-                'accepted': f'task {task_name} accepted. Processing...'
-            }
+            # if http_status == 202:
+            if 200 <= http_status < 300:
+                response = { 
+                    'accepted': f'task {task_name} accepted. Processing...'
+                }
 
         return response, http_status
 
