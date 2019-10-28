@@ -129,7 +129,7 @@ class Runner:
         # sys.stdout = open('%s%s%s/pdb2pqr_stdout.txt' % (INSTALLDIR, TMPDIR, job_id), 'w')
         # sys.stderr = open('%s%s%s/pdb2pqr_stderr.txt' % (INSTALLDIR, TMPDIR, job_id), 'w')
         
-        if self.invoke_method == 'gui':
+        if self.invoke_method == 'gui' or self.invoke_method == 'v1':
 
             run_arguements = self.weboptions.getRunArguments()
             if self.weboptions.runoptions.get('ph_calc_method', '') == 'pdb2pka':
@@ -164,7 +164,7 @@ class Runner:
                     fout.write(self.weboptions.pdbfilestring)
                 upload_list = [self.weboptions.pdbfilename, 'pdb2pqr_status', 'pdb2pqr_start_time']
 
-        elif self.invoke_method == 'cli':
+        elif self.invoke_method == 'cli' or self.invoke_method == 'v2':
             # construct command line argument string for when CLI is invoked
             command_line_list = []
             # get list of args from self.cli_params['flags']
