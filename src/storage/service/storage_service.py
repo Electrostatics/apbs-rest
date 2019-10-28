@@ -128,8 +128,10 @@ def storage_service(job_id, file_name=None):
             # print(type(file_data))
 
         if file_data.filename:
-            file_name = secure_filename(file_data.filename)
-            if file_data.filename and file_name:
+            uploaded_file_name = secure_filename(file_data.filename)
+            if file_name is None:
+                object_name = os.path.join(job_id, uploaded_file_name)
+            if file_data.filename and uploaded_file_name:
                 etag_str = storageClient.put_object(JOB_BUCKET_NAME, object_name, file_data)
 
                 # Returns internal error code if Minio connection isn't successful
