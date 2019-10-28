@@ -1,0 +1,187 @@
+openapi: "3.0.2"
+info:
+  title: "APBS-REST Services"
+  description: "This is the specification for the APBS server"
+  version: "0.5"
+  license:
+    name: "BSD-3-Clause"
+servers:
+  - url: http://apbs.127.0.0.1.xip.io
+
+paths:
+
+  # Id generator service
+  /id:
+    get:
+      summary: "Generates a unique ID string to identify a workflow"
+      operationId: "getID"
+      responses:
+        200:
+          description: "Successfully retrieved unique ID"
+      tags:
+        - ID Generation
+
+  # Storage service
+  /storage/{job_id}:
+    parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: file_name
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: "Retrieves the a tarfile of all contents for a specified job_id"
+      responses:
+        200:
+          description: "Successfully retrieved tarfile from storage"
+      tags:
+        - Storage
+    delete:
+      summary: "Deletes ALL contents pertaining to a particular job_id"
+      responses:
+        204:
+          description: "Successful deletion of all job_id files"
+      tags:
+        - Storage
+
+  /storage/{job_id}/{file_name}:
+    parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: file_name
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: "Retrieves the file specified by file_name"
+      responses:
+        200:
+          description: "Successfully retrieved file from storage"
+      parameters:
+        - in: query
+          name: json
+          description: Returns the file contents as a JSON object
+          schema:
+            type: boolean
+      tags:
+        - Storage
+    post:
+      summary: "Uploads a file to be used by the workflow parameters you eventually submit"
+      responses:
+        201:
+          description: "File has been successfully uploaded to the APBS-REST service"
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              # properties:
+              name: file_data
+              type: string
+              format: binary
+            
+      tags:
+        - Storage
+    delete:
+      summary: "Deletes the file specified by file_name"
+      responses:
+        204:
+          description: "Successfully deleted file from storage"
+      tags:
+        - Storage
+    
+      
+  # Task service
+  /task/{job_id}/{task_name}:
+    parameters:
+    - name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: task_name
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      summary: "Retrieves a JSON status for the requested task"
+      responses:
+        200:
+          description: "Successfully retrieved status from the task service"
+        404:
+          description: "Task type 'task_name' does not exist or is not implemented"
+      tags:
+        - Task
+    # post:
+    #   summary: "Submit a single task assigned to the respsective job ID"
+    #   responses:
+    #     201:
+    #       description: "Task has been accepted and sent to run in backend"
+    #   tags:
+    #     - Task
+
+  /task/{job_id}/apbs:
+    parameters:
+    - name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      summary: "Submit an APBS task assigned to the respsective job ID"
+      parameters:
+        - in: query
+          name: infile
+          description: Denotes whether to use the APBS infile defined by the "filename" key within JSON request
+          schema:
+            type: boolean
+      # requestBody:
+      #   required: true
+      #   content:
+      #     application/json:
+      #       schema:
+      #         filename:
+      #           type: string
+      responses:
+        202:
+          description: "APBS task has been accepted and sent to run in backend"
+        400:
+          description: "Error of the request itself. Details within JSON content."
+      tags:
+        - Task
+          
+  /task/{job_id}/pdb2pqr:
+    parameters:
+    - name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      summary: "Submit a PDB2PQR task assigned to the respsective job ID"
+      parameters:
+        - in: query
+          name: infile
+          description: Denotes whether to use the APBS infile defined by the "filename" key within JSON request
+          schema:
+            type: boolean
+      responses:
+        202:
+          description: "APBS task has been accepted and sent to run in backend"
+        400:
+          description: "Error of the request itself. Details within JSON content."
+      tags:
+        - Task
+
+  # Workflow Service
+  # /workflow/
