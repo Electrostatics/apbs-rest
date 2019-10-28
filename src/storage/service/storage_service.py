@@ -36,7 +36,7 @@ def is_Alive():
     return '', 200
 
 @storage_app.route('/api/storage/<job_id>/<file_name>', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
-@storage_app.route('/api/storage/<job_id>/', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
+@storage_app.route('/api/storage/<job_id>', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
 def storage_service(job_id, file_name=None):
     # def storage_service(job_id, file_name=None):
     """Endpoint serving as the gateway to storage bucket"""
