@@ -20,6 +20,21 @@ def handle_pdb2pqr_upload(upload_file, job_id, storage_host):
 
     return True
 
+def handle_upload(upload_file, job_id, storage_host, valid_extensions):
+    if upload_file:
+        file_name = secure_filename(upload_file.filename)
+        if allowed_file(file_name, valid_extensions):
+            pdb_stream = upload_file.stream
+            files = {'file_data': pdb_stream}
+            url = '%s/api/storage/%s/%s' % (storage_host, job_id, file_name)
+            r = requests.post(url, files=files)
+            if r.status_code < 200 or r.status_code > 299:
+                return False
+    else:
+        return False
+
+    return True
+
 def allowed_file(filename, valid_extensions):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in valid_extensions

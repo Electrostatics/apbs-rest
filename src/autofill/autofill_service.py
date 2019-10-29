@@ -117,7 +117,8 @@ def parse_upload(job_id, job_type):
 
             elif job_type == 'pdb2pqr':
                 files = request.files['file']
-                is_successful_upload = autofill_utils.handle_pdb2pqr_upload(files, job_id, STORAGE_HOST)
+                accepted_extensions = ['pdb', 'dat','names', 'mol2']
+                is_successful_upload = autofill_utils.handle_upload(files, job_id, STORAGE_HOST, accepted_extensions)
                 if is_successful_upload:
                     json_response = {
                         'upload_status': 'Success',
