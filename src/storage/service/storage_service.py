@@ -5,7 +5,8 @@ from json import JSONEncoder, loads, dumps
 from flask import request, send_from_directory, make_response, Response, Blueprint
 # from flask.json import json_encoder, json_decoder
 from flask import json
-from werkzeug import secure_filename, FileStorage
+from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
 from urllib3.exceptions import MaxRetryError
 from minio.error import ResponseError
 # from PDB2PQR_web import app
