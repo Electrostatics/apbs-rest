@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"log"
 
-	// "flag"
-
 	"io/ioutil"
 	"os"
 	"path"
@@ -13,7 +11,6 @@ import (
 
 	"github.com/Electrostatics/apbs-rest/cli/rest"
 	flag "github.com/spf13/pflag"
-	// "../rest"
 )
 
 type commandLine struct {
@@ -76,31 +73,41 @@ func ExtractReadFiles(inputContents string) []string {
 
 func main() {
 	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
-	var command commandLine
+	var Options commandLine
 
-	// debugPtr := flag.Bool("debug", false, "Print debug statements to standard output")
-	// Get new job ID if user doesn't specify one
-	var jobid string
-
-	// flag.StringVar(&jobid, "id", rest.GetNewID(), "Specify custom job identifier for execution. Defaults to randomly generated ID.")
-	flag.StringVar(&command.jobid, "id", rest.GetNewID(), "Specify custom job identifier for execution. Defaults to randomly generated ID.")
-	flag.BoolVar(&command.debug, "debug", false, "Print additional information to stdout.")
+	// Define flags for the help text
+	flag.StringVar(&Options.jobid, "id", "", "Specify custom job identifier for execution. Defaults to randomly generated ID.")
+	flag.BoolVar(&Options.debug, "debug", false, "Print additional information to stdout.")
+	flag.BoolVarP(&Options.help, "help", "h", false, "Print help message and exit.")
 	// jobid = "devTest"
 
 	// TODO: consider whether to print licensing flag from old binaries
 
 	// Check command line arguments
 	flag.Parse()
-	jobid = command.jobid
-	if !command.debug {
+	if !Options.debug {
 		log.SetOutput(ioutil.Discard)
+	}
+
+	// Display help message when --help flag is specified
+	if Options.help {
+		rest.PrintUsageError("APBS", flag.PrintDefaults)
+		return
+	}
+
+	// Retrieve job ID if none is specified
+	if Options.jobid == "" {
+		Options.jobid = rest.GetNewID()
 	}
 
 	if flag.NArg() < 1 {
 		rest.PrintUsageError("APBS", flag.PrintDefaults, "Not enough arguments: APBS input file required")
 		// panic("Not enough arguments: APBS input file required")
 	} else {
+		var jobid string
 		var allInputFiles []string
+
+		jobid = Options.jobid
 
 		// verify inputfile's existence
 		apbsFileName := flag.Arg(0)

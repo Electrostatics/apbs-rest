@@ -101,7 +101,7 @@ func (c *commandLine) Init() {
 	// Titration state calculation options
 	flag.StringVar(&c.phCalcMethod, "ph-calc-method", "", "Method used to calculate ph values. If a pH calculation method is selected, pKa values will be calculated and titratable residues potentially modified after comparison with the pH value supplied by --with_ph for each titratable residue")
 	flag.Float64Var(&c.phValue, "with-ph", 7, "Method used to calculate ph values. If a pH calculation method is selected, pKa values will be calculated and titratable residues potentially modified after comparison with the pH value supplied by --with_ph for each titratable residue")
-	flag.StringVar(&c.jobid, "id", rest.GetNewID(), "Specify custom job identifier for execution. Defaults to randomly generated ID.")
+	flag.StringVar(&c.jobid, "id", "", "Specify custom job identifier for execution. Defaults to randomly generated ID.")
 
 	// PROPKA
 	flag.StringVar(&c.propkaReference, "propka-reference", "", "Setting which reference to use for stability calculations. See PROPKA 3.0 documentation.")
@@ -306,7 +306,6 @@ type FormCLI struct {
 }
 
 func main() {
-	var apbsURL string
 	var allInputFiles []string
 	var Options commandLine
 	// var helpFlag bool
@@ -320,10 +319,7 @@ func main() {
 		*/
 	}
 
-	apbsURL = rest.GetInstallURL()
-	println(apbsURL)
 	Options.Init()
-
 	Options.OptionsFlagSet = flag.NewFlagSet("Options:", flag.ExitOnError)
 	Options.OptionsFlagSet.AddFlag(flag.Lookup("help"))
 	// helpFlag = *flag.Bool("help", false, "Print help message and exit.")
@@ -343,19 +339,23 @@ func main() {
 
 	// TODO: consider whether to print licensing flag from old binaries
 
-	// Check version flag
-	if Options.version {
+	if Options.help {
+		// Check Help flag
+		rest.PrintUsageError("PDB2PQR", Options.PrintHelpMessage)
+		return
+	} else if Options.version {
+		// Check version flag
 		pdb2pqrVersion := os.Getenv("PDB2PQR_VERSION")
 		if pdb2pqrVersion == "" {
 			pdb2pqrVersion = "DEV"
 		}
 		fmt.Printf("pdb2pqr (Version %s)\n", pdb2pqrVersion)
 		return
-	} else if Options.help {
-		// Check Help flag
-		// rest.PrintUsageError("PDB2PQR", flag.PrintDefaults)
-		rest.PrintUsageError("PDB2PQR", Options.PrintHelpMessage)
-		return
+	}
+
+	// Retrieve job ID if none is specified
+	if Options.jobid == "" {
+		Options.jobid = rest.GetNewID()
 	}
 
 	// Check mandatory flags for valid input
