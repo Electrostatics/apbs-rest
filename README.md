@@ -6,7 +6,7 @@
 * [Overview](#overview)
     * [What is Docker?](#what-is-docker)
     * [What is Kubernetes?](#what-is-kubernetes)
-<!-- * [What is Helm](#what-is-helm) -->
+    * [What is Helm](#what-is-helm)
 * [Install](#install)
     * [Prerequisites](#prerequisites)
     * [APBS-REST Installation](#apbs-rest-installation)
@@ -21,6 +21,8 @@
 ## Overview
 APBS-REST serves as the beginning effort to rebuild the infrastructure powering the [APBS-PDB2PQR](https://github.com/Electrostatics/apbs-pdb2pqr) software suite.  One of the goals with the redesign is to eliminate the OS-specific idiosyncrasies/inconsistencies one must account for during development.  While the main software undergoes its own overhaul, the services herein will become a deployment mechanism by which to execute APBS or PDB2PQR.  Facilitating the development/deployment are the containerization engine [Docker](https://www.docker.com/), the container-orchestration software [Kubernetes](https://kubernetes.io/), and the Kubernetes package manager [Helm](https://helm.sh/).
 
+Products of this effort include a new user interface alongside [command line tools](https://github.com/Electrostatics/apbs-rest/tree/master/cli) to interact with the service.
+
 ### What is Docker?
 <!-- From [Docker](https://www.docker.com/get-started): -->
 From [Docker](https://www.docker.com/why-docker):
@@ -33,7 +35,13 @@ Since the main components of APBS-REST are containerized elements, Kubernetes is
 >Kubernetes (K8s) is an open-source system for automating deployment, scaling, and management of containerized applications.
 It groups containers that make up an application into logical units for easy management and discovery.
 
-Depending on your platform, there exist a couple installation methods: **Minikube** or **Docker Desktop** 
+Depending on your platform, there exist a couple installation methods: **Minikube** or **Docker Desktop**
+
+### What is Helm?
+Configuring and deploying each microservice for a cluster can be a tedious procedure. Ameliorating this process is Helm, a tool for packaging container-based applications. From [Helm](https://helm.sh/):
+>Helm helps you manage Kubernetes applications — Helm Charts help you define, install, and upgrade even the most complex Kubernetes application.
+
+Advertising itself as "The package manager for Kubernetes", Helm, in concept, functions similarly to other popular package managers such as *pip* for Python, *apt*/*yum* for Linux, or *Homebrew* for macOS.
 
 <!-- ### What is Minikube? -->
 
