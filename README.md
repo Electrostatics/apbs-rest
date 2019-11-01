@@ -159,7 +159,7 @@ helm delete --purge apbs-rest
     minikube addons enable ingress
     helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
     ```
-- Docker Desktop (Windows/Mac)
+- Docker Desktop
     ```shell
     kubectl create serviceaccount tiller --namespace kube-system
     kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
