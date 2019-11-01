@@ -4,9 +4,9 @@
 
 ## Table of Contents
 * [Overview](#overview)
-    * [What is Docker?](#what-is-docker?)
-    * [What is Kubernetes?](#what-is-kubernetes?)
-    * [What is Helm?](#what-is-helm?)
+    * [What is Docker?](#what-is-docker)
+    * [What is Kubernetes?](#what-is-kubernetes)
+<!-- * [What is Helm](#what-is-helm) -->
 * [Install](#install)
     * [Prerequisites](#prerequisites)
     * [APBS-REST Installation](#apbs-rest-installation)
@@ -70,6 +70,17 @@ Before installing APBS-REST, the following must be installed on your device:
 - [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
 - [VirtualBox](https://www.virtualbox.org/wiki/Downloads) (required for Minikube)
 
+The commands ```kubectl``` and ```helm``` should how be available. Verify your Minikube and Helm installations:
+```
+$ kubectl version
+Client Version: version.Info{Major:"1", Minor:"16", GitVersion:"v1.16.2", GitCommit:"c97fe5036ef3df2967d086711e6c0c405941e14b", GitTreeState:"clean", BuildDate:"2019-10-15T19:18:23Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"darwin/amd64"}
+Server Version: version.Info{Major:"1", Minor:"16", GitVersion:"v1.16.0", GitCommit:"2bd9643cee5b3b3a5ecbd3af49d09018f0773c77", GitTreeState:"clean", BuildDate:"2019-09-18T14:27:17Z", GoVersion:"go1.12.9", Compiler:"gc", Platform:"linux/amd64"}
+
+$ helm version
+Client: &version.Version{SemVer:"v2.15.2", GitCommit:"8dce272473e5f2a7bf58ce79bb5c3691db54c96b", GitTreeState:"clean"}
+Server: &version.Version{SemVer:"v2.15.2", GitCommit:"8dce272473e5f2a7bf58ce79bb5c3691db54c96b", GitTreeState:"clean"}
+```
+
 **Note for Docker Desktop users:** If you already use the latest versions of Docker Desktop for Windows/Mac, Kubernetes is bundled and ready to be enabled via the Settings menu.  However, Docker Desktop for Windows requires Hyper-V, which users not on Windows 10 Professional or higher cannot access.  This is why we target Minikube for user installation of APBS-REST, as VirtualBox is available to anyone with a virtualization-compatible processor (most Intel/AMD CPUs over the past decade should have this feature).
 
 Please note that the Kubernetes version bundled with Docker Desktop **generally lags behind (1.14.7 compared to current 1.16.2 as of this writing)** and may exhibit potential incompatibilities in the future.  If you do plan to use Docker Desktop with it's Kubernetes, the current version (v2.1.0.4) has proven compatible during development thus far.
@@ -84,13 +95,6 @@ Any additional issues discovered will be noted here.
 <!-- <hr> -->
 
 ### APBS-REST Installation
-
-After installing Kubernetes and Helm to your system, you should have access to ```kubectl``` and ```helm``` commands. Verify your versions of Kubernetes and Helm:
-```shell
-kubectl version
-helm version
-```
-
 #### From the top of the repository
 If you've never used Helm or don't have its Tiller installed on your cluster, do the following:
 ```shell
