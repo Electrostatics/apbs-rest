@@ -22,7 +22,7 @@ Using the command line tools should mirror the same interface as the current too
 
 ## Requirements
 Requirements for development/building the APBS-CLI tools: 
-- Go &ge; 1.11
+- [Go](https://golang.org/dl/) (Golang) &ge; 1.11
     - Module support was implemented in this version
 
 ## Build
