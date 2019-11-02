@@ -5,6 +5,7 @@ import (
 
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"strconv"
@@ -31,6 +32,7 @@ type commandLine struct {
 	// System Options
 	version bool
 	help    bool
+	debug   bool
 
 	// Mandatory flags - user chooses one
 	forcefield     string
@@ -141,6 +143,7 @@ func (c *commandLine) Init() {
 	// System options
 	flag.BoolVar(&c.version, "version", false, "Show program’s version number and exit.")
 	flag.BoolVarP(&c.help, "help", "h", false, "Print help message and exit.")
+	flag.BoolVar(&c.debug, "debug", false, "Print additional information to stdout.")
 
 }
 
@@ -154,7 +157,7 @@ func (c *commandLine) JSON() map[string]interface{} {
 
 	// flag.visit(), adding flag name/value pairs to an interface object
 	flag.Visit(func(f *flag.Flag) {
-		if f.Name != "id" {
+		if f.Name != "id" && f.Name != "debug" {
 			flagMap[f.Name] = f.Value
 		}
 	})
@@ -198,7 +201,7 @@ func (c *commandLine) PrintHelpMessage() {
 	fmt.Printf("Options:\n")
 
 	// System options
-	flagArray = []string{"version", "help"}
+	flagArray = []string{"version", "debug", "help"}
 	printHelpLine(flagArray, 2)
 	fmt.Println()
 
@@ -306,9 +309,11 @@ type FormCLI struct {
 }
 
 func main() {
-	var allInputFiles []string
 	var Options commandLine
-	// var helpFlag bool
+	var allInputFiles []string
+
+	// Remove date-time text from log output
+	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
 
 	// Check if pdb2pqr_stdout.txt and pdb2pqr_stderr.txt exist
 	// TODO: utilize temp directory to store downloads
@@ -328,6 +333,11 @@ func main() {
 
 	// Parse all flags
 	flag.Parse()
+
+	// If no --debug, send log output to /dev/null
+	if !Options.debug {
+		log.SetOutput(ioutil.Discard)
+	}
 
 	// Load information for available forcefields and pH calculation methods
 	// TODO: figure out a way around depending on the path (maybe try using an explicitely declared imported Go struct)
@@ -361,9 +371,9 @@ func main() {
 	// Check mandatory flags for valid input
 	if !Options.HasMandatoryFlags() {
 		flagArray := []string{"ff", "userff", "clean"}
-		MissingFlagMessage := "One of the manditory options was not specified."
+		MissingFlagMessage := "One of the manditory options was not specified.\n"
 		rest.PrintUsageError("pdb2pqr", func() { printHelpLine(flagArray, 4) }, MissingFlagMessage)
-		fmt.Println()
+		// fmt.Println()
 		os.Exit(2)
 	} else {
 		if Options.userForcefield != "" {
@@ -398,7 +408,7 @@ func main() {
 	// TODO: add other input files to list (e.g. ligand, userff, etc)
 
 	rest.UploadFilesToStorage(allInputFiles, Options.jobid)
-	fmt.Println() // empty line
+	log.Println() // empty line
 	// if Options.
 
 	// Build submission form
@@ -409,15 +419,15 @@ func main() {
 
 	// Wait for completion, get final status
 	finalStatus := rest.WaitForExecutionPDB2PQR(Options.jobid)
-	fmt.Printf("Job complete.\n\n")
+	log.Printf("Job complete.\n\n")
 
 	// Download output files
-	fmt.Printf("Downloading output files:\n")
+	log.Printf("Downloading output files:\n")
 	for _, file := range finalStatus.Pdb2pqr.OutputFiles {
-		fmt.Printf("  %s\n", path.Base(file))
+		log.Printf("  %s\n", path.Base(file))
 		rest.DownloadFile(path.Base(file), Options.jobid)
 	}
-	fmt.Printf("Finished.\n")
+	log.Printf("Finished.\n")
 
 	// Print apbs_output to stdout
 	data, err := ioutil.ReadFile("pdb2pqr_stdout.txt")

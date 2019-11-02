@@ -83,8 +83,12 @@ func main() {
 
 	// TODO: consider whether to print licensing flag from old binaries
 
-	// Check command line arguments
+	/**
+	Check command line arguments
+	*/
 	flag.Parse()
+
+	// If no --debug, send log output to /dev/null
 	if !Options.debug {
 		log.SetOutput(ioutil.Discard)
 	}
