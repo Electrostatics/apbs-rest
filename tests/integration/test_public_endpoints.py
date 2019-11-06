@@ -64,6 +64,12 @@ def test_storage_service():
     assert response.status_code == 404
     assert body == 'File %s does not exist\n' % object_name
 
+    # GET: nonexistent directory
+    response = requests.get(job_id_url)
+    body = response.content.decode('utf-8')
+    assert response.status_code == 404
+    assert body == 'Requested ID %s has no associated files' % job_id
+
     # POST: new file, name it 'sample_text.txt'
     response = requests.post(req_url, data='hello world')
     assert response.status_code == 201
