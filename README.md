@@ -6,7 +6,7 @@
 * [Overview](#overview)
     * [What is Docker?](#what-is-docker)
     * [What is Kubernetes?](#what-is-kubernetes)
-    * [What is Helm](#what-is-helm)
+    * [What is Helm?](#what-is-helm)
 * [Install](#install)
     * [Prerequisites](#prerequisites)
     * [APBS-REST Installation](#apbs-rest-installation)
@@ -195,6 +195,14 @@ This will remove the release from your cluster **along with any associated stora
 
 ## For Developers
 
+### Additional Install Requirements
+Developers contributing to this repository will also need the following:
+- [Python 3.6+](https://www.python.org/downloads/)
+- [Python 2.7](https://www.python.org/downloads/release/python-2716/)
+    - for development on services using legacy [PDB2PQR code](https://github.com/Electrostatics/apbs-pdb2pqr/tree/master/pdb2pqr)
+- [Docker](https://docs.docker.com/install/)
+    - Certain tests require this as they utilize the [Docker SDK for Python](https://docker-py.readthedocs.io/en/stable/)
+    
 ### Preface
 This repository serves as the backend interface for an overhauled APBS web server.  As such, the code contained herein serves as **one of two** components necessary to develop on the website:
 * [apbs-web](https://github.com/Eo300/apbs-web) (front-end)
