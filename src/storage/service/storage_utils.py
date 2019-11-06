@@ -168,16 +168,26 @@ class StorageClient:
     
     def gzip_job_files(self, bucket_name, job_id):
         ''' Bundles all files of a job_id '''
+        num_zipped = None
         tarfile_path = '%s/%s/%s.tar.gz' % (self.cache_path, job_id, job_id)
         all_objects = self.list_objects(bucket_name, prefix=job_id, recursive=True)
-        tar = tarfile.open(tarfile_path, 'w:gz')
+        # tarfout = tarfile.open(tarfile_path, 'w:gz')
 
-        # Add files to tar archive
-        for obj in all_objects:
-            file_path = self.fget_object(bucket_name, obj.object_name)
-            if file_path is not None:
-                tar.add(file_path, arcname=os.path.basename(file_path))
-        tar.close()
+        if not os.path.isdir(os.path.dirname(tarfile_path)):
+            os.makedirs(os.path.dirname(tarfile_path))
+
+        with tarfile.open(tarfile_path, 'w:gz') as tarfout:
+            # Add files to tar archive
+            for obj in all_objects:
+                file_path = self.fget_object(bucket_name, obj.object_name)
+                if file_path is not None:
+                    tarfout.add(file_path, arcname=os.path.basename(file_path))
+            num_zipped = len(tarfout.getnames())
+
+        # If there are no files retrieved for job_id, return None
+        if num_zipped < 1:
+            os.remove(tarfile_path)
+            tarfile_path = None
 
         return tarfile_path
 

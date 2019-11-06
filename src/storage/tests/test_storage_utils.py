@@ -159,13 +159,19 @@ class StorageUtilsTest(unittest.TestCase):
     def test_gzip_job_files(self):
         '''
             Assert
+                - check that nonexistent ID returns None
                 - check that path returned is a TAR file
                 - files extracted are the flies expected
         '''
         num_files = 5
         job_dir = path.join(self.storage_client.cache_path, self.test_dir)
+        nonsense_dir = path.join(self.storage_client.cache_path, 'nonexistent_id')
         expected_files = []
         extracted_files = []
+
+        # Get tarfile for nonexistent ID
+        mkdir(nonsense_dir)
+        tar_path_nonsense = self.storage_client.gzip_job_files(MINIO_JOB_BUCKET, 'nonexistent_id')
 
         # Duplicate test file so we have multiple items to archive
         for n in range(num_files):
@@ -183,6 +189,7 @@ class StorageUtilsTest(unittest.TestCase):
                 extracted_files.append(tarinfo.name)
 
         # Assert
+        self.assertIs(tar_path_nonsense, None)
         self.assertTrue(tarfile.is_tarfile(tar_path))
         self.assertSetEqual(set(expected_files), set(extracted_files))
 

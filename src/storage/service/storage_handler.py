@@ -76,13 +76,17 @@ class StorageHandler:
             try:
                 # tar files for given job_id
                 tarfile_path = self.storageClient.gzip_job_files(JOB_BUCKET_NAME, job_id)
-                jobid_dir = os.path.dirname(tarfile_path)
-                
-                http_response_code = 200
-                response = send_from_directory(jobid_dir, os.path.basename(tarfile_path))
-            except:
+                if tarfile_path is not None:
+                    jobid_dir = os.path.dirname(tarfile_path)
+                    http_response_code = 200
+                    response = send_from_directory(jobid_dir, os.path.basename(tarfile_path))
+                else:
+                    http_response_code = 404
+                    response = 'Requested ID %s has no associated files' % job_id
+            except Exception as e:
                 response = "Error in retrieving contents for ID '%s'" % job_id
                 http_response_code = 500
+                print(e) #TODO: change to log message later
             finally:
                 return response, http_response_code
 
