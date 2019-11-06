@@ -73,12 +73,12 @@ All of the above along with...
 ## Install
 ### Prerequisites
 
-Before installing APBS-REST, the following must be installed on your device:
-- [Helm](https://github.com/helm/helm/releases)
+Before installing APBS-REST, the following must be installed in order on your device:
+- [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 - [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
-- [VirtualBox](https://www.virtualbox.org/wiki/Downloads) (required for Minikube)
+- [Helm](https://github.com/helm/helm/releases)
 
-The commands ```kubectl``` and ```helm``` should how be available. Verify your Minikube and Helm installations:
+The commands ```kubectl``` and ```helm``` should how be available. Verify your Minikube and Helm installations on your preferred command line:
 ```
 $ kubectl version
 Client Version: version.Info{Major:"1", Minor:"16", GitVersion:"v1.16.2", GitCommit:"c97fe5036ef3df2967d086711e6c0c405941e14b", GitTreeState:"clean", BuildDate:"2019-10-15T19:18:23Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"darwin/amd64"}
