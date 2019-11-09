@@ -10,6 +10,7 @@
 * [Install](#install)
     * [Prerequisites](#prerequisites)
     * [APBS-REST Installation](#apbs-rest-installation)
+    * [Known Installation Issues](#known-installation-issues)
 * [Uninstall from Cluster](#uninstall-from-cluster)
 * [For Developers](#for-developers)
 <!-- * [System Requirements](#system-requirements) -->
@@ -77,6 +78,7 @@ Before installing APBS-REST, the following must be installed in order on your de
 - [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 - [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
 - [Helm](https://github.com/helm/helm/releases)
+   - These instructions are for versions &gt;2.15 and &lt;3.x
 
 The commands ```kubectl``` and ```helm``` should how be available. Verify your Minikube and Helm installations on your preferred command line:
 ```
@@ -93,8 +95,9 @@ Server: &version.Version{SemVer:"v2.15.2", GitCommit:"8dce272473e5f2a7bf58ce79bb
 
 Please note that the Kubernetes version bundled with Docker Desktop **generally lags behind (1.14.7 compared to current 1.16.2 as of this writing)** and may exhibit potential incompatibilities in the future.  If you do plan to use Docker Desktop with it's Kubernetes, the current version (v2.1.0.4) has proven compatible during development thus far.
 
-#### Known installation issues/incompatibilities:
+### Known Installation Issues
 - Helm versions < 2.15 will will not install with Kubernetes v1.16
+- Helm version 3.0 makes significant changes to the command line interface. This README will be updated to reflect it after its full release
 - During initial testing, issues were encountered when attempting to start Minikube with Hyper-V as the driver.  Your mileage may vary, but VirtualBox has yet to exhibit any issues while launching Minikube (fingers crossed).
 
 Any additional issues discovered will be noted here.
