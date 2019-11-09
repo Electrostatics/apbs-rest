@@ -1,4 +1,4 @@
-# APBS-REST: Deploying APBS as a Containerized Microservice-Based Software
+# APBS-REST: Deploying APBS as Containerized Microservice-Driven Software
 
 *This project is a work in progress. Stability not guaranteed.*
 
@@ -106,13 +106,20 @@ Any additional issues discovered will be noted here.
 <!-- <hr> -->
 
 ### APBS-REST Installation
-#### From the top of the repository
+Firstly, clone/download this repository. The files needed to define the orchestration are contained within.  Navigate into the top directory of the repository:
+```shell
+cd apbs-rest/
+```
+
+
+#### After cloning of the repository
 If you've never used Helm or don't have its Tiller installed on your cluster, do the following:
 ```shell
 kubectl create serviceaccount tiller --namespace kube-system
 kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 helm init --service-account=tiller --wait
 ```
+This installs the server-side component necessary for Helm to operate.
 <br>
 
 Enable an ingress controller for your Minikube cluster. 
