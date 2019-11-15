@@ -25,6 +25,7 @@ jobs:
       - name: Launch Minikube
         run: eval ${{ steps.minikube.outputs.launcher }}
 
+      # TODO: setup using Helm v3 later
       - name: Setup Helm v2
         run: |
           kubectl create serviceaccount tiller --namespace kube-system
