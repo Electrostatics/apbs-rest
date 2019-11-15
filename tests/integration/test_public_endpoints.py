@@ -2,7 +2,11 @@ import requests, json, uuid, pprint, tarfile, os
 import prepare_tests
 import common_assertions
 
-APBS_URL = 'http://apbs.127.0.0.1.xip.io'
+APBS_HOST = os.getenv('APBS_HOST')
+if APBS_HOST is None:
+    raise EnvironmentError('Environment variable APBS_HOST is not set')
+
+APBS_URL = 'http://%s' % (APBS_HOST)
 apbs_adapter = requests.adapters.HTTPAdapter(max_retries=3)
 
 def test_liveness():
