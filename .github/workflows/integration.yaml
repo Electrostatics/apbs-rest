@@ -26,16 +26,24 @@ jobs:
       run: eval ${{ steps.minikube.outputs.launcher }}
 
     # TODO: setup using Helm v3 later
-    - name: Setup Helm v2
+    # - name: Setup Helm v2
+    #   run: |
+    #     kubectl create serviceaccount tiller --namespace kube-system
+    #     kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+    #     helm init --service-account=tiller --wait
+
+    - name: Download Helm v3
       run: |
-        kubectl create serviceaccount tiller --namespace kube-system
-        kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-        helm init --service-account=tiller --wait
+        wget https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
+        gunzip helm-v3.0.0-linux-amd64.tar.gz
+        tar -xvf helm-v3.0.0-linux-amd64.tar
+        mv linux-amd64/ helm-v3
 
     - name: Install APBS-REST via Helm
       run: |
         minikube addons enable ingress
-        helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+        ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+        # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
     - name: Wait for pods
       uses: CodingNagger/minikube-wait-action@v1.0.1
