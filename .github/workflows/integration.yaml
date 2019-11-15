@@ -41,8 +41,8 @@ jobs:
 
     - name: Install APBS-REST via Helm
       run: |
-        minikube addons enable ingress
-        ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+        sudo minikube addons enable ingress
+        sudo ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
         # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
     - name: Wait for pods
