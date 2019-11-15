@@ -1,0 +1,56 @@
+name: Service Integration
+on: 
+  push:
+    paths:
+      -'./github/workflows/*'
+      -'src/*'
+      -'tests/integration/*'
+      -'tests/requirements.txt'
+
+jobs:
+  job1:
+    name: Install Software Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out APBS-REST codebase
+        uses: actions/checkout@v1
+
+      - name: Setup Minikube
+        uses: CodingNagger/minikube-setup-action@v1.0.2
+        with:
+          minikube-version: 1.4.0
+          k8s-version: 1.16.0
+        id: minikube
+
+      - name: Launch Minikube
+        run: eval ${{ steps.minikube.outputs.launcher }}
+
+      - name: Setup Helm v2
+        run: |
+          kubectl create serviceaccount tiller --namespace kube-system
+          kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+          helm init --service-account=tiller --wait
+
+      - name: Install APBS-REST via Helm
+        run: |
+          minikube addons enable ingress
+          helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+
+      - name: Wait for pods
+        uses: CodingNagger/minikube-wait-action@v1.0.1
+
+      - name: Install PyTest and other Python dependencies
+        run: |
+          cd tests
+          python3 -m pip install --upgrade pip
+          python3 -m pip install venv
+          python3 -m venv venv
+          source venv/bin/activate
+          which pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          sleep 5
+          cd tests/integration
+          APBS_HOST=apbs.$(minikube ip).xip.io pytest
