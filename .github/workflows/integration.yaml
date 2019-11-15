@@ -2,17 +2,17 @@ name: Service Integration
 on: 
   push:
     paths:
-      -'./github/workflows/*'
-      -'src/*'
-      -'tests/integration/*'
-      -'tests/requirements.txt'
+      - '.github/workflows/*'
+      - 'tests/integration/*'
+      - 'tests/requirements.txt'
+      - 'src/*'
 
 jobs:
   job1:
     name: Install Software Dependencies
     runs-on: ubuntu-latest
     steps:
-    - name: Check out APBS-REST codebase
+    - name: Git checkout APBS-REST codebase
       uses: actions/checkout@v1
 
     - name: Setup Minikube
