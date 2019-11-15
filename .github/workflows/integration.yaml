@@ -52,7 +52,6 @@ jobs:
       run: |
         cd tests
         python3 -m pip install --upgrade pip
-        python3 -m pip install venv
         python3 -m venv venv
         source venv/bin/activate
         which pip
