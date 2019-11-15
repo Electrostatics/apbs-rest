@@ -52,7 +52,7 @@ jobs:
       run: |
         cd tests
         python3 -m pip install --upgrade pip
-        sudo apt-get install python3-venv
+        sudo apt install python3-venv
         python3 -m venv venv
         source venv/bin/activate
         which pip
@@ -60,6 +60,7 @@ jobs:
 
     - name: Run tests
       run: |
-        sleep 5
         cd tests/integration
+        source ../venv/bin/activate
         APBS_HOST=apbs.$(minikube ip).xip.io pytest
+        
