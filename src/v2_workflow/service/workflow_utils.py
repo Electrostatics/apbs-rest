@@ -86,6 +86,9 @@ class WorkflowHandler:
         return response, http_status_code
 
     def options(self, job_id, task_name):
-        response = {}
+        options = ['GET', 'POST']
+        response = make_response()
+        response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
+        response.headers['Access-Control-Allow-Methods'] = options
         http_status_code = 204
         return response, http_status_code
