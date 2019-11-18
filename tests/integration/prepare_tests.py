@@ -27,5 +27,21 @@ def prepare_task_v1(task_name: str, pdb_id: str='1a1p', infile_name: str='apbsin
 def prepare_task_v2(task_name: str, pdb_name: str):
     pass
 
-def prepare_workflow():
+def prepare_workflow_v1():
     pass
+
+def prepare_workflow_v2(workflow_name: str=None, pdb_id: str='1a1p', infile_name: str='apbsinput.in'):
+    workflow_params = {}
+    if workflow_name == 'pdb2pqr':
+        pass
+    elif workflow_name == 'apbs':
+        workflow_params = {
+            'form': {
+                'filename': infile_name
+            }
+        }
+    else:
+        # workflow specified within JSON; prepare accordingly
+        pass
+
+    return workflow_params

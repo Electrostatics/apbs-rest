@@ -196,6 +196,61 @@ def test_task_service():
         requests.delete('%s/storage/%s' % (APBS_URL, job_id))
 
 def test_workflow_service():
+    job_id = 'pytest-%s' % uuid.uuid4().hex[:8]
+    workflow_url = '%s/workflow' % APBS_URL
+    # pdb_id = '1a1p'
+    job_id_url = '%s/%s' % (workflow_url, job_id)
+    
+    try:
+            
+        """version 1 (to be deprecated as we overhaul)"""
+
+
+        """
+            version 2
+        """ 
+
+        '''Specify workflow in URL'''
+
+        # TODO: POST: PDB2PQR workflow
+
+
+        # POST: APBS workflow
+        infile_name = '1fas.in'
+        with open('../sample_input/1fas.in', 'r') as fin:
+            apbs_infile_data = fin.read()
+            response = requests.post('%s/storage/%s/1fas.in' % (APBS_URL, job_id), data=apbs_infile_data)
+            assert response.status_code == 201
+        with open('../sample_input/1fas.pqr', 'r') as fin:
+            apbs_pqr_data = fin.read()
+            response = requests.post('%s/storage/%s/1fas.pqr' % (APBS_URL, job_id), data=apbs_pqr_data)
+            assert response.status_code == 201
+        params = prepare_tests.prepare_workflow_v2(workflow_name='apbs', infile_name=infile_name)
+        response = requests.post('%s/%s/apbs' % (workflow_url, job_id), json=params)
+        assert response.status_code == 202
+        json_dict = json.loads(response.content)
+        assert 'accepted' in json_dict.keys()
+
+        # GET: check status of running workflow
+        # GET: continually check status of running workflow until finished
+        # GET: check status of completed workflow
+        common_assertions.assert_workflow_status(workflow_url, job_id, 'apbs')
+
+
+        ''' Specify workflow in JSON payload '''
+        # TODO: POST: PDB2PQR workflow with all details in JSON payload
+        # TODO: POST: APBS workflow with all details in JSON payload
+
+        # OPTIONS: available options within response header
+        response = requests.options(job_id_url)
+        assert response.status_code == 204
+        assert response.headers['Access-Control-Allow-Headers'] == 'x-requested-with'
+        assert response.headers['Access-Control-Allow-Methods'] == str(['GET', 'POST'])
+
+    finally:
+        # Remove contents from bucket
+        requests.delete('%s/storage/%s' % (APBS_URL, job_id)) 
+
     pass
 
 def test_autofill_service():
