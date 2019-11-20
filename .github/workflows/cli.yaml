@@ -1,0 +1,97 @@
+name: Build and Run CLI Tools
+on: 
+  push:
+    paths:
+      - '.github/workflows/*'
+      - 'tests/cli/*'
+      # - 'tests/requirements.txt'
+      # - 'src/*'
+  pull_request:
+    paths:
+      - '.github/workflows/*'
+      - 'tests/cli/*'
+
+jobs:
+
+  build:
+    name: Build CLI Binaries
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+    - name: Set up Go 1.13
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
+
+    - name: Get dependencies
+      shell: bash
+      run: |
+        go get -v -t -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
+    # Build the executables/binaries for the respective OS
+    - name: Build the Unix binaries
+      if: matrix.os != 'windows-latest'
+      run: |
+        cd ./cli/bin
+        go build -v ../apbs/
+        go build -v ../pdb2pqr/
+
+    - name: Verify Installations
+      if: matrix.os != 'windows-latest'
+      run: |
+        ./apbs -h
+        ./pdb2pqr -h
+
+
+  # job1:
+  #   name: Install Software Dependencies
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Git checkout APBS-REST codebase
+  #     uses: actions/checkout@v1
+
+  #   - name: Setup Minikube
+  #     uses: CodingNagger/minikube-setup-action@v1.0.2
+  #     with:
+  #       minikube-version: 1.4.0
+  #       k8s-version: 1.16.0
+  #     id: minikube
+
+  #   - name: Launch Minikube
+  #     shell: bash
+  #     run: eval ${{ steps.minikube.outputs.launcher }}
+
+  #   # TODO: setup using Helm v3 later
+  #   # - name: Setup Helm v2
+  #   #   run: |
+  #   #     kubectl create serviceaccount tiller --namespace kube-system
+  #   #     kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+  #   #     helm init --service-account=tiller --wait
+
+  #   - name: Download Helm v3 (Linux)
+  #     shell: bash
+  #     run: |
+  #       wget https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
+  #       gunzip helm-v3.0.0-linux-amd64.tar.gz
+  #       tar -xvf helm-v3.0.0-linux-amd64.tar
+  #       mv linux-amd64/ helm-v3
+
+  #   - name: Install APBS-REST via Helm
+  #     run: |
+  #       sudo minikube addons enable ingress
+  #       sudo ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+  #       # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+
+  #   - name: Wait for pods
+  #     uses: CodingNagger/minikube-wait-action@v1.0.1
+
+    
