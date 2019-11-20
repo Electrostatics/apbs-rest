@@ -15,6 +15,10 @@ src/storage/test
 cli/tests/output
 cli/tests/test-output
 
+# CLI
+cli/bin/
+!cli/bin/.gitkeep
+
 # Related cloned repositories
 apbs-pdb2pqr
 antd_pdb2pqr
