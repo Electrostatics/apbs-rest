@@ -1,0 +1,319 @@
+
+--------------------------
+PDB2PQR - a Python-based structural conversion utility
+--------------------------
+Please cite your use of PDB2PQR as:
+  Dolinsky TJ, Nielsen JE, McCammon JA, Baker NA.
+  PDB2PQR: an automated pipeline for the setup, execution,
+  and analysis of Poisson-Boltzmann electrostatics calculations.
+  Nucleic Acids Research 32 W665-W667 (2004).
+
+Beginning PDB2PQR...
+
+Parsed Amino Acid definition file.
+Created protein object -
+	Number of residues in protein: 166
+	Number of atoms in protein   : 573
+Setting the termini... 
+	PATCH INFO: THR A 1 patched with NTERM
+	PATCH INFO: TYR A 61 patched with CTERM
+Done.
+	PATCH INFO: MET A 2 patched with PEPTIDE
+	PATCH INFO: CYS A 3 patched with PEPTIDE
+	PATCH INFO: TYR A 4 patched with PEPTIDE
+	PATCH INFO: SER A 5 patched with PEPTIDE
+	PATCH INFO: HIS A 6 patched with PEPTIDE
+	PATCH INFO: THR A 7 patched with PEPTIDE
+	PATCH INFO: THR A 8 patched with PEPTIDE
+	PATCH INFO: THR A 9 patched with PEPTIDE
+	PATCH INFO: SER A 10 patched with PEPTIDE
+	PATCH INFO: ARG A 11 patched with PEPTIDE
+	PATCH INFO: ALA A 12 patched with PEPTIDE
+	PATCH INFO: ILE A 13 patched with PEPTIDE
+	PATCH INFO: LEU A 14 patched with PEPTIDE
+	PATCH INFO: THR A 15 patched with PEPTIDE
+	PATCH INFO: ASN A 16 patched with PEPTIDE
+	PATCH INFO: CYS A 17 patched with PEPTIDE
+	PATCH INFO: GLY A 18 patched with PEPTIDE
+	PATCH INFO: GLU A 19 patched with PEPTIDE
+	PATCH INFO: ASN A 20 patched with PEPTIDE
+	PATCH INFO: SER A 21 patched with PEPTIDE
+	PATCH INFO: CYS A 22 patched with PEPTIDE
+	PATCH INFO: TYR A 23 patched with PEPTIDE
+	PATCH INFO: ARG A 24 patched with PEPTIDE
+	PATCH INFO: LYS A 25 patched with PEPTIDE
+	PATCH INFO: SER A 26 patched with PEPTIDE
+	PATCH INFO: ARG A 27 patched with PEPTIDE
+	PATCH INFO: ARG A 28 patched with PEPTIDE
+	PATCH INFO: HIS A 29 patched with PEPTIDE
+	PATCH INFO: PRO A 30 patched with PEPTIDE
+	PATCH INFO: PRO A 31 patched with PEPTIDE
+	PATCH INFO: LYS A 32 patched with PEPTIDE
+	PATCH INFO: MET A 33 patched with PEPTIDE
+	PATCH INFO: VAL A 34 patched with PEPTIDE
+	PATCH INFO: LEU A 35 patched with PEPTIDE
+	PATCH INFO: GLY A 36 patched with PEPTIDE
+	PATCH INFO: ARG A 37 patched with PEPTIDE
+	PATCH INFO: GLY A 38 patched with PEPTIDE
+	PATCH INFO: CYS A 39 patched with PEPTIDE
+	PATCH INFO: GLY A 40 patched with PEPTIDE
+	PATCH INFO: CYS A 41 patched with PEPTIDE
+	PATCH INFO: PRO A 42 patched with PEPTIDE
+	PATCH INFO: PRO A 43 patched with PEPTIDE
+	PATCH INFO: GLY A 44 patched with PEPTIDE
+	PATCH INFO: ASP A 45 patched with PEPTIDE
+	PATCH INFO: ASP A 46 patched with PEPTIDE
+	PATCH INFO: TYR A 47 patched with PEPTIDE
+	PATCH INFO: LEU A 48 patched with PEPTIDE
+	PATCH INFO: GLU A 49 patched with PEPTIDE
+	PATCH INFO: VAL A 50 patched with PEPTIDE
+	PATCH INFO: LYS A 51 patched with PEPTIDE
+	PATCH INFO: CYS A 52 patched with PEPTIDE
+	PATCH INFO: CYS A 53 patched with PEPTIDE
+	PATCH INFO: THR A 54 patched with PEPTIDE
+	PATCH INFO: SER A 55 patched with PEPTIDE
+	PATCH INFO: PRO A 56 patched with PEPTIDE
+	PATCH INFO: ASP A 57 patched with PEPTIDE
+	PATCH INFO: LYS A 58 patched with PEPTIDE
+	PATCH INFO: CYS A 59 patched with PEPTIDE
+	PATCH INFO: ASN A 60 patched with PEPTIDE
+Checking for missing heavy atoms... 
+No heavy atoms found missing - Done.
+Updating SS bridges...
+	PATCH INFO: CYS A 52 patched with CYX
+	CYS A 52 - CYS A 41
+	PATCH INFO: CYS A 41 patched with CYX
+	CYS A 41 - CYS A 52
+	PATCH INFO: CYS A 22 patched with CYX
+	CYS A 22 - CYS A 3
+	PATCH INFO: CYS A 59 patched with CYX
+	CYS A 59 - CYS A 53
+	PATCH INFO: CYS A 53 patched with CYX
+	CYS A 53 - CYS A 59
+	PATCH INFO: CYS A 17 patched with CYX
+	CYS A 17 - CYS A 39
+	PATCH INFO: CYS A 39 patched with CYX
+	CYS A 39 - CYS A 17
+	PATCH INFO: CYS A 3 patched with CYX
+	CYS A 3 - CYS A 22
+Done.
+Checking if we must debump any residues... 
+Done.
+Running PROPKA and applying at pH 7.00... 
+Applying pKa values at a pH of 7.00:
+{'ARG 11 A': 12.431295043646394,
+ 'ARG 24 A': 13.056066681492602,
+ 'ARG 27 A': 13.140896716787337,
+ 'ARG 28 A': 12.509155372922127,
+ 'ARG 37 A': 12.4893447017985,
+ 'ASP 45 A': 2.718678629650554,
+ 'ASP 46 A': 3.87371277722026,
+ 'ASP 57 A': 3.09933642236069,
+ 'C- 61 A': 1.7833083580049747,
+ 'CYS 17 A': 99.99,
+ 'CYS 22 A': 99.99,
+ 'CYS 3 A': 99.99,
+ 'CYS 39 A': 99.99,
+ 'CYS 41 A': 99.99,
+ 'CYS 52 A': 99.99,
+ 'CYS 53 A': 99.99,
+ 'CYS 59 A': 99.99,
+ 'GLU 19 A': 4.449292414145893,
+ 'GLU 49 A': 3.795896154289649,
+ 'HIS 29 A': 6.386268240567687,
+ 'HIS 6 A': 6.085236477777042,
+ 'LYS 25 A': 10.515182056008006,
+ 'LYS 32 A': 10.417832328209403,
+ 'LYS 51 A': 10.639630826230409,
+ 'LYS 58 A': 10.680399896776734,
+ 'N+ 1 A': 7.850037627052164,
+ 'TYR 23 A': 10.252699487684685,
+ 'TYR 4 A': 10.09518793613823,
+ 'TYR 47 A': 9.329322678371208,
+ 'TYR 61 A': 10.243196654713614}
+
+Done.
+Adding hydrogens to the protein...
+ Added 447 hydrogen atoms.
+Checking if we must debump any residues... 
+Done.
+Initializing full optimization...
+Done.
+Optimization progress:
+  Detecting potential hydrogen bonds:
+	0% |                    | 100%
+	    ********************
+  Optimizing hydrogen bonds:
+	0% |                    | 100%
+	    ********************
+Applying the forcefield to the protein...Done.
+Printing protein summary...
+TMCYSHTTTSRAILTNCGENSCYRKSRRHPPKMVLGRGCGCPPGDDYLEVKCCTSPDKCNYXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+THR A 1
+MET A 2
+CYS A 3
+TYR A 4
+SER A 5
+HIS A 6
+THR A 7
+THR A 8
+THR A 9
+SER A 10
+ARG A 11
+ALA A 12
+ILE A 13
+LEU A 14
+THR A 15
+ASN A 16
+CYS A 17
+GLY A 18
+GLU A 19
+ASN A 20
+SER A 21
+CYS A 22
+TYR A 23
+ARG A 24
+LYS A 25
+SER A 26
+ARG A 27
+ARG A 28
+HIS A 29
+PRO A 30
+PRO A 31
+LYS A 32
+MET A 33
+VAL A 34
+LEU A 35
+GLY A 36
+ARG A 37
+GLY A 38
+CYS A 39
+GLY A 40
+CYS A 41
+PRO A 42
+PRO A 43
+GLY A 44
+ASP A 45
+ASP A 46
+TYR A 47
+LEU A 48
+GLU A 49
+VAL A 50
+LYS A 51
+CYS A 52
+CYS A 53
+THR A 54
+SER A 55
+PRO A 56
+ASP A 57
+LYS A 58
+CYS A 59
+ASN A 60
+TYR A 61
+HOH A 62
+HOH A 63
+HOH A 64
+HOH A 65
+HOH A 66
+HOH A 67
+HOH A 68
+HOH A 69
+HOH A 70
+HOH A 71
+HOH A 72
+HOH A 73
+HOH A 74
+HOH A 75
+HOH A 76
+HOH A 77
+HOH A 78
+HOH A 79
+HOH A 80
+HOH A 81
+HOH A 82
+HOH A 83
+HOH A 84
+HOH A 85
+HOH A 86
+HOH A 87
+HOH A 88
+HOH A 89
+HOH A 90
+HOH A 91
+HOH A 92
+HOH A 93
+HOH A 94
+HOH A 95
+HOH A 96
+HOH A 97
+HOH A 98
+HOH A 99
+HOH A 100
+HOH A 101
+HOH A 102
+HOH A 103
+HOH A 104
+HOH A 105
+HOH A 106
+HOH A 107
+HOH A 108
+HOH A 109
+HOH A 110
+HOH A 111
+HOH A 112
+HOH A 113
+HOH A 114
+HOH A 115
+HOH A 116
+HOH A 117
+HOH A 118
+HOH A 119
+HOH A 120
+HOH A 121
+HOH A 122
+HOH A 123
+HOH A 124
+HOH A 125
+HOH A 126
+HOH A 127
+HOH A 128
+HOH A 129
+HOH A 130
+HOH A 131
+HOH A 132
+HOH A 133
+HOH A 134
+HOH A 135
+HOH A 136
+HOH A 137
+HOH A 138
+HOH A 139
+HOH A 140
+HOH A 141
+HOH A 142
+HOH A 143
+HOH A 144
+HOH A 145
+HOH A 146
+HOH A 147
+HOH A 148
+HOH A 149
+HOH A 150
+HOH A 151
+HOH A 152
+HOH A 153
+HOH A 154
+HOH A 155
+HOH A 156
+HOH A 157
+HOH A 158
+HOH A 159
+HOH A 160
+HOH A 161
+HOH A 162
+HOH A 163
+HOH A 164
+HOH A 165
+HOH A 166
+Total time taken: 2.89 seconds
+

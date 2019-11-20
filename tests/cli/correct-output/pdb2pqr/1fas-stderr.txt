@@ -1,0 +1,2 @@
+Warning: multiple occupancies found: OG1 in THR A 1
+Warning: multiple occupancies found: OG in SER A 5
