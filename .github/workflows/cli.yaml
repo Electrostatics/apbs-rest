@@ -99,11 +99,15 @@ jobs:
       if: matrix.os != 'windows-latest'
       run: eval ${{ steps.minikube.outputs.launcher }}
 
-    - name: Launch Minikube (Windows)
+    # - name: Launch Minikube (Windows)
+    #   if: matrix.os == 'windows-latest'
+    #   shell: bash
+    #   run: |
+    #     minikube start --memory=4096mb
+    - name: Check for Hyper-V (Windows)
       if: matrix.os == 'windows-latest'
       shell: bash
-      run: |
-        minikube start --memory=4096mb
+      run: systeminfo
 
     # Install Helm v3 for the respective OS
     - name: Download Helm v3 (Linux)
@@ -130,14 +134,15 @@ jobs:
         sudo ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
         # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
-    - name: Install APBS-REST via Helm (Windows)
-      if: matrix.os == 'windows-latest'
-      shell: bash
-      run: |
-        minikube addons enable ingress
-        ./helm-v3/helm.exe install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+    # - name: Install APBS-REST via Helm (Windows)
+    #   if: matrix.os == 'windows-latest'
+    #   shell: bash
+    #   run: |
+    #     minikube addons enable ingress
+    #     ./helm-v3/helm.exe install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
     - name: Wait for pods
+      if: matrix.os != 'windows-latest'
       uses: CodingNagger/minikube-wait-action@v1.0.1
 
     # TODO: download Linux binaries to run/compare results
