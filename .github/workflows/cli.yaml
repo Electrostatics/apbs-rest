@@ -13,7 +13,7 @@ on:
 
 jobs:
 
-  build:
+  job_1:
     name: Build CLI Binaries
     runs-on: ${{ matrix.os }}
     strategy:
@@ -38,63 +38,108 @@ jobs:
             dep ensure
         fi
     # Build the executables/binaries for the respective OS
-    - name: Build the Unix binaries
+    # TODO: build Windows binaries
+    # TODO: upload Windows binaries
+    # TODO: upload macOS binaries
+    - name: Build the binaries (Unix)
       if: matrix.os != 'windows-latest'
       run: |
         cd ./cli/bin
         go build -v ../apbs/
         go build -v ../pdb2pqr/
 
-    - name: Verify Installations
+    - name: Verify Installations (Unix)
       if: matrix.os != 'windows-latest'
       run: |
         cd ./cli/bin
-        echo "$ ./apbs -h"
         ./apbs -h
-        echo "$ ./pdb2pqr -h"
         ./pdb2pqr -h
 
+    - name: Upload binaries to use later (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v1
+      with:
+        name: apbs
+        path: cli/bin/apbs
+    - name: Upload binaries to use later (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v1
+      with:
+        name: pdb2pqr
+        path: cli/bin/pdb2pqr
 
-  # job1:
-  #   name: Install Software Dependencies
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Git checkout APBS-REST codebase
-  #     uses: actions/checkout@v1
+  job_2:
+    name: Install Software Dependencies
+    needs: job_1
+    env:
+      MINIKUBE_VERSION: 
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
+    steps:
+    - name: Git checkout APBS-REST codebase
+      uses: actions/checkout@v1
 
-  #   - name: Setup Minikube
-  #     uses: CodingNagger/minikube-setup-action@v1.0.2
-  #     with:
-  #       minikube-version: 1.4.0
-  #       k8s-version: 1.16.0
-  #     id: minikube
-
-  #   - name: Launch Minikube
-  #     shell: bash
-  #     run: eval ${{ steps.minikube.outputs.launcher }}
-
-  #   # TODO: setup using Helm v3 later
-  #   # - name: Setup Helm v2
-  #   #   run: |
-  #   #     kubectl create serviceaccount tiller --namespace kube-system
-  #   #     kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-  #   #     helm init --service-account=tiller --wait
-
-  #   - name: Download Helm v3 (Linux)
-  #     shell: bash
-  #     run: |
-  #       wget https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
-  #       gunzip helm-v3.0.0-linux-amd64.tar.gz
-  #       tar -xvf helm-v3.0.0-linux-amd64.tar
-  #       mv linux-amd64/ helm-v3
-
-  #   - name: Install APBS-REST via Helm
-  #     run: |
-  #       sudo minikube addons enable ingress
-  #       sudo ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
-  #       # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
-
-  #   - name: Wait for pods
-  #     uses: CodingNagger/minikube-wait-action@v1.0.1
-
+    - name: Install Minikube (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      uses: CodingNagger/minikube-setup-action@v1.0.2
+      with:
+        minikube-version: 1.4.0
+        k8s-version: 1.16.0
+      id: minikube
     
+    - name: Install Minikube (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: choco install minikube
+
+    - name: Launch Minikube (Unix)
+      if: matrix.os != 'windows-latest'
+      run: eval ${{ steps.minikube.outputs.launcher }}
+
+    - name: Launch Minikube (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: |
+        minikube start --vm-diver=hyperv --memory=4096mb
+
+    # Install Helm v3 for the respective OS
+    - name: Download Helm v3 (Linux)
+      if: matrix.os != 'windows-latest'
+      run: |
+        wget https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
+        gunzip helm-v3.0.0-linux-amd64.tar.gz
+        tar -xvf helm-v3.0.0-linux-amd64.tar
+        mv linux-amd64/ helm-v3
+    
+    - name: Download Helm v3 (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: |
+        curl -O -L https://get.helm.sh/helm-v3.0.0-windows-amd64.zip
+        unzip helm-v3.0.0-windows-amd64.zip
+        mv windows-amd64/ helm-v3
+
+    # Install APBS-REST chart through Helm
+    - name: Install APBS-REST via Helm (Unix)
+      if: matrix.os != 'windows-latest'
+      run: |
+        sudo minikube addons enable ingress
+        sudo ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+        # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+
+    - name: Install APBS-REST via Helm (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: |
+        minikube addons enable ingress
+        ./helm-v3/helm.exe install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+
+    - name: Wait for pods
+      uses: CodingNagger/minikube-wait-action@v1.0.1
+
+    # TODO: download Linux binaries to run/compare results
+    # TODO: download Windows binaries to run/compare results
+    # TODO: download macOS binaries to run/compare results

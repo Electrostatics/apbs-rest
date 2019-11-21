@@ -9,7 +9,7 @@ on:
 
 jobs:
   job1:
-    name: Install Software Dependencies
+    name: Install Dependencies and Run Integration Tests
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout APBS-REST codebase
@@ -24,13 +24,6 @@ jobs:
 
     - name: Launch Minikube
       run: eval ${{ steps.minikube.outputs.launcher }}
-
-    # TODO: setup using Helm v3 later
-    # - name: Setup Helm v2
-    #   run: |
-    #     kubectl create serviceaccount tiller --namespace kube-system
-    #     kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-    #     helm init --service-account=tiller --wait
 
     - name: Download Helm v3
       run: |
