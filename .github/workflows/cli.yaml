@@ -71,8 +71,8 @@ jobs:
   job_2:
     name: Install Software Dependencies
     needs: job_1
-    env:
-      MINIKUBE_VERSION: 
+    # env:
+    #   MINIKUBE_VERSION: 
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
