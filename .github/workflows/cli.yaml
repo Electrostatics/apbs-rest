@@ -103,7 +103,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: bash
       run: |
-        minikube start --vm-diver=hyperv --memory=4096mb
+        minikube start --vm-driver=hyperv --memory=4096mb
 
     # Install Helm v3 for the respective OS
     - name: Download Helm v3 (Linux)
