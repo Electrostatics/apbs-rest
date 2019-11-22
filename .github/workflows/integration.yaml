@@ -55,5 +55,5 @@ jobs:
       run: |
         cd tests/integration
         source ../venv/bin/activate
-        APBS_HOST=apbs.$(minikube ip).xip.io pytest
+        APBS_HOST=apbs.$(minikube ip).xip.io pytest -n 3
         
