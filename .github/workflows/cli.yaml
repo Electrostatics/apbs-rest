@@ -41,31 +41,31 @@ jobs:
     # TODO: build Windows binaries
     # TODO: upload Windows binaries
     # TODO: upload macOS binaries
-    - name: Build the binaries (Unix)
+    - name: (Unix) Build the binaries
       if: matrix.os != 'windows-latest'
       run: |
         cd ./cli/bin
         go build -v ../apbs/
         go build -v ../pdb2pqr/
 
-    - name: Verify Installations (Unix)
+    - name: (Unix) Verify Installations
       if: matrix.os != 'windows-latest'
       run: |
         cd ./cli/bin
         ./apbs -h
         ./pdb2pqr -h
 
-    - name: Upload binaries to use later (Linux)
-      if: matrix.os == 'ubuntu-latest'
+    - name: (Unix) Upload APBS binarY for later use
+      if: matrix.os != 'windows-latest'
       uses: actions/upload-artifact@v1
       with:
-        name: apbs
+        name: apbs_${{ matrix.os }}
         path: cli/bin/apbs
-    - name: Upload binaries to use later (Linux)
-      if: matrix.os == 'ubuntu-latest'
+    - name: (Unix) Upload PDB2PQR binary for later use
+      if: matrix.os != 'windows-latest'
       uses: actions/upload-artifact@v1
       with:
-        name: pdb2pqr
+        name: pdb2pqr_${{ matrix.os }}
         path: cli/bin/pdb2pqr
 
   job_2:
@@ -76,13 +76,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # os: [ubuntu-latest]
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
+        # os: [ubuntu-latest, windows-latest]
     steps:
     - name: Git checkout APBS-REST codebase
       uses: actions/checkout@v1
 
-    - name: Install Minikube (Linux)
+    - name: (Linux) Install Minikube
       if: matrix.os == 'ubuntu-latest'
       uses: CodingNagger/minikube-setup-action@v1.0.2
       with:
@@ -90,27 +90,27 @@ jobs:
         k8s-version: 1.16.0
       id: minikube
     
-    - name: Install Minikube (Windows)
+    - name: (Windows) Install Minikube
       if: matrix.os == 'windows-latest'
       shell: bash
       run: choco install minikube
 
-    - name: Launch Minikube (Unix)
+    - name: (Unix) Launch Minikube
       if: matrix.os != 'windows-latest'
       run: eval ${{ steps.minikube.outputs.launcher }}
 
-    # - name: Launch Minikube (Windows)
+    # - name: (Windows) Launch Minikube
     #   if: matrix.os == 'windows-latest'
     #   shell: bash
     #   run: |
     #     minikube start --memory=4096mb
-    - name: Check for Hyper-V (Windows)
+    - name: (Windows) Check for Hyper-V
       if: matrix.os == 'windows-latest'
       shell: bash
       run: systeminfo
 
     # Install Helm v3 for the respective OS
-    - name: Download Helm v3 (Linux)
+    - name: (Linux) Download Helm v3
       if: matrix.os != 'windows-latest'
       run: |
         wget https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
@@ -118,7 +118,7 @@ jobs:
         tar -xvf helm-v3.0.0-linux-amd64.tar
         mv linux-amd64/ helm-v3
     
-    - name: Download Helm v3 (Windows)
+    - name: (Windows) Download Helm v3
       if: matrix.os == 'windows-latest'
       shell: bash
       run: |
@@ -127,14 +127,14 @@ jobs:
         mv windows-amd64/ helm-v3
 
     # Install APBS-REST chart through Helm
-    - name: Install APBS-REST via Helm (Unix)
+    - name: (Unix) Install APBS-REST via Helm
       if: matrix.os != 'windows-latest'
       run: |
         sudo minikube addons enable ingress
         sudo ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
         # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
-    # - name: Install APBS-REST via Helm (Windows)
+    # - name: (Windows) Install APBS-REST via Helm
     #   if: matrix.os == 'windows-latest'
     #   shell: bash
     #   run: |
@@ -146,5 +146,28 @@ jobs:
       uses: CodingNagger/minikube-wait-action@v1.0.1
 
     # TODO: download Linux binaries to run/compare results
-    # TODO: download Windows binaries to run/compare results
     # TODO: download macOS binaries to run/compare results
+    - name: (Unix) Download APBS binary and compare results of sample run
+      if: matrix.os != 'windows-latest'
+      uses: actions/download-artifact@v1
+      with:
+        name: apbs_${{ matrix.os }}
+      
+    - name: (Unix) Run APBS
+      if: matrix.os != 'windows-latest'
+      run: |
+        mv apbs_${{ matrix.os }} ./cli/bin/apbs
+        cd ./tests/cli/test-output/apbs/
+        cp ../../../sample_input/1fas.pqr .
+        APBS_HOST=apbs.$(minikube ip).xip.io ../../../../cli/bin/apbs ../../../sample_input/1fas.in
+
+    - name: (Unix) Run PDB2PQR
+      if: matrix.os != 'windows-latest'
+      run: |
+        mv pdb2pqr_${{ matrix.os }} ./cli/bin/pdb2pqr
+        cd ./tests/cli/test-output/pdb2pqr/
+        cp ../../../sample_input/1fas.pqr .
+        APBS_HOST=apbs.$(minikube ip).xip.io ../../../../cli/bin/pdb2pqr --with-ph=7.0 --ph-calc-method=propka --apbs-input --ff=parse --verbose ../../../sample_input/1fas.pdb 1fas.pqr
+
+
+    # TODO: download Windows binaries to run/compare results
