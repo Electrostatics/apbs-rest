@@ -45,8 +45,8 @@ jobs:
       if: matrix.os != 'windows-latest'
       run: |
         cd ./cli/bin
-        go build -v ../apbs/
-        go build -v ../pdb2pqr/
+        go build -v -o apbs ../apbs/
+        go build -v -o pdb2pqr ../pdb2pqr/
 
     - name: (Unix) Verify Installations
       if: matrix.os != 'windows-latest'
@@ -156,7 +156,7 @@ jobs:
     - name: (Unix) Run APBS
       if: matrix.os != 'windows-latest'
       run: |
-        mv apbs_${{ matrix.os }} ./cli/bin/apbs
+        mv apbs_${{ matrix.os }}/apbs ./cli/bin/
         cd ./tests/cli/test-output/apbs/
         cp ../../../sample_input/1fas.pqr .
         APBS_HOST=apbs.$(minikube ip).xip.io ../../../../cli/bin/apbs ../../../sample_input/1fas.in
@@ -164,7 +164,7 @@ jobs:
     - name: (Unix) Run PDB2PQR
       if: matrix.os != 'windows-latest'
       run: |
-        mv pdb2pqr_${{ matrix.os }} ./cli/bin/pdb2pqr
+        mv pdb2pqr_${{ matrix.os }}/pdb2pqr ./cli/bin/
         cd ./tests/cli/test-output/pdb2pqr/
         cp ../../../sample_input/1fas.pqr .
         APBS_HOST=apbs.$(minikube ip).xip.io ../../../../cli/bin/pdb2pqr --with-ph=7.0 --ph-calc-method=propka --apbs-input --ff=parse --verbose ../../../sample_input/1fas.pdb 1fas.pqr
