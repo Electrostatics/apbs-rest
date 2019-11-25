@@ -164,7 +164,8 @@ jobs:
     - name: (Unix) Run PDB2PQR
       if: matrix.os != 'windows-latest'
       run: |
-        sudo mv pdb2pqr_${{ matrix.os }}/pdb2pqr ./cli/bin/
+        mv pdb2pqr_${{ matrix.os }}/pdb2pqr ./cli/bin/
+        sudo chmod +x ./cli/bin/pdb2pqr
         cd ./tests/cli/test-output/pdb2pqr/
         cp ../../../sample_input/1fas.pqr .
         APBS_HOST=apbs.$(minikube ip).xip.io ../../../../cli/bin/pdb2pqr --with-ph=7.0 --ph-calc-method=propka --apbs-input --ff=parse --verbose ../../../sample_input/1fas.pdb 1fas.pqr
