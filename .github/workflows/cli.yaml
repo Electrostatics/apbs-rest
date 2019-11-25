@@ -156,7 +156,7 @@ jobs:
     - name: (Unix) Run APBS
       if: matrix.os != 'windows-latest'
       run: |
-        cp apbs_${{ matrix.os }}/apbs ./cli/bin/
+        sudo mv apbs_${{ matrix.os }}/apbs ./cli/bin/
         cd ./tests/cli/test-output/apbs/
         cp ../../../sample_input/1fas.pqr .
         APBS_HOST=apbs.$(minikube ip).xip.io ../../../../cli/bin/apbs ../../../sample_input/1fas.in
@@ -164,7 +164,7 @@ jobs:
     - name: (Unix) Run PDB2PQR
       if: matrix.os != 'windows-latest'
       run: |
-        mv pdb2pqr_${{ matrix.os }}/pdb2pqr ./cli/bin/
+        sudo mv pdb2pqr_${{ matrix.os }}/pdb2pqr ./cli/bin/
         cd ./tests/cli/test-output/pdb2pqr/
         cp ../../../sample_input/1fas.pqr .
         APBS_HOST=apbs.$(minikube ip).xip.io ../../../../cli/bin/pdb2pqr --with-ph=7.0 --ph-calc-method=propka --apbs-input --ff=parse --verbose ../../../sample_input/1fas.pdb 1fas.pqr
