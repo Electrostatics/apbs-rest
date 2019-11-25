@@ -156,7 +156,8 @@ jobs:
     - name: (Unix) Run APBS
       if: matrix.os != 'windows-latest'
       run: |
-        sudo mv apbs_${{ matrix.os }}/apbs ./cli/bin/
+        mv apbs_${{ matrix.os }}/apbs ./cli/bin/
+        sudo chmod +x ./cli/bin/apbs
         cd ./tests/cli/test-output/apbs/
         cp ../../../sample_input/1fas.pqr .
         APBS_HOST=apbs.$(minikube ip).xip.io ../../../../cli/bin/apbs ../../../sample_input/1fas.in
