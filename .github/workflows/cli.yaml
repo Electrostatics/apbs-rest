@@ -133,7 +133,7 @@ jobs:
       if: matrix.os != 'windows-latest'
       run: |
         sudo minikube addons enable ingress
-        sudo ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+        sudo ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).nip.io
         # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
     # - name: (Windows) Install APBS-REST via Helm
@@ -170,7 +170,7 @@ jobs:
         sudo chmod +x ./cli/bin/apbs
         cd ./tests/cli/test-output/apbs/
         cp ../../../sample_input/1fas.pqr .
-        APBS_HOST=apbs.$(minikube ip).xip.io ../../../../cli/bin/apbs ../../../sample_input/1fas.in
+        APBS_HOST=apbs.$(minikube ip).nip.io ../../../../cli/bin/apbs ../../../sample_input/1fas.in
 
     - name: (Unix) Run PDB2PQR
       if: matrix.os != 'windows-latest'
@@ -179,7 +179,7 @@ jobs:
         sudo chmod +x ./cli/bin/pdb2pqr
         cd ./tests/cli/test-output/pdb2pqr/
         cp ../../../sample_input/1fas.pqr .
-        APBS_HOST=apbs.$(minikube ip).xip.io ../../../../cli/bin/pdb2pqr --with-ph=7.0 --ph-calc-method=propka --apbs-input --ff=parse --verbose ../../../sample_input/1fas.pdb 1fas.pqr
+        APBS_HOST=apbs.$(minikube ip).nip.io ../../../../cli/bin/pdb2pqr --with-ph=7.0 --ph-calc-method=propka --apbs-input --ff=parse --verbose ../../../sample_input/1fas.pdb 1fas.pqr
 
 
     # TODO: download Windows binaries to run/compare results
