@@ -92,10 +92,10 @@ jobs:
         k8s-version: 1.16.0
       id: minikube
     
-    - name: (Windows) Install Minikube
+    - name: (Windows) Install Minikube and VirtualBox
       if: matrix.os == 'windows-latest'
       shell: bash
-      run: choco install minikube
+      run: choco install minikube virtualbox
 
     - name: (Unix) Launch Minikube
       if: matrix.os != 'windows-latest'
@@ -104,7 +104,7 @@ jobs:
     - name: (Windows) Launch Minikube
       if: matrix.os == 'windows-latest'
       # shell: bash
-      run: minikube start --memory=4096mb --vm-driver=hyperv --hyperv-virtual-switch="DockerNAT"
+      run: minikube start --memory=4096mb
 
     # - name: (Windows) Check for Hyper-V
     #   if: matrix.os == 'windows-latest'
