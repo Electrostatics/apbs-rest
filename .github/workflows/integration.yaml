@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - '.github/workflows/integration.yaml'
+      - 'utilities/wait_for_deployments.py'
       - 'tests/integration/*'
       - 'tests/requirements.txt'
       - 'src/*'
@@ -38,8 +39,8 @@ jobs:
         sudo ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
         # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
-    - name: Wait for pods
-      uses: CodingNagger/minikube-wait-action@v1.0.1
+    - name: Wait for deployments
+      run: python3 utility_scripts/wait_for_deployments.py
 
     - name: Install PyTest and other Python dependencies
       run: |
