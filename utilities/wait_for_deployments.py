@@ -48,7 +48,7 @@ if __name__ == "__main__":
             print('  %s' % service)
 
         # sleep n seconds then try again
-        print('\nRetry in %d seconds' % (retry_timer))
+        print('\nRetry in %d seconds' % (retry_timer), flush=True)
         time.sleep(retry_timer)
         deployment_output = get_deploy()
         undeployed, header = get_undeployed(deployment_output)

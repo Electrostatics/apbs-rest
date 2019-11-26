@@ -4,12 +4,14 @@ on:
     paths:
       - '.github/workflows/*'
       - 'tests/cli/*'
+      - 'utilities/wait_for_deployments.py'
       # - 'tests/requirements.txt'
       # - 'src/*'
   pull_request:
     paths:
       - '.github/workflows/*'
       - 'tests/cli/*'
+      - 'utilities/wait_for_deployments.py'
 
 jobs:
 
@@ -141,17 +143,25 @@ jobs:
     #     minikube addons enable ingress
     #     ./helm-v3/helm.exe install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
-    - name: Wait for pods
-      if: matrix.os != 'windows-latest'
-      uses: CodingNagger/minikube-wait-action@v1.0.1
+    # - name: Wait for pods
+    #   if: matrix.os != 'windows-latest'
+    #   uses: CodingNagger/minikube-wait-action@v1.0.1
+    - name: Wait for Deployments
+      run: python3 utilities/wait_for_deployments.py 30 10
 
     # TODO: download Linux binaries to run/compare results
     # TODO: download macOS binaries to run/compare results
-    - name: (Unix) Download APBS binary and compare results of sample run
+    - name: (Unix) Download APBS binary
       if: matrix.os != 'windows-latest'
       uses: actions/download-artifact@v1
       with:
         name: apbs_${{ matrix.os }}
+
+    - name: (Unix) Download PDB2PQR binary
+      if: matrix.os != 'windows-latest'
+      uses: actions/download-artifact@v1
+      with:
+        name: pdb2pqr_${{ matrix.os }}
       
     - name: (Unix) Run APBS
       if: matrix.os != 'windows-latest'
