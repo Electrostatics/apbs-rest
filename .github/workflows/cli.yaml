@@ -78,8 +78,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        # os: [ubuntu-latest, windows-latest]
+        # os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
     steps:
     - name: Git checkout APBS-REST codebase
       uses: actions/checkout@v1
@@ -101,15 +101,15 @@ jobs:
       if: matrix.os != 'windows-latest'
       run: eval ${{ steps.minikube.outputs.launcher }}
 
-    # - name: (Windows) Launch Minikube
+    - name: (Windows) Launch Minikube
+      if: matrix.os == 'windows-latest'
+      # shell: bash
+      run: minikube start --memory=4096mb
+
+    # - name: (Windows) Check for Hyper-V
     #   if: matrix.os == 'windows-latest'
     #   shell: bash
-    #   run: |
-    #     minikube start --memory=4096mb
-    - name: (Windows) Check for Hyper-V
-      if: matrix.os == 'windows-latest'
-      shell: bash
-      run: systeminfo
+    #   run: systeminfo
 
     # Install Helm v3 for the respective OS
     - name: (Linux) Download Helm v3
