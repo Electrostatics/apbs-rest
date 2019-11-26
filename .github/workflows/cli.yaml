@@ -92,24 +92,31 @@ jobs:
         k8s-version: 1.16.0
       id: minikube
     
-    - name: (Windows) Install Minikube and VirtualBox
-      if: matrix.os == 'windows-latest'
-      shell: bash
-      run: choco install minikube virtualbox
+    # - name: (Windows) Install Minikube
+    #   if: matrix.os == 'windows-latest'
+    #   shell: bash
+    #   run: choco install minikube
 
     - name: (Unix) Launch Minikube
       if: matrix.os != 'windows-latest'
       run: eval ${{ steps.minikube.outputs.launcher }}
 
-    - name: (Windows) Launch Minikube
-      if: matrix.os == 'windows-latest'
-      # shell: bash
-      run: minikube start --memory=4096mb
+    # - name: (Windows) Launch Minikube
+    #   if: matrix.os == 'windows-latest'
+    #   shell: bash
+    #   run: minikube start --memory=4096mb
 
     # - name: (Windows) Check for Hyper-V
     #   if: matrix.os == 'windows-latest'
     #   shell: bash
     #   run: systeminfo
+
+    - name: (Windows) List available clusers and nodes
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: |
+        kubectl get nodes
+        kubectl config view
 
     # Install Helm v3 for the respective OS
     - name: (Linux) Download Helm v3
