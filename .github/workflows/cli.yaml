@@ -111,11 +111,10 @@ jobs:
     #   shell: bash
     #   run: systeminfo
 
-    - name: (Windows) List available clusers and nodes
+    - name: (Windows) List available clusters
       if: matrix.os == 'windows-latest'
       shell: bash
       run: |
-        kubectl get nodes
         kubectl config view
 
     # Install Helm v3 for the respective OS
