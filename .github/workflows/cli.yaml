@@ -152,7 +152,10 @@ jobs:
     # - name: Wait for pods
     #   if: matrix.os != 'windows-latest'
     #   uses: CodingNagger/minikube-wait-action@v1.0.1
+
+    # TODO: remove condition once a k8s setup is figured out for the Windows build
     - name: Wait for Deployments
+      if: matrix.os != 'windows-latest'
       run: python3 utilities/wait_for_deployments.py 30 10
 
     # TODO: download Linux binaries to run/compare results
