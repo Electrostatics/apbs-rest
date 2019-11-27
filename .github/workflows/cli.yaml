@@ -78,8 +78,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # os: [ubuntu-latest]
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
+        # os: [ubuntu-latest, windows-latest]
     steps:
     - name: Git checkout APBS-REST codebase
       uses: actions/checkout@v1
@@ -111,11 +111,11 @@ jobs:
     #   shell: bash
     #   run: systeminfo
 
-    - name: (Windows) List available clusters
-      if: matrix.os == 'windows-latest'
-      shell: bash
-      run: |
-        kubectl config view
+    # - name: (Windows) List available clusters
+    #   if: matrix.os == 'windows-latest'
+    #   shell: bash
+    #   run: |
+    #     kubectl config view
 
     # Install Helm v3 for the respective OS
     - name: (Linux) Download Helm v3
@@ -126,13 +126,13 @@ jobs:
         tar -xvf helm-v3.0.0-linux-amd64.tar
         mv linux-amd64/ helm-v3
     
-    - name: (Windows) Download Helm v3
-      if: matrix.os == 'windows-latest'
-      shell: bash
-      run: |
-        curl -O -L https://get.helm.sh/helm-v3.0.0-windows-amd64.zip
-        unzip helm-v3.0.0-windows-amd64.zip
-        mv windows-amd64/ helm-v3
+    # - name: (Windows) Download Helm v3
+    #   if: matrix.os == 'windows-latest'
+    #   shell: bash
+    #   run: |
+    #     curl -O -L https://get.helm.sh/helm-v3.0.0-windows-amd64.zip
+    #     unzip helm-v3.0.0-windows-amd64.zip
+    #     mv windows-amd64/ helm-v3
 
     # Install APBS-REST chart through Helm
     - name: (Unix) Install APBS-REST via Helm
@@ -189,6 +189,15 @@ jobs:
         cd ./tests/cli/test-output/pdb2pqr/
         cp ../../../sample_input/1fas.pqr .
         APBS_HOST=apbs.$(minikube ip).nip.io ../../../../cli/bin/pdb2pqr --with-ph=7.0 --ph-calc-method=propka --apbs-input --ff=parse --verbose ../../../sample_input/1fas.pdb 1fas.pqr
+    
+    - name: (Unix) Look for expected APBS/PDB2PQR files
+      if: matrix.os != 'windows-latest'
+      run: |
+        cd ./tests/cli/test-output/pdb2pqr/
+        find 1fas.in 1fas.pqr 1fas.propka 1fas-input.json pdb2pqr_stderr.txt pdb2pqr_stdout.txt
+        cd ../apbs/
+        find 1fas.pqr.dx  apbs_stderr.txt  apbs_stdout.txt  io.mc
+
 
 
     # TODO: download Windows binaries to run/compare results
