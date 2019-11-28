@@ -2,14 +2,14 @@ name: Build and Run CLI Tools
 on: 
   push:
     paths:
-      - '.github/workflows/*'
+      - '.github/workflows/cli.yaml'
       - 'tests/cli/*'
       - 'utilities/wait_for_deployments.py'
       # - 'tests/requirements.txt'
       # - 'src/*'
   pull_request:
     paths:
-      - '.github/workflows/*'
+      - '.github/workflows/cli.yaml'
       - 'tests/cli/*'
       - 'utilities/wait_for_deployments.py'
 
