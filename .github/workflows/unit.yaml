@@ -17,10 +17,15 @@ jobs:
       - name: Git checkout APBS-REST codebase
         uses: actions/checkout@v1
 
-      - name: Setup the Python virtual environment, install dependencies
+      - name: Setup the Python virtual environment
         working-directory: ./src/uid
         run: |
+          apt install -y python3-venv
           python3 -m venv venv
+
+      - name: Install Python dependencies
+        working-directory: ./src/uid
+        run: |
           source venv/bin/activate
           pip install -r requirements.txt
 
@@ -37,10 +42,15 @@ jobs:
       - name: Git checkout APBS-REST codebase
         uses: actions/checkout@v1
         
-      - name: Setup the Python virtual environment, install dependencies
+      - name: Setup the Python virtual environment
         working-directory: ./src/storage
         run: |
+          apt install -y python3-venv
           python3 -m venv venv
+
+      - name: Install Python dependencies
+        working-directory: ./src/storage
+        run: |
           source venv/bin/activate
           pip install -r requirements.txt
       
