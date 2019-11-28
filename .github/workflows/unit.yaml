@@ -52,7 +52,7 @@ jobs:
         working-directory: ./src/storage
         run: |
           source venv/bin/activate
-          pip install -r requirements.txt
+          pip install -r requirements.txt pytest
       
       - name: Run unit tests
         working-directory: ./src/storage
