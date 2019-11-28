@@ -45,15 +45,15 @@ jobs:
     # TODO: upload macOS binaries
     - name: (Unix) Build the binaries
       if: matrix.os != 'windows-latest'
+      working-directory: ./cli/bin
       run: |
-        cd ./cli/bin
         go build -v -o apbs ../apbs/
         go build -v -o pdb2pqr ../pdb2pqr/
 
     - name: (Unix) Verify Installations
       if: matrix.os != 'windows-latest'
+      working-directory: ./cli/bin
       run: |
-        cd ./cli/bin
         ./apbs -h
         ./pdb2pqr -h
 
