@@ -1,0 +1,47 @@
+name: Run Microservice Unit Tests
+on: 
+  push:
+    paths:
+      - '.github/workflows/unit.yaml'
+      - 'src/*'
+  pull_request:
+    paths:
+      - '.github/workflows/unit.yaml'
+      - 'src/*'
+
+jobs:
+  id-service:
+    name: ID Service
+    runs-on: ubuntu-latest
+    steps:
+      # - name: Git checkout APBS-REST codebase
+      #   uses: actions/checkout@v1
+      - name: Setup the Python virtual environment, install dependencies
+        working-directory: ./src/uid
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Run unit tests
+        working-directory: ./src/uid
+        run: |
+          source venv/bin/activate
+          python -m unittest discover tests/
+        
+  storage-service:
+    name : Storage Service
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup the Python virtual environment, install dependencies
+        working-directory: ./src/storage
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+      
+      - name: Run unit tests
+        working-directory: ./src/storage
+        run: |
+          source venv/bin/activate
+          pytest tests/
