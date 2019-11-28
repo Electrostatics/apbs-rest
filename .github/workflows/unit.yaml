@@ -20,7 +20,7 @@ jobs:
       - name: Setup the Python virtual environment
         working-directory: ./src/uid
         run: |
-          apt install -y python3-venv
+          sudo apt install -y python3-venv
           python3 -m venv venv
 
       - name: Install Python dependencies
@@ -45,7 +45,7 @@ jobs:
       - name: Setup the Python virtual environment
         working-directory: ./src/storage
         run: |
-          apt install -y python3-venv
+          sudo apt install -y python3-venv
           python3 -m venv venv
 
       - name: Install Python dependencies
