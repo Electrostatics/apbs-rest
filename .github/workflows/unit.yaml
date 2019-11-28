@@ -14,8 +14,9 @@ jobs:
     name: ID Service
     runs-on: ubuntu-latest
     steps:
-      # - name: Git checkout APBS-REST codebase
-      #   uses: actions/checkout@v1
+      - name: Git checkout APBS-REST codebase
+        uses: actions/checkout@v1
+
       - name: Setup the Python virtual environment, install dependencies
         working-directory: ./src/uid
         run: |
@@ -33,6 +34,9 @@ jobs:
     name : Storage Service
     runs-on: ubuntu-latest
     steps:
+      - name: Git checkout APBS-REST codebase
+        uses: actions/checkout@v1
+        
       - name: Setup the Python virtual environment, install dependencies
         working-directory: ./src/storage
         run: |
