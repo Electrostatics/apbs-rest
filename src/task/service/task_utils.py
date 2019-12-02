@@ -155,6 +155,9 @@ def get_starttime(jobid, task_name):
             starttime = float(status_str.split('\n')[0].strip())
         else:
             print(status_str)
+    else:
+        print('    Start time retrieval status code: %d' % response.status_code, flush=True)
+        print('    response content: %s' % response.content, flush=True)
 
     return starttime
 
@@ -174,8 +177,12 @@ def get_endtime(jobid, task_name):
         else:
             print(status_str)
 
-    else:
+    elif response.status_code == 404:
         print('    %s job still running' % jobid)
+    else:
+        print('    Error in retrieving endtime. Investigate.', flush=True)
+        print('    Status code: %d' % (response.status_code), flush=True)
+        print('    response: %s' % (response.content), flush=True)
 
     return endtime
 
