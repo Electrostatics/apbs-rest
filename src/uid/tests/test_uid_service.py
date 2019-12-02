@@ -1,5 +1,5 @@
 import unittest
-from main import app
+from uid.main import app
 
 try:
     import simplejson as json

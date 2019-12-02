@@ -1,8 +1,10 @@
 from __future__ import print_function
 from flask import request, Blueprint
-import uuid
+# import uuid
+from pprint import pformat
 from random import choices
 from string import ascii_lowercase, digits
+import uuid, logging
 
 uid_gen = Blueprint('uid_gen', __name__)
 
@@ -28,4 +30,8 @@ def uid_generator():
 
         http_code = 200
         response = {'job_id': str(job_id)}
+
+        # logging.info('job_id - %s' % str(job_id))
+        # logging.info(pformat(response))
+
         return response, http_code

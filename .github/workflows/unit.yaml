@@ -33,7 +33,7 @@ jobs:
         working-directory: ./src/uid
         run: |
           source venv/bin/activate
-          python -m unittest discover tests/
+          pytest tests/
         
   storage-service:
     name : Storage Service
