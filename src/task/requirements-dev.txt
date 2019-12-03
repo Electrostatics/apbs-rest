@@ -1,0 +1,8 @@
+# mirror requirements.txt
+-r requirements.txt
+
+# additional packages for testing
+pytest==5.3.1
+pylint==2.3.1
+docker==4.0.1
+minio==4.0.16

@@ -59,3 +59,28 @@ jobs:
         run: |
           source venv/bin/activate
           pytest tests/
+  
+  task-service:
+    name : Task Service
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout APBS-REST codebase
+        uses: actions/checkout@v1
+        
+      - name: Setup the Python virtual environment
+        working-directory: ./src/task
+        run: |
+          sudo apt install -y python3-venv
+          python3 -m venv venv
+
+      - name: Install Python dependencies
+        working-directory: ./src/task
+        run: |
+          source venv/bin/activate
+          pip install -r requirements-dev.txt
+      
+      - name: Run unit tests
+        working-directory: ./src/task
+        run: |
+          source venv/bin/activate
+          pytest -s tests/

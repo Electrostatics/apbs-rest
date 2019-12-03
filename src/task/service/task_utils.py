@@ -8,7 +8,7 @@ except:
 
 TMP_EXEC_HOST = os.getenv('TMP_EXEC_HOST', 'http://localhost:5005')
 STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5001')
-STORAGE_URL  = os.environ.get('STORAGE_URL' , 'http://localhost:5001/storage')
+STORAGE_URL  = os.environ.get('STORAGE_URL' , 'http://localhost:5001/api/storage')
 
 END_STATES = ['complete', 'error']
 
