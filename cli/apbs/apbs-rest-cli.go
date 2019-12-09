@@ -129,8 +129,10 @@ func main() {
 		readFileNames := ExtractReadFiles(inputFileContents)
 		log.Println("File names extracted from", apbsFileName, ":\n", readFileNames)
 
+		// TODO: create temporary duplicate *.in file to replace relative paths
+
 		// Join input file and READ block files within same list
-		allInputFiles = append(allInputFiles, apbsFileName)
+		allInputFiles = append(allInputFiles, apbsFileName) // TODO: replace 'apbsFileName' with path to modified *.in file
 		for _, name := range readFileNames {
 			allInputFiles = append(allInputFiles, name)
 		}
