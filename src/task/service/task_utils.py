@@ -92,7 +92,8 @@ class TaskHandler:
                 TODO: provide better checks for status codes/errors
             '''
             if task_name == 'apbs':
-                # print('checking ')
+                # If 'infile' is in query-string and has value of true, proceed
+                #     assuming the user intends to use an APBS input file
                 if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
                     data = request.data
                     if 'filename' in data:

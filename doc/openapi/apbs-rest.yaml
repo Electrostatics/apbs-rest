@@ -81,6 +81,7 @@ paths:
           description: "File has been successfully uploaded to the APBS-REST service"
       requestBody:
         required: true
+        description: The raw file data to be uploaded to storage
         content:
           application/octet-stream:
             schema:
@@ -145,13 +146,12 @@ paths:
           description: Denotes whether to use the APBS infile defined by the "filename" key within JSON request
           schema:
             type: boolean
-      # requestBody:
-      #   required: true
-      #   content:
-      #     application/json:
-      #       schema:
-      #         filename:
-      #           type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/TaskAPBS"
       responses:
         202:
           description: "APBS task has been accepted and sent to run in backend"
@@ -185,3 +185,114 @@ paths:
 
   # Workflow Service
   # /workflow/
+  /workflow/{job_id}/{workflow_name}:
+    parameters:
+    - name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workflow_name
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      summary: "Retrieves a JSON status for the requested workflow"
+      responses:
+        200:
+          description: "Successfully retrieved status from the workflow service"
+        404:
+          description: "Workflow type 'workflow_name' does not exist or is not implemented"
+      tags:
+        - Workflow
+    # post:
+    #   summary: "Submit a single task assigned to the respsective job ID"
+    #   responses:
+    #     201:
+    #       description: "Task has been accepted and sent to run in backend"
+    #   tags:
+    #     - Task
+
+  /workflow/{job_id}/apbs:
+    parameters:
+    - name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      summary: "Submit an APBS workflow assigned to the respsective job ID"
+      parameters:
+        - in: query
+          name: infile
+          description: Denotes whether to use the APBS infile defined by the "filename" key within JSON request
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workflow:
+                  type: string
+                  enum: apbs
+                form:
+                  $ref: "#/definitions/TaskAPBS"
+      responses:
+        202:
+          description: "APBS workflow has been accepted and sent to run in backend"
+        400:
+          description: "Error of the request itself. Details within JSON content."
+      tags:
+        - Workflow
+          
+  /workflow/{job_id}/pdb2pqr:
+    parameters:
+    - name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      summary: "Submit a PDB2PQR workflow assigned to the respsective job ID"
+      parameters:
+        - in: query
+          name: infile
+          description: Denotes whether to use the APBS infile defined by the "filename" key within JSON request
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workflow:
+                  type: string
+                  enum: pdb2pqr
+                form:
+                  $ref: "#/definitions/TaskPDB2PQR"
+      responses:
+        202:
+          description: "APBS workflow has been accepted and sent to run in backend"
+        400:
+          description: "Error of the request itself. Details within JSON content."
+      tags:
+        - Workflow
+
+definitions:
+  TaskAPBS:
+    type: object
+    properties:
+      filename:
+        type: string
+
+  TaskPDB2PQR:
+    type: object
+    properties:
+      filename:
+        type: string
