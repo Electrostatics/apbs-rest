@@ -29,16 +29,15 @@ paths:
         required: true
         schema:
           type: string
-      - name: file_name
-        in: path
-        required: true
-        schema:
-          type: string
     get:
       summary: "Retrieves the a tarfile of all contents for a specified job_id"
       responses:
         200:
           description: "Successfully retrieved tarfile from storage"
+        404:
+          description: "Requested job_id has no associated files in storage"
+        500:
+          description: "An unknown server-side error in retrieving contents for job_id"
       tags:
         - Storage
     delete:
@@ -46,6 +45,11 @@ paths:
       responses:
         204:
           description: "Successful deletion of all job_id files"
+        500:
+          description: "Server-side error in deleting files"
+          # content:
+          #   text/plain:
+          #     type: string
       tags:
         - Storage
 
@@ -66,6 +70,10 @@ paths:
       responses:
         200:
           description: "Successfully retrieved file from storage"
+        404:
+          description: "File could not be found within storage"
+        500:
+          description: "An unknown server-side error in retrieving file from storage"
       parameters:
         - in: query
           name: json
@@ -78,7 +86,9 @@ paths:
       summary: "Uploads a file to be used by the workflow parameters you eventually submit"
       responses:
         201:
-          description: "File has been successfully uploaded to the APBS-REST service"
+          description: "File has been successfully uploaded to storage"
+        500:
+          description: "Server error in uploading file to storage"
       requestBody:
         required: true
         description: The raw file data to be uploaded to storage
@@ -97,6 +107,8 @@ paths:
       responses:
         204:
           description: "Successfully deleted file from storage"
+        500:
+          description: "Server-side error in deleting files"
       tags:
         - Storage
     
