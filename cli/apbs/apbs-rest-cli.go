@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 
 	"io/ioutil"
@@ -21,6 +22,7 @@ type commandLine struct {
 	version bool
 	help    bool
 	debug   bool
+	dryrun  bool
 }
 
 // form structure for workflow submission
@@ -71,6 +73,16 @@ func ExtractReadFiles(inputContents string) []string {
 	return fileNames
 }
 
+// CreatePlaceholderFile : creates placeholder with relative paths to files
+//                         specified in READ seciton of APBS input file
+func CreatePlaceholderFile(inputContents string, readFiles string) string {
+	var placeholderName string
+
+	// TODO: implement placeholder creation function so that this can be uploaded to storage instead
+
+	return placeholderName
+}
+
 func main() {
 	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
 	var Options commandLine
@@ -78,6 +90,7 @@ func main() {
 	// Define flags for the help text
 	flag.StringVar(&Options.jobid, "id", "", "Specify custom job identifier for execution. Defaults to randomly generated ID.")
 	flag.BoolVar(&Options.debug, "debug", false, "Print additional information to stdout.")
+	flag.BoolVar(&Options.dryrun, "dry-run", false, "Peforms all preparatory tasks, but does not execute ABPS.")
 	flag.BoolVarP(&Options.help, "help", "h", false, "Print help message and exit.")
 	// jobid = "devTest"
 
@@ -97,6 +110,11 @@ func main() {
 	if Options.help {
 		rest.PrintUsageError("APBS", flag.PrintDefaults)
 		return
+	}
+
+	// If --dry-run, inform user that execution is a dry run
+	if Options.dryrun {
+		fmt.Println("[dry-run] --dry-run flag specified: APBS will not execute, but prep tasks will be performed")
 	}
 
 	// Retrieve job ID if none is specified
@@ -140,6 +158,9 @@ func main() {
 		log.Println() // empty line
 		log.Println(jobid)
 
+		// println("all input files")
+		// fmt.Printf("%v", allInputFiles)
+
 		// Upload input files to storage service
 		rest.UploadFilesToStorage(allInputFiles, jobid)
 		log.Println() // empty line
@@ -148,32 +169,46 @@ func main() {
 		formObj := &form{
 			Filename: path.Base(apbsFileName)}
 
-		// Start APBS workflow
-		rest.StartWorkflow(jobid, "apbs", *formObj)
+		// Execute workflow operations if not dry-run
+		if !Options.dryrun {
+			// Start APBS workflow
+			rest.StartWorkflow(jobid, "apbs", *formObj)
 
-		// Wait for completion, get final status
-		finalStatus := rest.WaitForExecution(jobid)
-		log.Printf("Job complete.\n\n")
+			// Wait for completion, get final status
+			finalStatus := rest.WaitForExecution(jobid)
+			log.Printf("Job complete.\n\n")
 
-		// Download output files
-		log.Printf("Downloading output files:\n")
-		for _, file := range finalStatus.Apbs.OutputFiles {
-			log.Printf("  %s\n", path.Base(file))
-			rest.DownloadFile(path.Base(file), jobid)
+			// Download output files
+			log.Printf("Downloading output files:\n")
+			for _, file := range finalStatus.Apbs.OutputFiles {
+				log.Printf("  %s\n", path.Base(file))
+				rest.DownloadFile(path.Base(file), jobid)
+			}
+			log.Printf("Finished.\n")
+
+			// Print apbs_output to stdout
+			data, err = ioutil.ReadFile("apbs_stdout.txt")
+			rest.CheckErr(err)
+			os.Stdout.WriteString(string(data))
+
+			// Print error output to stderr
+			data, err = ioutil.ReadFile("apbs_stderr.txt")
+			rest.CheckErr(err)
+			os.Stderr.WriteString(string(data))
 		}
-		log.Printf("Finished.\n")
 
-		// Print apbs_output to stdout
-		data, err = ioutil.ReadFile("apbs_stdout.txt")
-		rest.CheckErr(err)
-		os.Stdout.WriteString(string(data))
-
-		// Print error output to stderr
-		data, err = ioutil.ReadFile("apbs_stderr.txt")
-		rest.CheckErr(err)
-		os.Stderr.WriteString(string(data))
+		// If dry-run, print expected execution information
+		if Options.dryrun {
+			// fmt.Println("Paths given are relative")
+			fmt.Printf("[dry-run] Input file given: %s\n", apbsFileName)
+			fmt.Printf("[dry-run] Files extracted:\n")
+			for _, filename := range readFileNames {
+				fmt.Printf("[dry-run]   %s", filename)
+			}
+		}
 
 		// Cleanout job files from cluster and stdout/stderr from local
+		log.Printf("Cleaning up job contents of %s\n", jobid)
 		rest.DeleteServerJobDirectory(jobid) // TODO: run this at exit if anything is uploaded
 	}
 }
