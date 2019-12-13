@@ -6,7 +6,7 @@
 - [Build](#build)
 
 ## Basic Usage
-Using the command line tools should mirror the same interface as the current tools for APBS and PDB2PQR:
+Using the command line tools should mirror the same interface as the current tools for APBS and PDB2PQR. The *one* exception is that an `APBS_HOST` must be defined in environment.  This can be your local installation or an online-hosted version of the software.
 - APBS
     ```shell
     apbs [options] input-file
@@ -19,6 +19,19 @@ Using the command line tools should mirror the same interface as the current too
     ```
     Further details can be found in the PDB2PQR [documentation](https://apbs-pdb2pqr.readthedocs.io/en/latest/pdb2pqr/invoking.html).
 
+Examples showing difference when ```APBS_HOST``` is set/unset:
+- With ```APBS_HOST``` set:
+    ```shell
+    $ export APBS_HOST="apbs.127.0.0.1.xip.io"
+    $ ./apbs sample.in
+    
+    # Normal, expected output of APBS
+    ```
+- With no ```APBS_HOST``` varable set:
+    ```
+    $ ./apbs sample.in
+    APBS_HOST environment variable not set (example: 'apbs.127.0.0.1.xip.io')
+    ```
 
 ## Requirements
 Requirements for development/building the APBS-CLI tools: 
