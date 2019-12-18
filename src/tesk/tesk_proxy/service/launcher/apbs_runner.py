@@ -129,6 +129,7 @@ class Runner:
             # Removes water from molecule if requested by the user
             try:
                 if form["removewater"] == "on":
+                    cur_dir = os.getcwd()
                     os.chdir('%stmp/%s' % (INSTALLDIR, job_id))
                     # os.chdir('./tmp/%s' % job_id)
                     inpath = pqrFileName 
@@ -154,7 +155,8 @@ class Runner:
 
                     shutil.move(inpath, newinpath)
                     shutil.move(outpath, newoutpath)
-                    os.chdir('../../')
+                    # os.chdir('../../')
+                    os.chdir(cur_dir)
 
             except KeyError:
                 pass

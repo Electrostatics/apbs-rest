@@ -157,14 +157,16 @@ def fieldStorageToDict(form):
         apbsOptions['fgyCent'] = locale.atoi(form["fgycent"])
         apbsOptions['fgzCent'] = locale.atoi(form["fgzcent"])
 
-    if form["gcent"] == "mol":
-        apbsOptions['gridCenterMethod'] = "molecule"
-        apbsOptions['gridCenterMoleculeID'] = locale.atoi(form["gcentid"])
-    elif form["gcent"] == "coord":
-        apbsOptions['gridCenterMethod'] = "coordinate"
-        apbsOptions['gxCent'] = locale.atoi(form["gxcent"])
-        apbsOptions['gyCent'] = locale.atoi(form["gycent"])
-        apbsOptions['gzCent'] = locale.atoi(form["gzcent"])
+    # added conditional to avoid checking 'gcent' for incompatible methods
+    if apbsOptions['calcType'] in ['mg-manual','mg-dummy']:
+        if form["gcent"] == "mol":
+            apbsOptions['gridCenterMethod'] = "molecule"
+            apbsOptions['gridCenterMoleculeID'] = locale.atoi(form["gcentid"])
+        elif form["gcent"] == "coord":
+            apbsOptions['gridCenterMethod'] = "coordinate"
+            apbsOptions['gxCent'] = locale.atoi(form["gxcent"])
+            apbsOptions['gyCent'] = locale.atoi(form["gycent"])
+            apbsOptions['gzCent'] = locale.atoi(form["gzcent"])
 
 
     apbsOptions['mol'] = locale.atoi(form["mol"])
