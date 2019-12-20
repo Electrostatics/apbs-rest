@@ -1,6 +1,6 @@
 # APBS-REST: Deploying APBS as Containerized Microservice-Driven Software
 
-*This project is a work in progress. Stability not guaranteed.*
+*This project remains a work in progress. Stability is not guaranteed, but [issue](https://github.com/Electrostatics/apbs-rest/issues) submissions are welcome.*
 
 ## Table of Contents
 * [Overview](#overview)
@@ -78,7 +78,8 @@ Before installing APBS-REST, the following must be installed in order on your de
 - [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 - [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
 - [Helm](https://github.com/helm/helm/releases)
-   - These instructions are for versions &gt;2.15 and &lt;3.x
+   - These instructions are for Helm 3, which introduced significant changes to its command line interface
+   - Instructions for Helm versions &gt;2.15 and &lt;3.x can be found in an [earlier version of this document](https://github.com/Electrostatics/apbs-rest/blob/56bb2bf9412918139146f4c2887b75b289dc61a4/README.md).
 
 The commands ```kubectl``` and ```helm``` should how be available. Verify your Minikube and Helm installations on your preferred command line:
 ```
@@ -97,8 +98,9 @@ Please note that the Kubernetes version bundled with Docker Desktop **generally 
 
 ### Known Installation Issues
 - Helm versions < 2.15 will will not install with Kubernetes v1.16
-- Helm version 3.0 makes significant changes to the command line interface. This README will be updated to reflect it after its full release
+- Helm version 3.0 makes significant changes to the command line interface. This README ~~will be~~ has been updated to reflect this.
 - During initial testing, issues were encountered when attempting to start Minikube with Hyper-V as the driver.  Your mileage may vary, but VirtualBox has yet to exhibit any issues while launching Minikube (fingers crossed).
+    - [UPDATE] It seems recent versions of Minikube show improved compatibility with Windows Hyper-V, so going the Minikube route should be safe should you need Hyper-V for something else (such as Docker Desktop)
 
 Any additional issues discovered will be noted here.
 
@@ -113,44 +115,64 @@ cd apbs-rest/
 
 
 #### After cloning of the repository
-If you've never used Helm or don't have its Tiller installed on your cluster, do the following:
+<!-- If you've never used Helm or don't have its Tiller installed on your cluster, do the following:
 ```shell
 kubectl create serviceaccount tiller --namespace kube-system
 kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 helm init --service-account=tiller --wait
 ```
 This installs the server-side component necessary for Helm to operate.
-<br>
+<br> -->
 
 Enable an ingress controller for your Minikube cluster. 
 ```shell
 minikube addons enable ingress
 ```
-- **Docker Desktop:** ```helm install``` an NGINX ingress controller since you don't have access to Minikube. Be mindful that the ```nginx-ingress``` **consumes the localhost ports 80 and 443.**
+- **Docker Desktop:** Add the stable repo to helm then ```helm install``` an NGINX ingress controller since you don't have access to Minikube. Be mindful that the ```nginx-ingress``` **consumes the localhost ports 80 and 443.**
     ```shell
-    helm install -n nginx-ingress --namespace kube-system stable/nginx-ingress
+    helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+    helm install nginx-ingress stable/nginx-ingress --namespace kube-system
     ```
 An ingress object manages/defines how external network access to services within the cluster is routed, and the ingress controller does the work of routing the traffic.
 
-<br>
-
-Finally, ```helm install``` APBS-REST onto your cluster:
+#### Create an APBS namespace
+Create a namespace for APBS-REST (examples will use the ```apbs``` namespace) to separate its resources from anything else you may install in the cluster:
 ```shell
+kubectl create namespace apbs
+```
+
+<!-- <br> -->
+#### Using Helm to install APBS-REST
+Finally, ```helm install``` APBS-REST onto your cluster:
+<!-- ```shell
 helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+``` -->
+```shell
+helm install apbs-rest charts/apbs-rest \
+--namespace apbs \
+--set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 ```
 - **Docker Desktop:** this step differs in that you'd use the localhost IP address.
-    ```shell
+    <!-- ```shell
     helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.127.0.0.1.xip.io
+    ``` -->
+    ```shell
+    helm install apbs-rest charts/apbs-rest \
+    --namespace apbs \
+    --set ingress.enabled=true,ingress.hosts[0]=apbs.127.0.0.1.xip.io
     ```
 The cluster will begin downloading the necessary images and readying the application.  Walk away and grab a coffee, because this step can take upwards of ~6 minutes (+/- based on your network speeds).  Review the arguments via ```helm install --help``` if you wish to understand the flags used above.
 
 If you'd like to view the installation status, execute the following:
-```shell
+<!-- ```shell
 helm status apbs-rest
+``` -->
+```shell
+kubectl get deployments --namespace apbs
 ```
-The output here will look familiar as it's the output from the previous install command. Specifically, seek out the section labeled ```v1/Deployment```
+The output here shows which components of APBS-REST are ready for use, indicated by ```0/1``` or ```1/1``` under the ```READY``` column.
 ```
-==> v1/Deployment
+$ kubectl get deployments --namespace apbs
 NAME                  READY  UP-TO-DATE  AVAILABLE  AGE
 apbs-rest-autofill    1/1    1           1          10m
 apbs-rest-id          1/1    1           1          10m
@@ -162,33 +184,40 @@ apbs-rest-tesk-proxy  1/1    1           1          10m
 apbs-rest-ui          1/1    1           1          10m
 apbs-rest-workflow    1/1    1           1          10m
 ```
-When you see that all deployments are in the READY state, you're good to go.  Find the host via the "Ingress" header of the ```helm status apbs-rest``` output. Use your browser to navigate to there and enjoy!
+When you see all deployments in the READY state, you're good to go.
+
+#### Access GUI via Browser
+Find the host if you forgot the one defined at the ```helm install``` step:
+```shell
+kubectl get ing --namespace apbs
+```
+Under the ```HOSTS``` column, the hostname you defined earlier will show. Use your browser to navigate to there and enjoy!
 
 #### Uninstall
-There's more regarding the uninstalling process [below](#uninstall-from-cluster), but it ultimately is just a ```helm delete``` on the name of the application (indicated by ```-n``` flag in the previous installation command)
+There's more regarding the uninstalling process [below](#uninstall-from-cluster), but it ultimately is just a ```helm uninstall``` on the name of the application, plus the namespace as usual
 ```shell
-helm delete --purge apbs-rest
+helm uninstall apbs-rest --namespace apbs
 ```
 
 
 #### All commands for easy Copy+Paste
 - Minikube
     ```shell
-    kubectl create serviceaccount tiller --namespace kube-system
-    kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-
-    helm init --service-account=tiller --wait
     minikube addons enable ingress
-    helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+    kubectl create namespace apbs
+    helm install apbs-rest charts/apbs-rest \
+    --namespace apbs \
+    --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
     ```
 - Docker Desktop
     ```shell
-    kubectl create serviceaccount tiller --namespace kube-system
-    kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-    
-    helm init --service-account=tiller --wait
-    helm install -n nginx-ingress --namespace kube-system stable/nginx-ingress
-    helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.127.0.0.1.xip.io
+    helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+    helm install nginx-ingress stable/nginx-ingress --namespace kube-system
+
+    kubectl create namespace apbs
+    helm install apbs-rest charts/apbs-rest \
+    --namespace apbs \
+    --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
     ```
 
 
@@ -197,9 +226,15 @@ helm delete --purge apbs-rest
 ## Uninstall from Cluster
 To uninstall the APBS-REST software from your local kubernetes cluster, simply type the following:
 ```
-helm delete --purge apbs-rest
+helm uninstall apbs-rest --namespace apbs
 ```
 This will remove the release from your cluster **along with any associated storage volumes.  Make certain you download any output files you need from the cluster before removing APBS-REST from your local cluster.**
+
+To uninstall the NGINX ingress controller we installed earlier, it's a similar command:
+```
+helm uninstall nginx-ingress --namespace kube-system
+```
+
 
 <hr/>
 
