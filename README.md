@@ -217,7 +217,7 @@ helm uninstall apbs-rest --namespace apbs
     kubectl create namespace apbs
     helm install apbs-rest charts/apbs-rest \
     --namespace apbs \
-    --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+    --set ingress.enabled=true,ingress.hosts[0]=apbs.127.0.0.1.xip.io
     ```
 
 
