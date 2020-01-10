@@ -1,8 +1,13 @@
 # stage 1 - build APBS and PDB2PQR
 FROM ubuntu:18.04 as apbs_pdb2pqr-build
+
 WORKDIR /app
 RUN apt update -y \
-    && apt install -y python-pip swig cmake g++ make git \
+    && apt install -y python-pip swig g++ make git wget
+
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.16.2/cmake-3.16.2-Linux-x86_64.tar.gz \
+    && gunzip cmake-3.16.2-Linux-x86_64.tar.gz \
+    && tar -xf cmake-3.16.2-Linux-x86_64.tar \
     && git clone https://github.com/Electrostatics/apbs-pdb2pqr.git
 
 WORKDIR /app/apbs-pdb2pqr/apbs
@@ -10,6 +15,7 @@ RUN git submodule init \
     && git submodule update \
     && mkdir -p /app/builds/apbs \
     && cd /app/builds/apbs \
+    && export PATH=$PATH:/app/cmake-3.16.2-Linux-x86_64/bin \
     && cmake /app/apbs-pdb2pqr/apbs -DENABLE_PYTHON=ON -DBUILD_SHARED_LIBS=ON \
     && make
 # WORKDIR /app/apbs_build

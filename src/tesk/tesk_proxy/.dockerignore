@@ -6,8 +6,8 @@ __pycache__
 tests
 
 # Existing symlinks
-legacy/src
-legacy/apbs_cgi.py
+service/legacy/src
+service/legacy/apbs_cgi.py
 
 # Files
 *.pyc

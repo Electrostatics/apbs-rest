@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 if [ $1 = 'apbs' ]
 then
     cd tesk_execution

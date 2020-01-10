@@ -64,36 +64,39 @@ class Runner:
 
         # downloading necessary files
         if infile_name is not None:
+            file_list = tesk_proxy_utils.apbs_extract_input_files(job_id, infile_name, storage_host)
+
             infile_dest_path = os.path.join(self.job_dir, infile_name)
             print('downloading infile')
             download_file(job_id, infile_name, infile_dest_path, storage_host)
 
 
-            print('parsing infile READ section')
-            file_list = []
-            with open(infile_dest_path, 'r') as fin:
-                READ_start = False
-                READ_end = False
-                for whole_line in fin:
-                    line = whole_line.strip()
-                    for arg in line.split():
-                        # print(line.split())
-                        if arg.upper() == 'READ':
-                            READ_start = True
-                        elif arg.upper() == 'END':
-                            READ_end = True
-                        else:
-                            file_list.append(arg)
+            # print('parsing infile READ section')
+            # file_list = []
+            # with open(infile_dest_path, 'r') as fin:
+            #     READ_start = False
+            #     READ_end = False
+            #     for whole_line in fin:
+            #         line = whole_line.strip()
+            #         for arg in line.split():
+            #             # print(line.split())
+            #             if arg.upper() == 'READ':
+            #                 READ_start = True
+            #             elif arg.upper() == 'END':
+            #                 READ_end = True
+            #             else:
+            #                 file_list.append(arg)
 
-                        if READ_start and READ_end:
-                            break
-                    if READ_start and READ_end:
-                        break
-            # removes the type of file/format from list (e.g. 'charge pqr')
+            #             if READ_start and READ_end:
+            #                 break
+            #         if READ_start and READ_end:
+            #             break
+            # # removes the type of file/format from list (e.g. 'charge pqr')
+            # print(file_list)
+            # file_list = file_list[2:]
+            # self.read_file_list = file_list
             print(file_list)
-            file_list = file_list[2:]
-            self.read_file_list = file_list
-            print(file_list)
+            # raise Exception('GONNA jump ship here')
 
             print('-----downloading other files-----')
             for name in file_list:
@@ -190,6 +193,8 @@ class Runner:
         pprint(apbs_json)
 
         url = tesk_host + '/v1/tasks'
+        
+        #TODO: create handler in case of non-200 response
         response = post(url, headers=headers, json=apbs_json)
         print(response.content)
         return

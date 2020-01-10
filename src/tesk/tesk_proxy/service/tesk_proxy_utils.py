@@ -54,22 +54,56 @@ def apbs_extract_input_files(job_id, infile_name, storage_host):
     file_list = []
     for whole_line in StringIO(u'%s' % infile_text):
         line = whole_line.strip()
-        for arg in line.split():
-            # print(line.split())
-            if arg.upper() == 'READ':
-                READ_start = True
-            elif arg.upper() == 'END':
-                READ_end = True
-            else:
-                file_list.append(arg)
+        # print(line)
+        # for arg in line.split():
+        #     # print(line.split())
+        #     if line.startswith('#'):
+        #         pass
+        #     elif arg.upper() == 'READ':
+        #         READ_start = True
+        #     elif arg.upper() == 'END':
+        #         READ_end = True
+        #     elif READ_start and not READ_end:
+        #         file_list.append(arg)
+        #     else:
+        #         pass
 
-            if READ_start and READ_end:
-                break
+        #     if READ_start and READ_end:
+        #         break
+
         if READ_start and READ_end:
             break
+        
+        elif not READ_start and not READ_end:
+            if line.startswith('#'):
+                pass
+            else:
+                split_line = line.split()
+                if len(split_line) > 0:
+                    if split_line[0].upper() == 'READ':
+                        # print('ENTERING READ SECTION')
+                        READ_start = True
+                    elif split_line[0].upper() == 'END':
+                        # print('LEAVING READ SECTION')
+                        READ_end = True
+
+        elif READ_start and not READ_end:
+            if line.startswith('#'):
+                pass
+            else:
+                split_line = line.split()
+                if len(split_line) > 0:
+                    if split_line[0].upper() == 'END':
+                        # print('LEAVING READ SECTION')
+                        READ_end = True
+                    else:
+                        # print('line.split()[2:]', line.split()[2:])
+                        # print(split_line)
+                        for arg in line.split()[2:]:
+                            file_list.append(arg)
 
     # Slice list to only include files and nothing else in READ section
-    file_list = file_list[2:]
+    # file_list = file_list[2:]
     return file_list
 
 # def apbs_json_config(job_id, command_line_args, storage_host):
