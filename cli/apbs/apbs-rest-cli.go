@@ -40,28 +40,43 @@ func ExtractReadFiles(inputContents string) []string {
 
 	for i := 0; scanner.Scan(); i++ {
 		lineText := strings.TrimSpace(scanner.Text())
-		splitLine := strings.Fields(lineText)
 
-		for _, element := range splitLine {
-			if strings.ToUpper(element) == "READ" {
-				readStart = true
-			} else if strings.ToUpper(element) == "END" {
-				readEnd = true
-			} else {
-				fileNames = append(fileNames, element)
-			}
-			// Break from loop when we've exited READ section
-			if readStart && readEnd {
-				break
-			}
-		}
-		// Since we've reached the end of the READ section, stop reading file
+		// If we've entered and exited READ section, stop reading file
 		if readStart && readEnd {
 			break
+		} else if !readStart && !readEnd {
+			// If READ section hasn't been seen, iterate lines until found
+			if strings.HasPrefix(lineText, "#") {
+				// ignore commented lines
+			} else {
+				splitLine := strings.Fields(lineText)
+				if len(splitLine) > 0 {
+					if strings.ToUpper(splitLine[0]) == "READ" {
+						readStart = true
+					} else if strings.ToUpper(splitLine[0]) == "END" {
+						readEnd = true
+					}
+				}
+			}
+		} else if readStart && !readEnd {
+			// If within READ section, add files to fileNames
+			if strings.HasPrefix(lineText, "#") {
+				// ignore commented lines
+			} else {
+				splitLine := strings.Fields(lineText)
+				if len(splitLine) > 0 {
+					if strings.ToUpper(splitLine[0]) == "END" {
+						readEnd = true
+					} else {
+						// slicing with [2:] removes the type of file/format from list (e.g. 'charge pqr')
+						for _, arg := range splitLine[2:] {
+							fileNames = append(fileNames, arg)
+						}
+					}
+				}
+			}
 		}
 	}
-	// removes the type of file/format from list (e.g. 'charge pqr')
-	fileNames = fileNames[2:]
 
 	// check that each file exists
 	for _, name := range fileNames {
