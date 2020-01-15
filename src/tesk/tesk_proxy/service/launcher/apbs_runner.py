@@ -44,6 +44,8 @@ class Runner:
         elif form is not None:
             self.form = form
             self.apbsOptions = fieldStorageToDict(form)
+            # TODO: catch error if something wrong happes in fieldStorageToDict;
+            #   handle in tesk_proxy_service
 
         if job_id is not None:
             self.job_id = job_id

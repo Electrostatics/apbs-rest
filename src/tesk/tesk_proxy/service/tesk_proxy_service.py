@@ -32,6 +32,8 @@ def submit_tesk_action(job_id, task_name):
         '''
         if task_name.lower() in ['apbs', 'pdb2pqr']:
             if task_name == 'apbs':
+                # TODO: wrap in try/except; set response/http_code when
+                #   initializing apbs_runner.Runner()
                 if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
                     infile_name = request.json['filename']
                     runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, infile_name=infile_name)
@@ -51,7 +53,8 @@ def submit_tesk_action(job_id, task_name):
                     redirectURL = runner.start(STORAGE_HOST, TESK_HOST)
 
             elif task_name == 'pdb2pqr':
-                pass
+                # TODO: wrap in try/except; except WebOptionsError as err, 
+                #   print err, set response and http_status
                 form = request.json
                 runner = pdb2pqr_runner.Runner(form, request.files, STORAGE_HOST, job_id=job_id)
                 redirectURL = runner.start(STORAGE_HOST, TESK_HOST)
