@@ -3,11 +3,11 @@ on:
   push:
     paths:
       - '.github/workflows/unit.yaml'
-      - 'src/*'
+      - 'src/**'
   pull_request:
     paths:
       - '.github/workflows/unit.yaml'
-      - 'src/*'
+      - 'src/**'
 
 jobs:
   id-service:

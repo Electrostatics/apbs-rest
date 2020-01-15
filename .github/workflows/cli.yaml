@@ -3,18 +3,18 @@ on:
   push:
     paths:
       - '.github/workflows/cli.yaml'
-      - 'cli/*'
+      - 'cli/**'
       - '!cli/README.md'
-      - 'tests/cli/*'
+      - 'tests/cli/**'
       - 'utilities/wait_for_deployments.py'
       # - 'tests/requirements.txt'
       # - 'src/*'
   pull_request:
     paths:
       - '.github/workflows/cli.yaml'
-      - 'cli/*'
+      - 'cli/**'
       - '!cli/README.md'
-      - 'tests/cli/*'
+      - 'tests/cli/**'
       - 'utilities/wait_for_deployments.py'
 
 jobs:

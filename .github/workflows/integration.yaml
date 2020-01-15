@@ -4,9 +4,9 @@ on:
     paths:
       - '.github/workflows/integration.yaml'
       - 'utilities/wait_for_deployments.py'
-      - 'tests/integration/*'
+      - 'tests/integration/**'
       - 'tests/requirements.txt'
-      - 'src/*'
+      - 'src/**'
 
 jobs:
   job1:
