@@ -44,7 +44,7 @@ def export_input_file_list(file_list, job_id, prefix, job_dir):
 def apbs_extract_input_files(job_id, infile_name, storage_host):
     object_name = "%s/%s" % (job_id, infile_name)
     url = '%s/api/storage/%s?json=true' % (storage_host, object_name)
-    response = requests.get(url)
+    response = requests.get(url) # TODO: check response code
     infile_text = response.json()[object_name]
 
     # Read only the READ section of infile, 

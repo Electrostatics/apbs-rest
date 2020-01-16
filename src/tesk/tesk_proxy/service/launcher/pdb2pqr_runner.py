@@ -61,12 +61,8 @@ class Runner:
                 self.invoke_method = 'gui'
                 self.weboptions = WebOptions(form, files)
 
-        except WebOptionsError as error:
-            print(error)
-            sys.exit(2)
-            # TODO: reraise WebOptionsError for tesk_proxy_service.py to
-            # catch when it invokes the pdb2pqr_runner.Runner() __init__
-            # It'd catch the error, returning a Bad Request error (300)
+        except WebOptionsError:
+            raise
 
     def prepare_job(self, job_id):
 

@@ -9,13 +9,16 @@ def sanitizeFileName(fileName):
     return fileName
 
 class WebOptionsError(Exception):
-    pass
+    def __init__(self, message, bad_key=None):
+        super(WebOptionsError, self).__init__(message)
+        self.bad_weboption = bad_key
 
 class WebOptions(object):
     '''Helper class for gathering and querying options selected by the user'''
     def __init__(self, form, files):
         '''Gleans all information about the user selected options and uploaded files.
         Also validates the user input. Raises WebOptionsError if there is any problems.'''
+        '''TODO: set second parameter of WebOptionError calls to specify bad key'''
         
         #options to pass to runPDB2PQR
         self.runoptions = {}
