@@ -98,7 +98,10 @@ class TaskHandler:
                     data = request.data
                     if 'filename' in data:
                         post_response = requests.post('%s/api/tesk/%s/%s?infile=true' % (TMP_EXEC_HOST, job_id, task_name), json=data)
-                        if post_response.status_code == 500:
+                        if post_response.status_code == 400:
+                            http_status = post_response.status_code
+                            response = post_response.json() # could probably just access/pass along raw data
+                        elif post_response.status_code == 500:
                             http_status = post_response.status_code
                             response = {
                                 'error': 'There was an error within the service. Please try again later'
@@ -122,13 +125,23 @@ class TaskHandler:
                             form[key] = str(form[key])
 
                     # Send task to placeholder executor service
-                    requests.post('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
+                    post_response = requests.post('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
+                    if post_response.status_code == 400:
+                        http_status = post_response.status_code
+                        response = post_response.json() # could probably just access/pass along raw data
+                    elif post_response.status_code == 500:
+                        http_status = post_response.status_code
+                        response = post_response.json()
+
 
             elif task_name == 'pdb2pqr':
                 form = request.data
                 # Send task to placeholder executor service
                 print('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name))
                 post_response = requests.post('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
+                if post_response.status_code == 400 or post_response.status_code == 500:
+                    http_status = post_response.status_code
+                    response = post_response.json()
                 print('tesk proxy response', post_response.status_code)
                 
 

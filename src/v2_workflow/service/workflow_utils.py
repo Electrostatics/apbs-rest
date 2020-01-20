@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, make_response
 from os import getenv
 from sys import stderr
 from requests import get, post
@@ -77,7 +77,16 @@ class WorkflowHandler:
             if task_response.status_code == 202:
                 http_status_code = task_response.status_code
                 response = task_response.json()
+
             #TODO: write handler for a fail case if Task Service sends non-202 response
+            #Solution: just pass along status/response from task service
+            elif task_response.status_code in [400, 500]:
+                http_status_code = task_response.status_code
+                response = task_response.json()
+            else:
+                # may handle differently in future
+                http_status_code = task_response.status_code
+                response = task_response.json()
 
         except Exception as e:
             http_status_code = 500
