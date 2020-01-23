@@ -340,10 +340,10 @@ function update_surface(action){
         update_surface(0);
     }
 
-    function getpqr(jobid, storage_url){
+    function getpqr(jobid, pqr_prefix, storage_url){
         var xhr = new XMLHttpRequest();
         //jobid = 14357857643;
-        url = storage_url+"/"+jobid+"/"+jobid+".pqr";
+        url = storage_url+"/"+jobid+"/"+pqr_prefix+".pqr";
         // console.log(url)
         // url = "http://nbcr-222.ucsd.edu/pdb2pqr_2.1.1/tmp/"+jobid+"/"+jobid+".pqr";
         //url = "../3dmol/files/1fas.pqr";
@@ -363,9 +363,9 @@ function update_surface(action){
         
     }
 
-    function getcube(jobid, storage_url){
+    function getcube(jobid, pqr_prefix, storage_url){
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", storage_url+"/"+jobid+"/"+jobid+".cube");
+        xhr.open("GET", storage_url+"/"+jobid+"/"+pqr_prefix+".cube");
         // console.log(storage_url+"/"+jobid+"/"+jobid+".cube")
         // xhr.open("GET", "http://nbcr-222.ucsd.edu/pdb2pqr_2.1.1/tmp/"+jobid+"/"+jobid+".cube");
         //xhr.open("GET", "../3dmol/files/1fas.cube");

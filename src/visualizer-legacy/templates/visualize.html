@@ -21,7 +21,7 @@
     </head>
     <body>
         <script type="text/javascript">build_page('{{ jobid }}')</script>
-        <script type="text/javascript">getpqr('{{ jobid }}', '{{ storage_url }}')</script>
-        <script type="text/javascript">getcube('{{ jobid }}', '{{ storage_url }}')</script>
+        <script type="text/javascript">getpqr('{{ jobid }}', '{{ pqr_prefix }}', '{{ storage_url }}')</script>
+        <script type="text/javascript">getcube('{{ jobid }}', '{{ pqr_prefix }}', '{{ storage_url }}')</script>
     </body>
 </html>
