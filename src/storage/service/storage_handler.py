@@ -49,7 +49,6 @@ class StorageHandler:
                 try:
                     file_str = self.storageClient.get_object(JOB_BUCKET_NAME, object_name)
                     file_str_json = { object_name: file_str.decode('utf-8') }
-                    # response = make_response(JSONEncoder().encode(file_str_json))
                     response = make_response( dumps(file_str_json) )
                     response.headers['Content-Type'] = 'application/json'
                     http_response_code = 200
@@ -98,22 +97,14 @@ class StorageHandler:
         response = 'Success'
         http_response_code = 201
 
-        # pp.pprint(request.files.keys())
-        print('request.files keys:')
-        for key in request.files.keys():
-            print('  ', key)
         try:
             file_data = request.files['file_data']
-            # print(type(file_data), flush=True)
         except:
-            # file_data = BytesIO(request.data)
-            # print(request.data.decode('utf-8'))
-
+            # fallback in case file data is in body
             file_data = FileStorage(
                 stream=BytesIO(request.data),
                 filename=file_name,
             )
-            # print(type(file_data))
 
         if file_data.filename:
             uploaded_file_name = secure_filename(file_data.filename)
