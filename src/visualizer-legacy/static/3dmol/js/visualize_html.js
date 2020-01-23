@@ -80,8 +80,8 @@ function build_page(jobid){
 "        <option style='color: black;' value='RGB'>Red-Green-Blue </option>" +
 "        <!--<option style='color: black;' value='BWR'>Blue-White-Red </option>-->" +
 "    </select><br>" +
-"<!--<table border='0' cellspacing='0'><tr><td valign='top'>RWB<br>RGB</td><td valign='top'><img src='/static/3dmol/images/rwb.png' width='250'><br><img src='/static/3dmol/images/rgb.png' width='250'></td></tr></table>-->" +
- "<span id='colorbar'><img id='rwb' src='/static/3dmol/images/rwb.png' width='250'></span>" +
+"<!--<table border='0' cellspacing='0'><tr><td valign='top'>RWB<br>RGB</td><td valign='top'><img src='/viz/static/3dmol/images/rwb.png' width='250'><br><img src='/viz/static/3dmol/images/rgb.png' width='250'></td></tr></table>-->" +
+ "<span id='colorbar'><img id='rwb' src='/viz/static/3dmol/images/rwb.png' width='250'></span>" +
 
 "    <!--<div class='inner'><ul class='button-group round'><input type='button' button class='button-labela pure-button' style='width: 90px; height: 30px; color: black' value='Add labels'" +
 "        onclick='addLabels(glviewer); glviewer.render();'></button></input>" +

@@ -17,6 +17,13 @@ ui:
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
+viz:
+  image:
+    repository: electrostatics/apbs-viz-legacy
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
 task:
   image:
     repository: electrostatics/apbs-task

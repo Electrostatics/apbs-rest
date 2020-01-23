@@ -218,9 +218,9 @@ function update_surface(action){
         var y = w.options[w.selectedIndex].value;
         //console.log(y);
         if(y=='RWB')
-           document.getElementById("colorbar").innerHTML ="<img src=/static/3dmol/images/rwb.png width='250'>";
+           document.getElementById("colorbar").innerHTML ="<img src=/viz/static/3dmol/images/rwb.png width='250'>";
         if(y=='RGB')
-            document.getElementById("colorbar").innerHTML ="<img src=/static/3dmol/images/rgb.png width='250'>";
+            document.getElementById("colorbar").innerHTML ="<img src=/viz/static/3dmol/images/rgb.png width='250'>";
 
     }
 

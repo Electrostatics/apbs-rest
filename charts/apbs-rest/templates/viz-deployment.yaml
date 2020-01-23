@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "apbsrest.fullname" . }}-viz
+  labels:
+    app: {{ template "apbsrest.name" . }}
+    chart: {{ template "apbsrest.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    service: viz
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "apbsrest.name" . }}
+      release: {{ .Release.Name }}
+      service: viz
+  template:
+    metadata:
+      labels:
+        app: {{ template "apbsrest.name" . }}
+        release: {{ .Release.Name }}
+        service: viz
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.viz.image.repository }}:{{ .Values.viz.image.tag }}"
+          imagePullPolicy: {{ .Values.viz.image.pullPolicy }}
+          env:
+          - name: STORAGE_URL
+            value: /storage
+          - name: FLASK_APP
+            value: "main.py"
+          ports:
+            - name: http
+              containerPort: 5008
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /check
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /check
+              port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

@@ -4,3 +4,10 @@ __pycache__
 *.pyc
 .vscode
 .devcontainer
+
+doc/
+samples/
+.env
+.dockerignore
+Dockerfile
+README.md

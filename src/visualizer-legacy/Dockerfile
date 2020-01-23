@@ -7,4 +7,4 @@ COPY . /app
 EXPOSE 5008
 
 ENTRYPOINT [ "gunicorn" ]
-CMD [ "-w", "4", "-b", "0.0.0.0:5009", "main:app" ]
+CMD [ "-w", "4", "-b", "0.0.0.0:5008", "main:app" ]

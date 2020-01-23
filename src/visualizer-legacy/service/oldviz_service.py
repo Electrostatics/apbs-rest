@@ -1,5 +1,6 @@
 from __future__ import print_function
 from flask import request, Blueprint, render_template
+# from flask import url_for
 import os, logging
 
 STORAGE_URL  = os.environ.get('STORAGE_URL' , 'http://localhost:5001/api/storage')
@@ -46,5 +47,5 @@ def render_3dmol():
         error_message = f'Missing arguments in URL query: <b>{missing_args}</b>'
         return error_message, http_status
     else:
-        # 
+        # print(url_for('static', filename='3dmol/js/3dmol.js'))
         return render_template('visualize.html', jobid=job_id, pqr_prefix=pqr_prefix, storage_url=STORAGE_URL), http_status

@@ -22,8 +22,7 @@ dictConfig({
     }
 })
 
-app = Flask(__name__)
-# CORS(app)
+app = Flask(__name__, static_url_path='/viz/static')
 app.register_blueprint(oldviz_service.viz_service)
 
 def main():
