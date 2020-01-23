@@ -1,0 +1,5 @@
+# mirror requirements.txt
+-r requirements.txt
+
+# additional packages for production environment
+gunicorn==20.0.4

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+    <head>
+        <!-- {trackingscript} -->
+        <script type="text/javascript">
+            // {trackingevents}
+        </script>
+        <title>Visualization</title>
+        <link rel="stylesheet" href="/static/3dmol/css/pdb2pqr_3dmol.css" type="text/css">
+        <link rel="stylesheet" href="/static/3dmol/css/foundation.css">
+        <link rel="stylesheet" type="text/css" href="/static/3dmol/css/pure-min.css" media="screen" />
+        <link rel="stylesheet" href="/static/3dmol/css/toggles.css" type="text/css">
+        <link rel="stylesheet" href="/static/3dmol/css/ui_css.css" type="text/css">
+        <script type="text/JavaScript" src="/static/3dmol/js/pitt_3Dmol.js"></script>
+        
+       
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <!-- <script src="http://3dmol.csb.pitt.edu/build/3Dmol.js"></script> -->
+        <script type="text/JavaScript" src="/static/3dmol/js/visualize_html.js"></script>
+        <script type="text/JavaScript" src="/static/3dmol/js/3dmol.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">build_page('{{ jobid }}')</script>
+        <script type="text/javascript">getpqr('{{ jobid }}', '{{ storage_url }}')</script>
+        <script type="text/javascript">getcube('{{ jobid }}', '{{ storage_url }}')</script>
+    </body>
+</html>

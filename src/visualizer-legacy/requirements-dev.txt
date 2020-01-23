@@ -1,0 +1,7 @@
+# mirror requirements.txt
+-r requirements.txt
+
+# additional packages for testing
+pytest==5.3.1
+pylint==2.3.1
+gunicorn==20.0.4
