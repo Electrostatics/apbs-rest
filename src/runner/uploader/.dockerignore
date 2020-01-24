@@ -1,0 +1,6 @@
+# Directories
+sandbox/
+
+# Files
+.dockerignore
+uploader.dockerfile

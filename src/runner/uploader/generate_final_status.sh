@@ -4,6 +4,7 @@
 cur_dir=$(pwd)
 task_name=$1
 upload_dir=/app/_upload
+# upload_dir=_upload
 
 # mkdir _upload
 # TODO: tar, gzip, then copy over pdb2pka_output directory; Perhaps delegate to the PDB2PQR container
@@ -58,8 +59,11 @@ then
   # Write the output files
   for file in $output_basename*
   do
-    echo $JOB_ID/${file} >> ${task_name}_status
-    echo $JOB_ID/${file} >> ${task_name}_output_files
+    if [ -f $file ]
+    then
+      echo $JOB_ID/${file} >> ${task_name}_status
+      echo $JOB_ID/${file} >> ${task_name}_output_files
+    fi
   done
 
   if [ $output_basename = $JOB_ID ] # if outputname is assigned by jobid
@@ -92,6 +96,7 @@ elif [ ${task_name} = 'apbs' ]
 then
   cp *.in apbsinput.in # might not be needed anymore. Need to investigate
   pqr_name=$(ls *.pqr)
+  pqr_prefix=${pqr_name%.*}
   # dx_name=*.dx
 
   # Record the end time for the job
@@ -112,8 +117,19 @@ then
 
   for file in *.dx
   do
-    echo $JOB_ID/${file} >> ${task_name}_status
-    echo $JOB_ID/${file} >> ${task_name}_output_files
+    if [ -f $file ]
+    then
+      echo 'Found a *.dx file:' $file
+      echo $JOB_ID/${file} >> ${task_name}_status
+      echo $JOB_ID/${file} >> ${task_name}_output_files
+
+      echo 'Converting to *.cube file:' $pqr_prefix'.cube'
+      python ../dx2cube.py $file $pqr_name $pqr_prefix.cube
+      if [ -f $pqr_prefix.cube ]; then
+        echo $JOB_ID/${pqr_prefix}.cube >> ${task_name}_output_files
+        echo 'Conversion complete:' $pqr_prefix'.cube'
+      fi
+    fi
   done
 
   echo $JOB_ID/apbs_stdout.txt >> ${task_name}_status
