@@ -103,9 +103,7 @@ class TaskHandler:
                             response = post_response.json() # could probably just access/pass along raw data
                         elif post_response.status_code == 500:
                             http_status = post_response.status_code
-                            response = {
-                                'error': 'There was an error within the service. Please try again later'
-                            }
+                            response = post_response.json()
                     else:
                         '''Construct error response'''
                         http_status = 400

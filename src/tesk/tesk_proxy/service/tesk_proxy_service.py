@@ -37,33 +37,42 @@ def submit_tesk_action(job_id, task_name):
             }
 
             if task_name == 'apbs':
-                # TODO: wrap in try/except; set response/http_code when
-                #   initializing apbs_runner.Runner()
-                if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
-                    infile_name = request.json['filename']
-                    runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, infile_name=infile_name)
-                    redirectURL = runner.start(STORAGE_HOST, TESK_HOST)
-                    
-                    # Update response with URL to monitor on a browser
-                    response['jobURL'] = redirectURL
-                    
-                else:
-                    form = request.json
-                    for key in form.keys():
-                        # unravels output parameters from form
-                        if key == 'output_scalar':
-                            for option in form[key]:
-                                form[option] = option
-                            form.pop('output_scalar')
-                        elif not isinstance(form[key], str):
-                            form[key] = str(form[key])
+                # TODO: wrap in try/except; set response/http_code when initializing apbs_runner.Runner()
+                try:
+                    if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
+                        infile_name = request.json['filename']
+                        runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, infile_name=infile_name)
+                        redirectURL = runner.start(STORAGE_HOST, TESK_HOST)
+                        
+                        # Update response with URL to monitor on a browser
+                        response['jobURL'] = redirectURL
+                        
+                    else:
+                        form = request.json
+                        for key in form.keys():
+                            # unravels output parameters from form
+                            if key == 'output_scalar':
+                                for option in form[key]:
+                                    form[option] = option
+                                form.pop('output_scalar')
+                            elif not isinstance(form[key], str):
+                                form[key] = str(form[key])
 
-                    runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, form=form)
-                    redirectURL = runner.start(STORAGE_HOST, TESK_HOST)
+                        runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, form=form)
+                        redirectURL = runner.start(STORAGE_HOST, TESK_HOST)
 
-                    # Update response with URL to monitor on a browser
-                    response['jobURL'] = redirectURL
-                    http_status = 202
+                        # Update response with URL to monitor on a browser
+                        response['jobURL'] = redirectURL
+                        http_status = 202
+                except Exception as err:
+                    print('%s:'%type(err).__name__ , err, file=sys.stderr) # TODO: construct as log message
+                    response['message'] = None
+                    response['error'] = ('Internal error while processing request. '
+                                         'If error persists, please report through usual channels (email, issues, etc.)')
+                    http_status = 500
+
+                    # print traceback for debugging
+                    print(traceback.format_exc(), file=sys.stderr) # TODO: construct as log message
 
             elif task_name == 'pdb2pqr':
                 try:

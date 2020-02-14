@@ -80,7 +80,7 @@ class WorkflowHandler:
 
             #TODO: write handler for a fail case if Task Service sends non-202 response
             #Solution: just pass along status/response from task service
-            elif task_response.status_code in [400, 500]:
+            elif task_response.status_code in [400, 500]: # may want to predefine [400, 500] to avoid reinstantiating per request
                 http_status_code = task_response.status_code
                 response = task_response.json()
             else:
