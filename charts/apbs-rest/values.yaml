@@ -37,6 +37,9 @@ teskproxy:
     tag: latest
     #pullPolicy: IfNotPresent
     pullPolicy: Always
+  env:
+    workloadPullPolicy: Always
+    volcanoNamespace: volcano-system
 
 autofill:
   image:

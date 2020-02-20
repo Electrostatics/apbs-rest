@@ -35,6 +35,8 @@ spec:
             value: /id/
           - name: AUTOFILL_URL
             value: /autofill
+          - name: VIZ_URL
+            value: /viz
           ports:
             - name: http
               containerPort: 80

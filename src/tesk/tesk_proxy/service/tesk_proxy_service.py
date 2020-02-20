@@ -9,6 +9,7 @@ tesk_proxy = Blueprint('tesk_proxy', __name__)
 PDB2PQR_BUILD_PATH = os.environ.get('PDB2PQR_BUILD_PATH')
 STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5001')
 TESK_HOST = os.environ.get('TESK_HOST', 'http://localhost:5001')
+IMAGE_PULL_POLICY = os.environ.get('IMAGE_PULL_POLICY', 'Always')
 
 if PDB2PQR_BUILD_PATH is not None:
     sys.path.append(PDB2PQR_BUILD_PATH)
@@ -42,7 +43,7 @@ def submit_tesk_action(job_id, task_name):
                     if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
                         infile_name = request.json['filename']
                         runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, infile_name=infile_name)
-                        redirectURL = runner.start(STORAGE_HOST, TESK_HOST)
+                        redirectURL = runner.start(STORAGE_HOST, TESK_HOST, IMAGE_PULL_POLICY)
                         
                         # Update response with URL to monitor on a browser
                         response['jobURL'] = redirectURL
@@ -59,7 +60,7 @@ def submit_tesk_action(job_id, task_name):
                                 form[key] = str(form[key])
 
                         runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, form=form)
-                        redirectURL = runner.start(STORAGE_HOST, TESK_HOST)
+                        redirectURL = runner.start(STORAGE_HOST, TESK_HOST, IMAGE_PULL_POLICY)
 
                         # Update response with URL to monitor on a browser
                         response['jobURL'] = redirectURL
@@ -78,7 +79,7 @@ def submit_tesk_action(job_id, task_name):
                 try:
                     form = request.json
                     runner = pdb2pqr_runner.Runner(form, request.files, STORAGE_HOST, job_id=job_id)
-                    redirectURL = runner.start(STORAGE_HOST, TESK_HOST)
+                    redirectURL = runner.start(STORAGE_HOST, TESK_HOST, IMAGE_PULL_POLICY)
 
                     # Update response with URL to monitor on a browser
                     response['jobURL'] = redirectURL

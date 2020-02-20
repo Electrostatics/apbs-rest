@@ -9,6 +9,8 @@ from service.legacy.src.utilities import (getTrackingScriptString,
                                                 startLogFile,
                                                 resetLogFile)
 
+# from weboptions import WebOptionsError
+
 def fieldStorageToDict(form):
     """ Converts the CGI input from the web interface to a dictionary """
     apbsOptions = {'writeCheck':0}
@@ -338,7 +340,7 @@ def pqrFileCreator(apbsOptions):
     input.write('quit')
     input.close()
 
-def redirector(logTime):
+def redirector(logTime, jobtype=None):
     # if (str(logTime) != "False") and (str(logTime) != "notenoughmem"):
     #     startLogFile(logTime, 'apbs_start_time', str(time.time()))
     #     resetLogFile(logTime, 'apbs_end_time')
@@ -347,9 +349,14 @@ def redirector(logTime):
 #        starttimefile.close()
         
     redirectWait = 3
+
+    jobtype_query = ''
+    if jobtype is not None:
+        jobtype_query = '&jobtype=%s' % jobtype
     
-    redirectURL = "{website}jobstatus?jobid={jobid}".format(website=WEBSITE, 
-                                                                                jobid=logTime)
+    redirectURL = "{website}jobstatus?jobid={jobid}{jobtype}".format(website=WEBSITE, 
+                                                                     jobid=logTime,
+                                                                     jobtype=jobtype_query)
 
 #     string = """
 # <html> 

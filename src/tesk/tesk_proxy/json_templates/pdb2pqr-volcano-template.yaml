@@ -1,0 +1,106 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  name: task-{{job_id}}-pdb2pqr
+  namespace: {{namespace}}
+spec:
+  minAvailable: 1
+  # ttlSecondsAfterFinished: 100
+  schedulerName: volcano
+  maxRetry: 2
+  backoffLimit: 2
+  plugins:
+    ssh: []
+    svc: []
+  tasks:
+    - replicas: 1
+      name: run-apbs
+      policies:
+        - event: TaskCompleted
+          action: CompleteJob
+      template:
+        spec:
+          # restartPolicy: OnFailure
+          restartPolicy: Never
+          initContainers:
+            # Download container
+            - command:
+                - python
+                - ../download_input_files.py
+                # - sample.pdb
+                # Add addtional elements to this command array
+              env:
+                - name: JOB_ID
+                  value: {{job_id}}
+                - name: STORAGE_HOST
+                  # value: http://apbs-rest-test.westus2.cloudapp.azure.com/storage
+                  value: {{storage_url}} # change env_Name to STORAGE_URL
+              resources:
+                  requests:
+                    memory: "100Mi"
+                    cpu: "100m"
+                  limits:
+                    memory: "100Mi"
+                    cpu: "100m"
+              image: electrostatics/apbs-downloader:latest
+              imagePullPolicy: {{image_pull_policy}}
+              name: apbs-rest-downloader
+              workingDir: /app/run
+              volumeMounts:
+              - mountPath: /app/run
+                name: apbs-volume
+                
+            # APBS/PDB2PQR execution container
+            - command:
+                - bash
+                - -c
+                - |
+                  /app/builds/pdb2pqr/pdb2pqr.py {{command_line_args}} > pdb2pqr_stdout.txt 2> pdb2pqr_stderr.txt
+              resources:
+                  requests:
+                    memory: "512Mi"
+                    cpu: "1000m"
+                  limits:
+                    memory: "512Mi"
+                    cpu: "1000m"
+              image: electrostatics/pdb2pqr-bin:latest
+              imagePullPolicy: {{image_pull_policy}}
+              name: apbs-executor
+              workingDir: /app/run
+              volumeMounts:
+              - mountPath: /app/run
+                name: apbs-volume
+
+
+          containers:
+            # Upload container
+            - command:
+                - sh
+                - -c
+                - |
+                  ../generate_final_status.sh pdb2pqr {{output_basename}}
+                  ls -la
+                  python ../upload_output_files.py
+              env:
+                - name: JOB_ID
+                  value: {{job_id}}
+                - name: STORAGE_HOST
+                  # value: http://apbs-rest-test.westus2.cloudapp.azure.com/storage
+                  value: {{storage_url}}
+              resources:
+                  requests:
+                    memory: "100Mi"
+                    cpu: "100m"
+                  limits:
+                    memory: "100Mi"
+                    cpu: "100m"
+              image: electrostatics/apbs-uploader:latest
+              imagePullPolicy: {{image_pull_policy}}
+              name: apbs-rest-uploader
+              workingDir: /app/run
+              volumeMounts:
+              - mountPath: /app/run
+                name: apbs-volume
+          volumes:
+            - name: apbs-volume
+              emptyDir: {}

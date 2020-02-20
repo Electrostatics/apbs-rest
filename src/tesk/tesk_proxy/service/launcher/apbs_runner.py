@@ -2,8 +2,13 @@ import string, sys, os, time, errno, shutil, tempfile, urllib, copy, pickle, glo
 import subprocess
 from multiprocessing import Process
 
+from pprint import pprint
 from requests import get, post
-from json import loads
+from json import loads, dumps
+
+import kubernetes.client
+from kubernetes import config
+from kubernetes.client.rest import ApiException
 
 # from tmp_task_exec import executor_utils
 from service import tesk_proxy_utils
@@ -38,6 +43,9 @@ class Runner:
         self.read_file_list = []
         # self.read_file_list = None
 
+        # Load kubeconfig
+        config.load_incluster_config()
+        # config.load_kube_config()
 
         if infile_name is not None:
             self.infile_name = infile_name
@@ -166,7 +174,7 @@ class Runner:
             except KeyError:
                 pass
 
-    def run_job(self, storage_host, tesk_host):
+    def run_job(self, storage_host, tesk_host, image_pull_policy):
         job_id = self.job_id
         if self.infile_name is not None:
             infile_name = self.infile_name
@@ -184,24 +192,53 @@ class Runner:
         print('infile name is: '+infile_name)
         upload_list = ['apbs_status', 'apbs_start_time', infile_name]
         tesk_proxy_utils.send_to_storage_service(storage_host, job_id, upload_list, os.path.join(INSTALLDIR, TMPDIR))
-
+        
+        """
         # TESK request headers
         headers = {}
         headers['Content-Type'] = 'application/json'
         headers['Accept'] = 'application/json'
         apbs_json = tesk_proxy_utils.apbs_json_config(job_id, infile_name, storage_host, os.path.join(INSTALLDIR, TMPDIR))
-
-        from pprint import pprint
-        pprint(apbs_json)
-
+        # pprint(apbs_json)
         url = tesk_host + '/v1/tasks'
+        # print( dumps(pdb2pqr_json_dict, indent=2) )
+        """        
+
+        # Set up job to send to Volcano.sh
+        volcano_namespace = os.environ.get('VOLCANO_NAMESPACE')
+        apbs_kube_dict = tesk_proxy_utils.apbs_yaml_config(job_id, volcano_namespace, image_pull_policy, infile_name, storage_host, os.path.join(INSTALLDIR, TMPDIR))
+        # print( dumps(apbs_kube_dict, indent=2) )
+
+        # create an instance of the API class
+        configuration = kubernetes.client.Configuration()
+        api_instance = kubernetes.client.CustomObjectsApi(kubernetes.client.ApiClient(configuration))
+        group = 'batch.volcano.sh' # str | The custom resource's group name
+        version = 'v1alpha1' # str | The custom resource's version
+        namespace = volcano_namespace # str | The custom resource's namespace
+        plural = 'jobs' # str | The custom resource's plural name. For TPRs this would be lowercase plural kind.
+        # body = kubernetes.client.UNKNOWN_BASE_TYPE() # UNKNOWN_BASE_TYPE | The JSON schema of the Resource to create.
+        pretty = 'true' # str | If 'true', then the output is pretty printed. (optional)
         
-        #TODO: create handler in case of non-200 response
-        response = post(url, headers=headers, json=apbs_json)
-        print(response.content)
+        body = apbs_kube_dict
+
+        try:
+            api_response = api_instance.create_namespaced_custom_object(group, version, namespace, plural, body, pretty=pretty)
+
+            # print('\n\n\n')
+            pprint(api_response)
+            # print(type(api_response))
+        except ApiException as e:
+            print("Exception when calling CustomObjectsApi->create_namespaced_custom_object: %s\n" % e)
+
+                
+        # raise Exception('Hopping out here. Job not submitted')
+
+        # #TODO: create handler in case of non-200 response
+        # response = post(url, headers=headers, json=apbs_json)
+        # print(response.content)
         return
 
-    def start(self, storage_host, tesk_host):
+    def start(self, storage_host, tesk_host, image_pull_policy):
         # pass
         job_id = self.job_id
 
@@ -216,10 +253,10 @@ class Runner:
         # p = Process(target=self.run_job, args=(storage_host,))
         # p.start()
 
-        self.run_job(storage_host, tesk_host)
+        self.run_job(storage_host, tesk_host, image_pull_policy)
 
-        print('Getting redirector')
-        redirect = redirector(job_id)
+        # print('Getting redirector')
+        redirect = redirector(job_id, 'apbs')
 
         # Upload initial files to storage service
         # file_list = [

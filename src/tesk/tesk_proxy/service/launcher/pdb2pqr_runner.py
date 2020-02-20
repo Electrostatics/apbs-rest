@@ -4,6 +4,11 @@ import requests
 import logging
 from multiprocessing import Process
 from pprint import pprint
+from json import dumps
+
+import kubernetes.client
+from kubernetes import config
+from kubernetes.client.rest import ApiException
 
 from service import tesk_proxy_utils
 from service.legacy.pdb2pqr_old_utils import redirector, setID
@@ -31,6 +36,10 @@ class Runner:
         self.weboptions = None
         self.invoke_method = None
         self.cli_params = None
+
+        # Load kubeconfig
+        config.load_incluster_config()
+        # config.load_kube_config()
 
         self.starttime = time.time()
         if job_id is None:
@@ -107,7 +116,7 @@ class Runner:
         statusfile.close()
 
 
-    def run_job(self, job_id, storage_host, tesk_host):
+    def run_job(self, job_id, storage_host, tesk_host, image_pull_policy):
         pqr_name = None
         # print(self.weboptions.pdbfilestring)
         # pdblist, errlist = readPDB(self.weboptions.pdbfile)
@@ -199,26 +208,53 @@ class Runner:
 
         tesk_proxy_utils.send_to_storage_service(storage_host, job_id, upload_list, os.path.join(INSTALLDIR, TMPDIR))
 
+        """
         # TESK request headers
         headers = {}
         headers['Content-Type'] = 'application/json'
         headers['Accept'] = 'application/json'
-        pdb2pqr_json = tesk_proxy_utils.pdb2pqr_json_config(job_id, command_line_args, storage_host, os.path.join(INSTALLDIR, TMPDIR), pqr_name=pqr_name)
-
-
-        # from pprint import pprint
-        pprint(pdb2pqr_json)
+        pdb2pqr_json_dict = tesk_proxy_utils.pdb2pqr_json_config(job_id, command_line_args, storage_host, os.path.join(INSTALLDIR, TMPDIR), pqr_name=pqr_name)
 
         url = tesk_host + '/v1/tasks/'
         print(url)
+        # print( dumps(pdb2pqr_json_dict, indent=2) )
+        """        
+
+        # Set up job to send to Volcano.sh
+        volcano_namespace = os.environ.get('VOLCANO_NAMESPACE')
+        pdb2pqr_kube_dict = tesk_proxy_utils.pdb2pqr_yaml_config(job_id, volcano_namespace, image_pull_policy, command_line_args, storage_host, os.path.join(INSTALLDIR, TMPDIR), pqr_name=pqr_name)
+        # print( dumps(pdb2pqr_kube_dict, indent=2) )
+
+        # create an instance of the API class
+        configuration = kubernetes.client.Configuration()
+        api_instance = kubernetes.client.CustomObjectsApi(kubernetes.client.ApiClient(configuration))
+        group = 'batch.volcano.sh' # str | The custom resource's group name
+        version = 'v1alpha1' # str | The custom resource's version
+        namespace = volcano_namespace # str | The custom resource's namespace
+        plural = 'jobs' # str | The custom resource's plural name. For TPRs this would be lowercase plural kind.
+        # body = kubernetes.client.UNKNOWN_BASE_TYPE() # UNKNOWN_BASE_TYPE | The JSON schema of the Resource to create.
+        pretty = 'true' # str | If 'true', then the output is pretty printed. (optional)
         
-        #TODO: create handler in case of non-200 response
-        response = requests.post(url, headers=headers, json=pdb2pqr_json)
+        body = pdb2pqr_kube_dict
+
+        try:
+            api_response = api_instance.create_namespaced_custom_object(group, version, namespace, plural, body, pretty=pretty)
+
+            # print('\n\n\n')
+            pprint(api_response)
+            # print(type(api_response))
+        except ApiException as e:
+            print("Exception when calling CustomObjectsApi->create_namespaced_custom_object: %s\n" % e)
+
+                
+        # raise Exception('Hopping out here. Job not submitted')
+        # #TODO: create handler in case of non-200 response
+        # response = requests.post(url, headers=headers, json=pdb2pqr_json_dict)
         
-        print(response.content)
+        # print(response.content)
         return
 
-    def start(self, storage_host, tesk_host):
+    def start(self, storage_host, tesk_host, image_pull_policy):
         # Acquire job ID
         self.starttime = time.time()
         # job_id = setID(self.starttime)
@@ -232,10 +268,10 @@ class Runner:
         # p = Process(target=self.run_job, args=(job_id, storage_host))
         # p.start()
 
-        self.run_job(job_id, storage_host, tesk_host)
+        self.run_job(job_id, storage_host, tesk_host, image_pull_policy)
 
         # Upload initial files to storage service
-        redirect = redirector(job_id, self.weboptions)
+        redirect = redirector(job_id, self.weboptions, 'pdb2pqr')
         # file_list = [
         #     'typemap',
         #     'pdb2pqr_status',

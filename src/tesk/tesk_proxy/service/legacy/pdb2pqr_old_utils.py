@@ -26,7 +26,7 @@ def setID(time):
     return id
 
 
-def redirector(name, weboptions):
+def redirector(name, weboptions, jobtype=None):
     """
         Prints a page which redirects the user to querystatus.cgi and writes starting time to file
     """
@@ -35,11 +35,15 @@ def redirector(name, weboptions):
 
     utilities.startLogFile(name, 'pdb2pqr_start_time', str(time.time()))
     
+    jobtype_query = ''
+    if jobtype is not None:
+        jobtype_query = '&jobtype=%s' % jobtype
+    
     jobid = name
     
     if weboptions is None:
         ui_url = os.getenv("UI_URL", "http://localhost:3000")
-        redirectURL = "{website}jobstatus?jobid={jobid}".format(website=ui_url, jobid=jobid)
+        redirectURL = "{website}jobstatus?jobid={jobid}{jobtype}".format(website=ui_url, jobid=jobid, jobtype=jobtype_query)
     else:
         analiticsDict = weboptions.getOptions()
         
@@ -69,8 +73,7 @@ def redirector(name, weboptions):
                                                                 action=event, 
                                                                 label=events[event]) 
             
-        redirectURL = "{website}jobstatus?jobid={jobid}".format(website=WEBSITE, 
-                                                                                    jobid=jobid)
+        redirectURL = "{website}jobstatus?jobid={jobid}{jobtype}".format(website=WEBSITE, jobid=jobid, jobtype=jobtype_query)
 
         #     string = """
         # <html>

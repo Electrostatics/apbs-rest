@@ -22,6 +22,7 @@ spec:
         release: {{ .Release.Name }}
         service: tesk-proxy
     spec:
+      serviceAccountName: {{ template "apbsrest.fullname" . }}-tesk-proxy
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.teskproxy.image.repository }}:{{ .Values.teskproxy.image.tag }}"
@@ -37,6 +38,10 @@ spec:
             value: http://{{ template "apbsrest.fullname" . }}
           - name: FLASK_RUN_PORT
             value: "5007"
+          - name: IMAGE_PULL_POLICY
+            value: {{ .Values.teskproxy.env.workloadPullPolicy }}
+          - name: VOLCANO_NAMESPACE
+            value: {{ .Values.teskproxy.env.volcanoNamespace }}
           ports:
             - name: http
               containerPort: 5007

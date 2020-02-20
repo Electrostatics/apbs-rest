@@ -7,6 +7,11 @@ try:
 except:
     from StringIO import StringIO
 
+from kubernetes import client, config
+import yaml
+import kubernetes.client
+from kubernetes.client.rest import ApiException
+
 def send_to_storage_service(storage_host, job_id, file_list, local_upload_dir):
     if sys.version_info[0] == 2:
         stdout.write('Uploading to storage container... \n')
@@ -129,6 +134,89 @@ def apbs_json_config(job_id, infile_name, storage_host, local_upload_dir):
     send_to_storage_service(storage_host, job_id, [inputfile_list_name], local_upload_dir)
 
     return json_dict
+
+# def apbs_yaml_config(job_id, kube_namespace, infile_name, storage_host):
+def apbs_yaml_config(job_id, kube_namespace, image_pull_policy, infile_name, storage_host, local_upload_dir):
+    # Load job template JSON string; insert job_id and storage_host into
+    template_name = 'apbs-volcano-template.yaml'
+    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', template_name)).read() 
+    # json_template_str = open(os.path.join(os.getcwd(), 'apbs', template_name)).read() 
+    json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
+    json_template_str = json_template_str.replace(b'{{storage_url}}', '%s/api/storage' % storage_host)
+    # json_template_str = json_template_str.replace(b'{{storage_host}}', '%s/api/storage' % storage_host)
+    json_template_str = json_template_str.replace(b'{{infile}}', infile_name)
+    json_template_str = json_template_str.replace(b'{{namespace}}', kube_namespace)
+    json_template_str = json_template_str.replace(b'{{image_pull_policy}}', image_pull_policy) 
+
+    # Append required download files to downloader container
+    # infile_name = 'apbsinput.in'
+    download_list = apbs_extract_input_files(job_id, infile_name, storage_host)
+    download_list = download_list + [infile_name]
+    
+    # append additional params to the download list through YAML
+    kube_obj_dict = yaml.load(json_template_str, Loader=yaml.FullLoader)
+    container_command = kube_obj_dict['spec']['tasks'][0]['template']['spec']['initContainers'][0]['command']
+    kube_obj_dict['spec']['tasks'][0]['template']['spec']['initContainers'][0]['command'] = container_command + download_list
+
+    # Export and upload list of input files
+    job_dir = '%s%s' % (local_upload_dir, job_id)
+    inputfile_list_name = export_input_file_list(download_list, job_id, 'apbs', job_dir)
+    send_to_storage_service(storage_host, job_id, [inputfile_list_name], local_upload_dir)
+
+    return kube_obj_dict
+
+
+# def pdb2pqr_yaml_config(job_id, kube_namespace, command_line_args, storage_host, pqr_name=None):
+def pdb2pqr_yaml_config(job_id, kube_namespace, image_pull_policy, command_line_args, storage_host, local_upload_dir, pqr_name=None):
+    # Load job template JSON string; insert job_id and storage_host into
+    # template_name = 'pdb2pqr-volcano-template.yaml'
+    template_name = 'pdb2pqr-volcano-template.yaml'
+    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', template_name)).read()
+    json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
+    json_template_str = json_template_str.replace(b'{{storage_url}}', '%s/api/storage' % storage_host)
+    json_template_str = json_template_str.replace(b'{{namespace}}', kube_namespace)
+    json_template_str = json_template_str.replace(b'{{image_pull_policy}}', image_pull_policy) 
+
+    # Insert PDB2PQR command line arguments
+    json_template_str = json_template_str.replace(b'{{command_line_args}}', command_line_args) 
+
+    # Get pqr file basename, insert as upload_results.sh argument
+    arg_list = command_line_args.split()
+    pdb_filename = arg_list[-2]
+    logging.info('pqr filename: %s' % pqr_name)
+    logging.info('type(pqr_name): %s' % type(pqr_name))
+    if isinstance(pqr_name, unicode) and len(pqr_name) > 0:
+        logging.info('os.path.splitext(pqr_name)[0]: %s' % os.path.splitext(pqr_name)[0])
+        json_template_str = json_template_str.replace(b'{{output_basename}}', os.path.splitext(pqr_name)[0] )
+    else:
+        json_template_str = json_template_str.replace(b'{{output_basename}}', job_id )
+
+    # Extract user forcefield, user names, and ligand files; prepare download list for container
+    download_list = []
+    for arg in arg_list:
+        if '--userff' in arg:
+            userff_filename = arg.split('=')[1]
+            download_list.append(userff_filename)
+        elif '--usernames' in arg:
+            usernames_filename = arg.split('=')[1]
+            download_list.append(usernames_filename)
+        elif '--ligand' in arg:
+            ligand_filename = arg.split('=')[1]
+            download_list.append(ligand_filename)
+    
+    # Construct list of files for download container
+    # download_list = [pdb_filename]
+    download_list.append(pdb_filename)
+    kube_obj_dict = yaml.load(json_template_str, Loader=yaml.FullLoader)
+    download_container_command = kube_obj_dict['spec']['tasks'][0]['template']['spec']['initContainers'][0]['command']
+    kube_obj_dict['spec']['tasks'][0]['template']['spec']['initContainers'][0]['command'] = download_container_command + download_list
+
+    # Export and upload list of input files
+    job_dir = '%s%s' % (local_upload_dir, job_id)
+    inputfile_list_name = export_input_file_list(download_list, job_id, 'pdb2pqr', job_dir)
+    send_to_storage_service(storage_host, job_id, [inputfile_list_name], local_upload_dir)
+
+    return kube_obj_dict
 
 def pdb2pqr_json_config(job_id, command_line_args, storage_host, local_upload_dir, pqr_name=None):
     # Load job template JSON string; insert job_id and storage_host into
