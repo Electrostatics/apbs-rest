@@ -39,7 +39,7 @@ teskproxy:
     pullPolicy: Always
   env:
     workloadPullPolicy: Always
-    volcanoNamespace: volcano-system
+    # volcanoNamespace: volcano-system
 
 autofill:
   image:

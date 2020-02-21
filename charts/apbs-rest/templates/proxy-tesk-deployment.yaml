@@ -41,7 +41,8 @@ spec:
           - name: IMAGE_PULL_POLICY
             value: {{ .Values.teskproxy.env.workloadPullPolicy }}
           - name: VOLCANO_NAMESPACE
-            value: {{ .Values.teskproxy.env.volcanoNamespace }}
+            value: {{ .Release.Namespace }}
+            # value: {{ .Values.teskproxy.env.volcanoNamespace }}
           ports:
             - name: http
               containerPort: 5007

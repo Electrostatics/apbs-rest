@@ -3,3 +3,10 @@ appVersion: "1.0"
 description: A Helm chart for Kubernetes
 name: apbs-rest
 version: 0.1.0
+
+# dependencies:
+#     - name: volcano
+#       version: 0.3
+#       namespace: volcano-system
+#     #   repository: https://github.com/volcano-sh/volcano/releases/download/v0.3/volcano-0.3-linux-gnu.tar.gz
+#     #   repository: https://github.com/volcano-sh/volcano/tree/release-0.3/installer/helm/chart/volcano
