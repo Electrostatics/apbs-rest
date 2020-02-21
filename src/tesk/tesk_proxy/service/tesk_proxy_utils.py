@@ -114,7 +114,7 @@ def apbs_extract_input_files(job_id, infile_name, storage_host):
 # def apbs_json_config(job_id, command_line_args, storage_host):
 def apbs_json_config(job_id, infile_name, storage_host, local_upload_dir):
     # Load job template JSON string; insert job_id and storage_host into
-    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', 'apbs_v2.json')).read() 
+    json_template_str = open(os.path.join(os.getcwd(), 'job_templates', 'apbs_v2.json')).read() 
     json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
     json_template_str = json_template_str.replace(b'{{storage_host}}', '%s/api/storage' % storage_host)
     # json_template_str = json_template_str.replace(b'{{infile}}', command_line_args)
@@ -139,7 +139,7 @@ def apbs_json_config(job_id, infile_name, storage_host, local_upload_dir):
 def apbs_yaml_config(job_id, kube_namespace, image_pull_policy, infile_name, storage_host, local_upload_dir):
     # Load job template JSON string; insert job_id and storage_host into
     template_name = 'apbs-volcano-template.yaml'
-    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', template_name)).read() 
+    json_template_str = open(os.path.join(os.getcwd(), 'job_templates', template_name)).read() 
     # json_template_str = open(os.path.join(os.getcwd(), 'apbs', template_name)).read() 
     json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
     json_template_str = json_template_str.replace(b'{{storage_url}}', '%s/api/storage' % storage_host)
@@ -171,7 +171,7 @@ def pdb2pqr_yaml_config(job_id, kube_namespace, image_pull_policy, command_line_
     # Load job template JSON string; insert job_id and storage_host into
     # template_name = 'pdb2pqr-volcano-template.yaml'
     template_name = 'pdb2pqr-volcano-template.yaml'
-    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', template_name)).read()
+    json_template_str = open(os.path.join(os.getcwd(), 'job_templates', template_name)).read()
     json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
     json_template_str = json_template_str.replace(b'{{storage_url}}', '%s/api/storage' % storage_host)
     json_template_str = json_template_str.replace(b'{{namespace}}', kube_namespace)
@@ -220,7 +220,7 @@ def pdb2pqr_yaml_config(job_id, kube_namespace, image_pull_policy, command_line_
 
 def pdb2pqr_json_config(job_id, command_line_args, storage_host, local_upload_dir, pqr_name=None):
     # Load job template JSON string; insert job_id and storage_host into
-    json_template_str = open(os.path.join(os.getcwd(), 'json_templates', 'pdb2pqr_v2.json')).read()
+    json_template_str = open(os.path.join(os.getcwd(), 'job_templates', 'pdb2pqr_v2.json')).read()
     json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
     json_template_str = json_template_str.replace(b'{{storage_host}}', '%s/api/storage' % storage_host)
 

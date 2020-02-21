@@ -229,6 +229,7 @@ class Runner:
             # print(type(api_response))
         except ApiException as e:
             print("Exception when calling CustomObjectsApi->create_namespaced_custom_object: %s\n" % e)
+            raise
 
                 
         # raise Exception('Hopping out here. Job not submitted')
