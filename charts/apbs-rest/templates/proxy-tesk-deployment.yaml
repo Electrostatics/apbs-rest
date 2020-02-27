@@ -43,6 +43,10 @@ spec:
           - name: VOLCANO_NAMESPACE
             value: {{ .Release.Namespace }}
             # value: {{ .Values.teskproxy.env.volcanoNamespace }}
+          - name: APBS_JOB_MEM_LIMIT
+            value: {{ .Values.teskproxy.env.apbsMemoryLimit }}
+          - name: PDB2PQR_JOB_MEM_LIMIT
+            value: {{ .Values.teskproxy.env.pdb2pqrMemoryLimit }}
           ports:
             - name: http
               containerPort: 5007

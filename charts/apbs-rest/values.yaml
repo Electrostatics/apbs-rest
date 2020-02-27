@@ -39,6 +39,8 @@ teskproxy:
     pullPolicy: Always
   env:
     workloadPullPolicy: Always
+    apbsMemoryLimit: 8192Mi
+    pdb2pqrMemoryLimit: 512Mi
     # volcanoNamespace: volcano-system
 
 autofill:
