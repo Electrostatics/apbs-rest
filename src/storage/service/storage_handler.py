@@ -105,17 +105,23 @@ class StorageHandler:
 
     def post(self, object_name, job_id, file_name=None):
         # EXTENSION_WHITELIST = set(['pqr', 'pdb', 'in', 'p'])
-        response = 'Success'
+        response = { 'status': None, 'message': None }
+        # response = 'Success'
         http_response_code = 201
 
         try:
             file_data = request.files['file_data']
-        except:
+        except KeyError:
             # fallback in case file data is in body
             file_data = FileStorage(
                 stream=BytesIO(request.data),
                 filename=file_name,
             )
+        except:
+            http_response_code = 500
+            response['status'] = 'failed'
+            response['message'] = "Could not find data to upload.  File data should be in request body or form files with key='file_data'"
+            return response, http_response_code
 
         if file_data.filename:
             uploaded_file_name = secure_filename(file_data.filename)
@@ -126,8 +132,14 @@ class StorageHandler:
 
                 # Returns internal error code if Minio connection isn't successful
                 if etag_str is None:
-                    response = "File '%s' could not be uploaded at this time. Please try again later."
+                    response['status'] = 'failed'
+                    response['message'] = "File '%s' could not be uploaded at this time. Please try again later." % (file_name)
                     http_response_code = 500
+                else:
+                    # Create success response
+                    response['status'] = 'success'
+                    response['message'] = "Data uploaded to %s/%s." % (job_id, file_name)
+                    http_response_code = 201
 
         return response, http_response_code
 
@@ -138,7 +150,7 @@ class StorageHandler:
                 If file_name is present, only that file the given job_id is deleted
                 Otherwise, ALL FILES for a given job_id are deleted (like deleting a directory)
         '''
-        response = ''
+        response = { 'status': None, 'message': None }
         http_response_code = 204
 
         object_list = []
@@ -155,12 +167,19 @@ class StorageHandler:
 
         try:
             self.storageClient.remove_objects(JOB_BUCKET_NAME, object_list)
+            # http_response_code = 200 #TODO: adjust unit tests before changing code to 200
+            # response['status'] = 'success'
+            # response['message'] = 'Object(s) successfully deleted'
+            http_response_code = 204
+            response = ''
         except ResponseError:
             http_response_code = 500
-            response = 'Request for deletion could not be completed at this time. Please try again later'
+            response['status'] = 'failed'
+            response['message'] = 'Request for deletion could not be completed at this time. Please try again later'
         except Exception as err:
             http_response_code = 500
-            response = 'Internal error while completing request.'
+            response['status'] = 'failed'
+            response['message'] = 'Internal error while completing request.'
             print(err, file=sys.stderr) #TODO: change to log message later
         finally:
             return response, http_response_code
