@@ -1,0 +1,7 @@
+# mirror requirements.txt
+-r requirements.txt
+
+# additional packages for testing
+pylint==2.3.1
+pytest==5.3.1
+pytest-xdist==1.30.0

@@ -25,17 +25,28 @@ class StorageHandler:
         if file_name:
             ''' Gets single file if file_name is not None '''
             return_json = False
+            view_in_browser = False
+
             if 'json' in request.args.keys():
                 if request.args['json'].lower() == 'true':
                     return_json = True
+            if 'view' in request.args.keys():
+                if request.args['view'].lower() == 'true':
+                    view_in_browser = True
 
             if not return_json:
                 '''send_file_from_directory'''
                 try:
                     file_path_in_cache = self.storageClient.fget_object(JOB_BUCKET_NAME, object_name)
                     file_dir = os.path.dirname(file_path_in_cache)
-                    response = send_from_directory(file_dir, os.path.basename(file_path_in_cache))
+
                     http_response_code = 200
+                    response = send_from_directory(file_dir, os.path.basename(file_path_in_cache))
+                    if view_in_browser:
+                        response.headers['Content-Disposition'] = 'inline'
+                    else:
+                        response.headers['Content-Disposition'] = 'attachment; filename="%s"' % file_name
+                    
                 except MaxRetryError:
                     response = 'Error in retrieving file\n'
                     http_response_code = 500

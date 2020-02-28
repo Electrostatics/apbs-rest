@@ -153,6 +153,7 @@ class StorageClient:
         """ Compares etags of bucket with MD5 hash of local
             Returns true if they match, false otherwise
         """
+        return False
         dir_name, file_name = object_name.split('/')
         path = os.path.join(self.cache_path, dir_name, file_name)
 
