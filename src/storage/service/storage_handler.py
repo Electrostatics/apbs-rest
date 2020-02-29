@@ -44,6 +44,7 @@ class StorageHandler:
                     response = send_from_directory(file_dir, os.path.basename(file_path_in_cache))
                     if view_in_browser:
                         response.headers['Content-Disposition'] = 'inline'
+                        response.headers['Content-Type'] = 'text/plain; charset=utf-8'
                     else:
                         response.headers['Content-Disposition'] = 'attachment; filename="%s"' % file_name
                     
