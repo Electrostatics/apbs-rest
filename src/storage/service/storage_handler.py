@@ -6,7 +6,7 @@ from flask import request, send_from_directory, make_response
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from urllib3.exceptions import MaxRetryError
-from minio.error import ResponseError
+from minio.error import ResponseError, NoSuchKey
 
 from . import storage_utils
 
@@ -24,8 +24,12 @@ class StorageHandler:
     def get(self, object_name, job_id, file_name=None):
         if file_name:
             ''' Gets single file if file_name is not None '''
+            response = ''
+            http_response_code = None
+
             return_json = False
             view_in_browser = False
+            check_file_existence = False
 
             if 'json' in request.args.keys():
                 if request.args['json'].lower() == 'true':
@@ -33,20 +37,31 @@ class StorageHandler:
             if 'view' in request.args.keys():
                 if request.args['view'].lower() == 'true':
                     view_in_browser = True
+            if 'exists' in request.args.keys():
+                if request.args['exists'].lower() == 'true':
+                    check_file_existence = True
 
             if not return_json:
                 '''send_file_from_directory'''
                 try:
-                    file_path_in_cache = self.storageClient.fget_object(JOB_BUCKET_NAME, object_name)
-                    file_dir = os.path.dirname(file_path_in_cache)
+                    if not check_file_existence:
+                        file_path_in_cache = self.storageClient.fget_object(JOB_BUCKET_NAME, object_name)
+                        file_dir = os.path.dirname(file_path_in_cache)
 
-                    http_response_code = 200
-                    response = send_from_directory(file_dir, os.path.basename(file_path_in_cache))
-                    if view_in_browser:
-                        response.headers['Content-Disposition'] = 'inline'
-                        response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+                        http_response_code = 200
+                        response = send_from_directory(file_dir, os.path.basename(file_path_in_cache))
+                        if view_in_browser:
+                            response.headers['Content-Disposition'] = 'inline'
+                            response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+                        else:
+                            response.headers['Content-Disposition'] = 'attachment; filename="%s"' % file_name
                     else:
-                        response.headers['Content-Disposition'] = 'attachment; filename="%s"' % file_name
+                        if self.storageClient.object_exists(JOB_BUCKET_NAME, object_name):
+                            http_response_code = 204
+                        else:
+                            http_response_code = 404
+                            response = 'File %s does not exist\n' % file_name
+                            return response, http_response_code
                     
                 except MaxRetryError:
                     response = 'Error in retrieving file\n'
@@ -59,17 +74,31 @@ class StorageHandler:
                     
             else:
                 try:
-                    file_str = self.storageClient.get_object(JOB_BUCKET_NAME, object_name)
-                    file_str_json = { object_name: file_str.decode('utf-8') }
-                    response = make_response( dumps(file_str_json) )
-                    response.headers['Content-Type'] = 'application/json'
-                    http_response_code = 200
+                    if not check_file_existence:
+                        file_str = self.storageClient.get_object(JOB_BUCKET_NAME, object_name)
+                        file_str_json = { object_name: file_str.decode('utf-8') }
+                        response = make_response( dumps(file_str_json) )
+                        response.headers['Content-Type'] = 'application/json'
+                        http_response_code = 200
+                    else:
+                        if self.storageClient.object_exists(JOB_BUCKET_NAME, object_name):
+                            http_response_code = 204
+                        else:
+                            response = {object_name: None}
+                            http_response_code = 404
+                            return response, http_response_code
 
                 except MaxRetryError:
                     json_string = {object_name: None}
                     response = make_response(dumps(json_string))
                     response.headers['Content-Type'] = 'application/json'
                     http_response_code = 500
+
+                except NoSuchKey as e:
+                    json_string = {object_name: None}
+                    response = make_response(dumps(json_string))
+                    response.headers['Content-Type'] = 'application/json'
+                    http_response_code = 404
 
                 except Exception as e:
                     # import traceback

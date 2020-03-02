@@ -1,6 +1,6 @@
 from __future__ import print_function
 from minio import Minio
-from minio.error import ResponseError
+from minio.error import ResponseError, NoSuchKey
 from shutil import rmtree
 import os, hashlib, sys, tarfile
 
@@ -16,6 +16,13 @@ class StorageClient:
         '''Utilize tempfile module in future'''
         if not os.path.exists(self.cache_path):
             os.makedirs(self.cache_path)
+
+    def object_exists(self, bucket_name, object_name):
+        try:
+            data = self.__minio_client.stat_object(bucket_name, object_name)
+            return True
+        except NoSuchKey:
+            return False
 
     def get_object(self, bucket_name, object_name, request_headers=None):
         data = None

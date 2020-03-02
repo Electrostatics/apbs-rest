@@ -1,9 +1,19 @@
 Dockerfile
-__pycache__
+
+# Wildcards
 *venv*
 *.http
 *.pyc
-.vscode
-.devcontainer
+
+# Files
 .env
+test_sym
+requirements-dev.txt
 start_minio.sh
+
+# Directories
+__pycache__/
+.vscode/
+.devcontainer/
+tests/
+.pytest_cache/
