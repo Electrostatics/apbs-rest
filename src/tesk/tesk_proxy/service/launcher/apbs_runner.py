@@ -35,6 +35,13 @@ class JobDirectoryExistsError(Exception):
     def __init__(self, expression):
         self.expression = expression
 
+class MissingFilesError(IOError):
+    # TODO: change superclass to FileNotFoundError on eventual Python3 upgrade
+    def __init__(self, message, file_list=[]):
+        super(IOError, self).__init__(message)
+        # super().__init__(message) #TODO: use this line on Python3 upgrade
+        self.missing_files = file_list
+
 class Runner:
     def __init__(self, storage_host, job_id=None, form=None, infile_name=None):
         self.job_id = None
@@ -74,6 +81,12 @@ class Runner:
 
         # downloading necessary files
         if infile_name is not None:
+
+            # Check if infile exists in storage; raise exception if not
+            exist_response = get('%s/api/storage/%s/%s?exists=true' % (storage_host, job_id, infile_name))
+            if not exist_response.ok:
+                raise MissingFilesError('Missing APBS input file. Please upload.', [infile_name])
+
             file_list = tesk_proxy_utils.apbs_extract_input_files(job_id, infile_name, storage_host)
 
             infile_dest_path = os.path.join(self.job_dir, infile_name)
@@ -107,6 +120,16 @@ class Runner:
             # self.read_file_list = file_list
             print(file_list)
             # raise Exception('GONNA jump ship here')
+
+            # Check if additional READ files exist in storage service
+            missing_files = []
+            for name in file_list:
+                resp = get('%s/api/storage/%s/%s?exists=true' % (storage_host, job_id, name))
+                if not resp.ok:
+                    missing_files.append(str(name))
+            if len(missing_files) > 0:
+                raise MissingFilesError('Please upload missing file(s) from READ section storage: %s' % str(missing_files), missing_files)
+                # raise FileNotFoundError('Unable to find READ files in storage: %s' % str(missing_files))
 
             print('-----downloading other files-----')
             for name in file_list:

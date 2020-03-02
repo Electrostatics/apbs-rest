@@ -42,6 +42,9 @@ def submit_tesk_action(job_id, task_name):
                 try:
                     if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
                         infile_name = request.json['filename']
+                        if infile_name is None:
+                            raise apbs_runner.MissingFilesError('No APBS input file specified.')
+
                         runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, infile_name=infile_name)
                         redirectURL = runner.start(STORAGE_HOST, TESK_HOST, IMAGE_PULL_POLICY)
                         
@@ -65,6 +68,18 @@ def submit_tesk_action(job_id, task_name):
                         # Update response with URL to monitor on a browser
                         response['jobURL'] = redirectURL
                         http_status = 202
+                
+                # except FileNotFoundError as err:
+                except apbs_runner.MissingFilesError as err:
+                    print('%s:'%type(err).__name__ , err, file=sys.stderr) # TODO: construct as log message
+                    response['message'] = None
+                    response['error'] = str(err)
+                    response['missing_files'] = err.missing_files
+                    http_status = 400
+
+                    # print traceback for debugging
+                    print(traceback.format_exc(), file=sys.stderr) # TODO: construct as log message
+
                 except Exception as err:
                     print('%s:'%type(err).__name__ , err, file=sys.stderr) # TODO: construct as log message
                     response['message'] = None
