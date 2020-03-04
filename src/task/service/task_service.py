@@ -32,6 +32,12 @@ def task_action(job_id, task_name):
 
     # Submit a task
     elif request.method == 'POST':
-        response, http_status = task_handler.post(job_id, task_name)
-        
+        try:
+            response, http_status = task_handler.post(job_id, task_name)
+        except:
+            response = {}
+            response['message'] = None
+            response['error'] = ('Internal error while processing request. '
+                                'If error persists, please report through usual channels (email, issues, etc.)')
+            http_status = 500
     return response, http_status

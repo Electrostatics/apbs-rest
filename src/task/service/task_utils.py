@@ -113,7 +113,7 @@ class TaskHandler:
 
                 else:
                     form = request.data
-                    for key in form.keys():
+                    for key in list(form.keys()):
                         # unravels output parameters from form
                         if key == 'output_scalar':
                             for option in form[key]:
