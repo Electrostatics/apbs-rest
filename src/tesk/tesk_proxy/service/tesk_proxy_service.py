@@ -2,6 +2,7 @@ from __future__ import print_function
 from flask import request, Blueprint
 from launcher import pdb2pqr_runner, apbs_runner
 from legacy.weboptions import WebOptionsError
+from kubernetes import config
 import os, sys, traceback
 
 tesk_proxy = Blueprint('tesk_proxy', __name__)
@@ -10,6 +11,9 @@ PDB2PQR_BUILD_PATH = os.environ.get('PDB2PQR_BUILD_PATH')
 STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5001')
 TESK_HOST = os.environ.get('TESK_HOST', 'http://localhost:5001')
 IMAGE_PULL_POLICY = os.environ.get('IMAGE_PULL_POLICY', 'Always')
+
+config.load_incluster_config()
+# config.load_kube_config()
 
 if PDB2PQR_BUILD_PATH is not None:
     sys.path.append(PDB2PQR_BUILD_PATH)

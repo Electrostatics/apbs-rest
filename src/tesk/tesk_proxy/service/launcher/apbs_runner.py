@@ -51,7 +51,7 @@ class Runner:
         # self.read_file_list = None
 
         # Load kubeconfig
-        config.load_incluster_config()
+        # config.load_incluster_config()
         # config.load_kube_config()
 
         if infile_name is not None:

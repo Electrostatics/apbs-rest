@@ -38,7 +38,7 @@ class Runner:
         self.cli_params = None
 
         # Load kubeconfig
-        config.load_incluster_config()
+        # config.load_incluster_config()
         # config.load_kube_config()
 
         self.starttime = time.time()
