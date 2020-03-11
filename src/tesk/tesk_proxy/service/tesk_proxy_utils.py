@@ -277,3 +277,137 @@ def pdb2pqr_json_config(job_id, command_line_args, storage_host, local_upload_di
     send_to_storage_service(storage_host, job_id, [inputfile_list_name], local_upload_dir)
 
     return json_dict
+
+"""
+    Utility functions which interact with Kubernetes and/or Volcano
+    TODO: move *_yaml_config() functions down here
+"""
+
+VOLCANO_GROUP = 'batch.volcano.sh' 
+VOLCANO_VERSION = 'v1alpha1' 
+VOLCANO_PLURAL = 'jobs' 
+VOLCANO_PRETTY = 'true' 
+VOLCANO_CONFIGURATION = None
+
+def get_volcano_job(job_id, task_name, kube_namespace):
+    VOLCANO_CONFIGURATION = kubernetes.client.Configuration()
+    assert isinstance(VOLCANO_CONFIGURATION, kubernetes.client.configuration.Configuration)
+    api_instance = kubernetes.client.CustomObjectsApi(kubernetes.client.ApiClient(VOLCANO_CONFIGURATION))
+
+    if task_name == 'pdb2pqr':
+        task_name = 'pdb'
+    job_name = 'task-%s-%s' % (job_id, task_name)
+
+    try:
+        api_response = api_instance.get_namespaced_custom_object(VOLCANO_GROUP, VOLCANO_VERSION, kube_namespace, VOLCANO_PLURAL, job_name)
+        # pprint(api_response)
+    except ApiException as e:
+        print("Exception when calling CustomObjectsApi->get_namespaced_custom_object: %s\n" % e)
+        if e.reason == 'Not Found' and e.status == 404:
+            return {'error': True, 'reason': e.reason, 'status': e.status}
+    return api_response
+
+def get_kube_pod(pod_name, kube_namespace):
+    pod_info = None
+    VOLCANO_CONFIGURATION = kubernetes.client.Configuration()
+    assert isinstance(VOLCANO_CONFIGURATION, kubernetes.client.configuration.Configuration)
+    api_instance = kubernetes.client.CoreV1Api(kubernetes.client.ApiClient(VOLCANO_CONFIGURATION))
+    try:
+        pod_info = api_instance.read_namespaced_pod(pod_name, kube_namespace)
+        # print( pod_info )
+        # print( type(pod_info) )
+    except ApiException as e:
+        print("Exception when calling CoreV1Api->read_namespaced_pod: %s\n" % e)
+
+    return pod_info
+
+def extract_pod_container_info_list(pod_info_dict):
+    status_list = []
+    for container in pod_info_dict.status.init_container_statuses + pod_info_dict.status.container_statuses:
+        status_info = {}
+        status_info['state_info'] = {}
+        status_info['name'] = container.name
+
+        if container.state.waiting is not None:
+            state = container.state.waiting
+            status_info['state'] = 'waiting'
+            status_info['state_info']['reason'] = state.reason
+            status_info['state_info']['message'] = state.message
+
+        elif container.state.running is not None:
+            state = container.state.running
+            status_info['state'] = 'running'
+            status_info['state_info']['started_at'] = calendar.timegm( state.started_at.timetuple() )
+
+        elif container.state.terminated is not None:
+            state = container.state.terminated
+            status_info['state'] = 'terminated'
+            status_info['state_info']['started_at'] = calendar.timegm( state.started_at.timetuple() )
+            status_info['state_info']['finished_at'] = calendar.timegm( state.finished_at.timetuple() )
+            status_info['state_info']['exit_code'] = state.exit_code
+            status_info['state_info']['reason'] = state.reason
+            status_info['state_info']['message'] = state.message
+
+        # status_list.append(container)
+        status_list.append(status_info)
+    return status_list
+
+# def parse_pod_status_info(status_list):
+#     for status in status_list:
+#         if 
+
+def parse_volcano_job_info(vcjob_info_dict):
+    assert isinstance(vcjob_info_dict, dict)
+    RFC3339_format = '%Y-%m-%dT%H:%M:%SZ'
+    status     = None
+    start_time = None
+    end_time   = None
+    return_status = {}
+
+    # tasks = vcjob_info_dict['metadata']['labels']['tasks'].split(';')[0] # splitting on ';' in case there's more tasks in future
+    job_id = vcjob_info_dict['metadata']['labels']['jobid']
+    tasks = vcjob_info_dict['metadata']['labels']['tasks'] # 'apbs' or 'pdb2pqr'
+    vcjob_name = vcjob_info_dict['metadata']['name']
+
+    # Get associate pod info for jobname
+    vcpod_name = '%s-%s-0' % (vcjob_name, vcjob_info_dict['spec']['tasks'][0]['name'])
+    namespace = vcjob_info_dict['metadata']['namespace']
+    pod_info = get_kube_pod(vcpod_name, namespace)
+    pod_container_list = extract_pod_container_info_list(pod_info)
+
+    # Get start time
+    start_time = vcjob_info_dict['metadata']['creationTimestamp']
+    start_time = datetime.strptime(start_time, RFC3339_format) # convert from RFC3339 timestamp to datetime object
+    start_time = calendar.timegm( start_time.timetuple() ) # convert datetime to num-seconds
+
+    job_phase = vcjob_info_dict['status']['state']['phase']
+    status = None
+    if 'failed' in vcjob_info_dict['status']:
+        # Set status
+        status = 'failed'
+        # Get end time
+        end_time = vcjob_info_dict['status']['state']['lastTransitionTime']
+        end_time = datetime.strptime(end_time, RFC3339_format) # convert from RFC3339 timestamp to datetime object
+        end_time = calendar.timegm( end_time.timetuple() )
+        
+    elif 'succeeded' in vcjob_info_dict['status']: 
+        # Set status
+        status = 'complete'
+        # Get end time
+        end_time = vcjob_info_dict['status']['state']['lastTransitionTime']
+        end_time = datetime.strptime(end_time, RFC3339_format) # convert from RFC3339 timestamp to datetime object
+        end_time = calendar.timegm( end_time.timetuple() )
+
+    elif 'pending' in vcjob_info_dict['status']: 
+        # Set status
+        status = 'pending'
+        
+    elif 'running' in vcjob_info_dict['status']: 
+        # Set status
+        status = 'running'
+
+    return_status['status'] = status
+    return_status['startTime'] = start_time
+    return_status['endTime'] = end_time
+    return_status['taskStatus'] = pod_container_list
+    return return_status

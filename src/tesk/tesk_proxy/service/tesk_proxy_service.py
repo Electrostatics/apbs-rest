@@ -1,8 +1,9 @@
 from __future__ import print_function
 from flask import request, Blueprint
+from kubernetes import config
 from launcher import pdb2pqr_runner, apbs_runner
 from legacy.weboptions import WebOptionsError
-from kubernetes import config
+from tesk_proxy_utils import get_volcano_job, parse_volcano_job_info
 import os, sys, traceback
 
 tesk_proxy = Blueprint('tesk_proxy', __name__)
@@ -12,8 +13,8 @@ STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5001')
 TESK_HOST = os.environ.get('TESK_HOST', 'http://localhost:5001')
 IMAGE_PULL_POLICY = os.environ.get('IMAGE_PULL_POLICY', 'Always')
 
-config.load_incluster_config()
-# config.load_kube_config()
+# config.load_incluster_config()
+config.load_kube_config()
 
 if PDB2PQR_BUILD_PATH is not None:
     sys.path.append(PDB2PQR_BUILD_PATH)
@@ -30,8 +31,30 @@ def submit_tesk_action(job_id, task_name):
     http_status = None
 
     if request.method == 'GET':
-        #TODO: Get task status from execution service (TESK/Batch)
-        pass
+        #TODO: Get task status from scheduling service (Volcano.sh)
+        response = {}
+        http_status = None
+        volcano_namespace = os.environ.get('VOLCANO_NAMESPACE')
+        try:
+            vcjob_info = get_volcano_job(job_id, task_name, volcano_namespace)
+            if 'status' in vcjob_info and vcjob_info['status'] == 404:
+                # If job not found, return 404
+                http_status = 404
+                response['error'] = vcjob_info['reason']
+                response['message'] = "Could not find instance of task '%s' for jobid '%s'" % (task_name, job_id)
+            else:
+                response = parse_volcano_job_info(vcjob_info)
+                http_status = 200
+
+        except Exception as err:
+            response = {}
+            response['message'] = None
+            response['error'] = ('Internal error while processing request. '
+                                'If error persists, please report through usual channels (email, issues, etc.)')
+            http_status = 500
+            print(traceback.format_exc, file=sys.stderr)
+            # raise
+
     elif request.method == 'POST':
         '''
             Handler for using the TESK service.
