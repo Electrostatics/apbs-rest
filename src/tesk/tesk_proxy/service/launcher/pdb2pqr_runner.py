@@ -50,7 +50,7 @@ class Runner:
         try:
             # if 'invoke_method' in form and isinstance(form['invoke_method'], str):
             if 'invoke_method' in form :
-                print('invoke_method found, value: %s' % str(form['invoke_method']) )
+                logging.info('invoke_method found, value: %s' % str(form['invoke_method']) )
                 if form['invoke_method'].lower() == 'cli':
                     self.invoke_method = 'cli'
                     self.cli_params = {
@@ -63,10 +63,10 @@ class Runner:
                     self.invoke_method = 'gui'
                     self.weboptions = WebOptions(form, files)
             else:
-                print('invoke_method not found: %s' % str('invoke_method' in form))
+                logging.warning('invoke_method not found: %s' % str('invoke_method' in form))
                 if 'invoke_method' in form:
-                    print("form['invoke_method']: "+str(form['invoke_method']))
-                    print(type(form['invoke_method']))
+                    logging.debug("form['invoke_method']: "+str(form['invoke_method']))
+                    logging.debug(type(form['invoke_method']))
                 self.invoke_method = 'gui'
                 self.weboptions = WebOptions(form, files)
 
@@ -158,15 +158,15 @@ class Runner:
             command_line_args = self.weboptions.getCommandLine()
             if '--summary' in command_line_args:
                 command_line_args = command_line_args.replace('--summary', '')
-            print(command_line_args)
-            print(self.weboptions.pdbfilename)
+            logging.debug(command_line_args)
+            logging.debug(self.weboptions.pdbfilename)
             
             if self.weboptions.user_did_upload:
                 upload_list = ['pdb2pqr_status', 'pdb2pqr_start_time']
             else:
                 if os.path.splitext(self.weboptions.pdbfilename)[1] != '.pdb':
                     self.weboptions.pdbfilename = self.weboptions.pdbfilename+'.pdb' # add pdb extension to pdbfilename
-                print(self.weboptions.pdbfilename)
+                logging.debug(self.weboptions.pdbfilename)
                 # Write the PDB file contents to disk
                 with open(os.path.join(INSTALLDIR, TMPDIR, job_id, self.weboptions.pdbfilename), 'w') as fout:
                     fout.write(self.weboptions.pdbfilestring)
@@ -195,7 +195,7 @@ class Runner:
             upload_list = ['pdb2pqr_status', 'pdb2pqr_start_time']
 
             pqr_name = self.cli_params['pqr_name']
-            logging.info('pqr filename: %s' % pqr_name)
+            logging.info('pqr filename: %s', pqr_name)
 
 
         # Write the start time to a file, before posting to TESK
@@ -241,10 +241,10 @@ class Runner:
             api_response = api_instance.create_namespaced_custom_object(group, version, namespace, plural, body, pretty=pretty)
 
             # print('\n\n\n')
-            pprint(api_response)
+            logging.debug( 'Response from Kube API server: %s', dumps(api_response, indent=2) )
             # print(type(api_response))
         except ApiException as e:
-            print("Exception when calling CustomObjectsApi->create_namespaced_custom_object: %s\n" % e)
+            logging.error("Exception when calling CustomObjectsApi->create_namespaced_custom_object: %s\n",  e)
             raise
 
                 

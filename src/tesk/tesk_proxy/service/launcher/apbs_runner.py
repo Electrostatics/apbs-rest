@@ -1,5 +1,6 @@
 import string, sys, os, time, errno, shutil, tempfile, urllib, copy, pickle, glob
 import subprocess
+import logging
 from multiprocessing import Process
 
 from pprint import pprint
@@ -29,7 +30,7 @@ def download_file(job_id, file_name, dest_path, storage_host):
         with open(dest_path, 'w') as fout:
             fout.write(object_str)
     except Exception as e:
-        print('ERROR: %s'%e)
+        logging.error('ERROR: %s', e)
 
 class JobDirectoryExistsError(Exception):
     def __init__(self, expression):
@@ -68,13 +69,13 @@ class Runner:
             self.job_id = form['pdb2pqrid']
 
         self.job_dir = '%s%s%s' % (INSTALLDIR, TMPDIR, self.job_id)
-        print(self.job_dir)
+        logging.debug(self.job_dir)
         if not os.path.isdir(self.job_dir):
             os.mkdir(self.job_dir)
 
     def prepare_job(self, storage_host):
         # taken from mainInput()
-        print('preparing job execution')
+        logging.info('preparing job execution')
         infile_name = self.infile_name
         form = self.form
         job_id = self.job_id
@@ -90,7 +91,7 @@ class Runner:
             file_list = tesk_proxy_utils.apbs_extract_input_files(job_id, infile_name, storage_host)
 
             infile_dest_path = os.path.join(self.job_dir, infile_name)
-            print('downloading infile')
+            logging.info("downloading infile: '%s'", infile_name)
             download_file(job_id, infile_name, infile_dest_path, storage_host)
 
 
@@ -212,7 +213,7 @@ class Runner:
         # set the APBS status to running, write to disk, upload
         with open(os.path.join(INSTALLDIR, TMPDIR, job_id, 'apbs_status'), 'w') as fout:
             fout.write('running\n')
-        print('infile name is: '+infile_name)
+        logging.debug('infile name is: %s', infile_name)
         upload_list = ['apbs_status', 'apbs_start_time', infile_name]
         tesk_proxy_utils.send_to_storage_service(storage_host, job_id, upload_list, os.path.join(INSTALLDIR, TMPDIR))
         
@@ -247,11 +248,11 @@ class Runner:
         try:
             api_response = api_instance.create_namespaced_custom_object(group, version, namespace, plural, body, pretty=pretty)
 
-            # print('\n\n\n')
-            pprint(api_response)
-            # print(type(api_response))
+            # pprint(api_response)
+            logging.debug( 'Response from Kube API server: %s', dumps(api_response, indent=2) )
+            # logging.debug(dumps(get_response, indent=2))
         except ApiException as e:
-            print("Exception when calling CustomObjectsApi->create_namespaced_custom_object: %s\n" % e)
+            logging.error("Exception when calling CustomObjectsApi->create_namespaced_custom_object: %s\n", e)
             raise
 
                 
@@ -273,7 +274,7 @@ class Runner:
         # Run PDB2PQR in separate process
         startLogFile(job_id, 'apbs_status', "running\n")
 
-        print('Starting subprocess')
+        logging.debug('Starting job for job_id %s', job_id)
         # p = Process(target=self.run_job, args=(storage_host,))
         # p.start()
 

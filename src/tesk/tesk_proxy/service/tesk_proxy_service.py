@@ -4,8 +4,7 @@ from kubernetes import config
 from launcher import pdb2pqr_runner, apbs_runner
 from legacy.weboptions import WebOptionsError
 from tesk_proxy_utils import get_volcano_job, parse_volcano_job_info
-import os, sys, traceback
-
+import os, sys, traceback, logging, json
 tesk_proxy = Blueprint('tesk_proxy', __name__)
 
 PDB2PQR_BUILD_PATH = os.environ.get('PDB2PQR_BUILD_PATH')
@@ -13,8 +12,10 @@ STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5001')
 TESK_HOST = os.environ.get('TESK_HOST', 'http://localhost:5001')
 IMAGE_PULL_POLICY = os.environ.get('IMAGE_PULL_POLICY', 'Always')
 
-# config.load_incluster_config()
-config.load_kube_config()
+try:
+    config.load_incluster_config()
+except:
+    config.load_kube_config()
 
 if PDB2PQR_BUILD_PATH is not None:
     sys.path.append(PDB2PQR_BUILD_PATH)
@@ -42,6 +43,7 @@ def submit_tesk_action(job_id, task_name):
                 http_status = 404
                 response['error'] = vcjob_info['reason']
                 response['message'] = "Could not find instance of task '%s' for jobid '%s'" % (task_name, job_id)
+                logging.info("Task '%s->%s' could not be found. Status: %s", job_id, task_name, json.dumps(vcjob_info['status'], indent=2))
             else:
                 response = parse_volcano_job_info(vcjob_info)
                 http_status = 200
@@ -52,7 +54,7 @@ def submit_tesk_action(job_id, task_name):
             response['error'] = ('Internal error while processing request. '
                                 'If error persists, please report through usual channels (email, issues, etc.)')
             http_status = 500
-            print(traceback.format_exc, file=sys.stderr)
+            logging.error(traceback.format_exc())
             # raise
 
     elif request.method == 'POST':
@@ -98,24 +100,24 @@ def submit_tesk_action(job_id, task_name):
                 
                 # except FileNotFoundError as err:
                 except apbs_runner.MissingFilesError as err:
-                    print('%s:'%type(err).__name__ , err, file=sys.stderr) # TODO: construct as log message
+                    logging.error('%s: %s', type(err).__name__, err) # # Print error to log
                     response['message'] = None
                     response['error'] = str(err)
                     response['missing_files'] = err.missing_files
                     http_status = 400
 
                     # print traceback for debugging
-                    print(traceback.format_exc(), file=sys.stderr) # TODO: construct as log message
+                    logging.error(traceback.format_exc()) # # Print error to log
 
                 except Exception as err:
-                    print('%s:'%type(err).__name__ , err, file=sys.stderr) # TODO: construct as log message
+                    logging.error('%s: %s', type(err).__name__, err) # Print error to log
                     response['message'] = None
                     response['error'] = ('Internal error while processing request. '
                                          'If error persists, please report through usual channels (email, issues, etc.)')
                     http_status = 500
 
                     # print traceback for debugging
-                    print(traceback.format_exc(), file=sys.stderr) # TODO: construct as log message
+                    logging.error(traceback.format_exc()) # Print error to log
 
             elif task_name == 'pdb2pqr':
                 try:
@@ -128,9 +130,7 @@ def submit_tesk_action(job_id, task_name):
                     http_status = 202
 
                 except WebOptionsError as err:
-                    print('JOB_ID--%s TASK_NAME--%s:' % (job_id, task_name),
-                          str(err), file=sys.stderr
-                    ) # TODO: construct as log message
+                    logging.error('JOB_ID--%s TASK_NAME--%s: %s', job_id, task_name, str(err))
                     response.pop('message')
                     response['error'] = str(err)
                     if err.bad_weboption is not None:
@@ -138,14 +138,14 @@ def submit_tesk_action(job_id, task_name):
                     http_status = 400
 
                 except Exception as err:
-                    print('%s:'%type(err).__name__ , err, file=sys.stderr) # TODO: construct as log message
+                    logging.error('%s: %s', type(err).__name__, err) # Print error to log
                     response['message'] = None
                     response['error'] = ('Internal error while processing request. '
                                          'If error persists, please report through usual channels (email, issues, etc.)')
                     http_status = 500
 
                     # print traceback for debugging
-                    print(traceback.format_exc(), file=sys.stderr) # TODO: construct as log message
+                    logging.error(traceback.format_exc()) # Print error to log
 
 
             # response = {

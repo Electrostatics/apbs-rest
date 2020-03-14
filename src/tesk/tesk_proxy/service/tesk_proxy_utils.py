@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os, sys, logging, requests, calendar
 from sys import stdout
-from json import loads
+from json import loads, dumps
 from datetime import datetime
 try:
     from io import StringIO
@@ -305,10 +305,12 @@ def get_volcano_job(job_id, task_name, kube_namespace):
     job_name = 'task-%s-%s' % (job_id, task_name)
 
     try:
+        logging.info("Retrieving info for vcjob object '%s'", job_name)
         api_response = api_instance.get_namespaced_custom_object(VOLCANO_GROUP, VOLCANO_VERSION, kube_namespace, VOLCANO_PLURAL, job_name)
         # pprint(api_response)
     except ApiException as e:
-        print("Exception when calling CustomObjectsApi->get_namespaced_custom_object: %s\n" % e)
+        logging.error("Could not find vcjob object '%s'", job_name)
+        logging.error("Exception when calling CustomObjectsApi->get_namespaced_custom_object: %s", e)
         if e.reason == 'Not Found' and e.status == 404:
             return {'error': True, 'reason': e.reason, 'status': e.status}
     return api_response
@@ -323,39 +325,42 @@ def get_kube_pod(pod_name, kube_namespace):
         # print( pod_info )
         # print( type(pod_info) )
     except ApiException as e:
-        print("Exception when calling CoreV1Api->read_namespaced_pod: %s\n" % e)
+        logging.error("Could not find pod object '%s'", pod_name)
+        logging.error("Exception when calling CoreV1Api->read_namespaced_pod: %s", e)
 
     return pod_info
 
 def extract_pod_container_info_list(pod_info_dict):
     status_list = []
-    for container in pod_info_dict.status.init_container_statuses + pod_info_dict.status.container_statuses:
-        status_info = {}
-        status_info['state_info'] = {}
-        status_info['name'] = container.name
+    if pod_info_dict is not None:
+        if pod_info_dict.status.init_container_statuses is not None and pod_info_dict.status.container_statuses is not None:
+            for container in pod_info_dict.status.init_container_statuses + pod_info_dict.status.container_statuses:
+                status_info = {}
+                status_info['state_info'] = {}
+                status_info['name'] = container.name
 
-        if container.state.waiting is not None:
-            state = container.state.waiting
-            status_info['state'] = 'waiting'
-            status_info['state_info']['reason'] = state.reason
-            status_info['state_info']['message'] = state.message
+                if container.state.waiting is not None:
+                    state = container.state.waiting
+                    status_info['state'] = 'waiting'
+                    status_info['state_info']['reason'] = state.reason
+                    status_info['state_info']['message'] = state.message
 
-        elif container.state.running is not None:
-            state = container.state.running
-            status_info['state'] = 'running'
-            status_info['state_info']['started_at'] = calendar.timegm( state.started_at.timetuple() )
+                elif container.state.running is not None:
+                    state = container.state.running
+                    status_info['state'] = 'running'
+                    status_info['state_info']['started_at'] = calendar.timegm( state.started_at.timetuple() )
 
-        elif container.state.terminated is not None:
-            state = container.state.terminated
-            status_info['state'] = 'terminated'
-            status_info['state_info']['started_at'] = calendar.timegm( state.started_at.timetuple() )
-            status_info['state_info']['finished_at'] = calendar.timegm( state.finished_at.timetuple() )
-            status_info['state_info']['exit_code'] = state.exit_code
-            status_info['state_info']['reason'] = state.reason
-            status_info['state_info']['message'] = state.message
+                elif container.state.terminated is not None:
+                    state = container.state.terminated
+                    status_info['state'] = 'terminated'
+                    status_info['state_info']['started_at'] = calendar.timegm( state.started_at.timetuple() )
+                    status_info['state_info']['finished_at'] = calendar.timegm( state.finished_at.timetuple() )
+                    status_info['state_info']['exit_code'] = state.exit_code
+                    status_info['state_info']['reason'] = state.reason
+                    status_info['state_info']['message'] = state.message
 
-        # status_list.append(container)
-        status_list.append(status_info)
+                # status_list.append(container)
+                status_list.append(status_info)
     return status_list
 
 # def parse_pod_status_info(status_list):
@@ -404,16 +409,32 @@ def parse_volcano_job_info(vcjob_info_dict):
         end_time = datetime.strptime(end_time, RFC3339_format) # convert from RFC3339 timestamp to datetime object
         end_time = calendar.timegm( end_time.timetuple() )
 
-    elif 'pending' in vcjob_info_dict['status']: 
-        # Set status
-        status = 'pending'
+    elif 'pending' in vcjob_info_dict['status'] or 'Pending' == vcjob_info_dict['status']['state']['phase']: 
+        # Set status as 'pending' if first init container is 'waiting'.
+        #   ^implies that no further containers would've started either
+        # if pod_info is not None and pod_container_list[0]['state'] == 'waiting':
+        #     status = 'pending'
+        # else:
+        #     status = 'running'
+
+        if pod_info is None:
+            status = 'pending'
+        elif pod_container_list and pod_container_list[0]['state'] == 'waiting':
+            status = 'pending'
+        else:
+            status = 'running'
+
+
         
     elif 'running' in vcjob_info_dict['status']: 
         # Set status
         status = 'running'
+    else:
+        logging.info( dumps(vcjob_info_dict, indent=2) )
 
     return_status['status'] = status
     return_status['startTime'] = start_time
     return_status['endTime'] = end_time
     return_status['taskStatus'] = pod_container_list
+    logging.info( dumps(return_status, indent=2) )
     return return_status
