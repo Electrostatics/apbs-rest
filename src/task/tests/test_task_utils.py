@@ -84,7 +84,7 @@ def start_storage_service(request):
                 is_storage_ready = True
         except Exception:
             retry_timer = 1 # second(s)
-            print('Storage service is not ready yet! Waiting %d second(s)' % retry_timer)
+            print('Storage service is not ready yet! Waiting %d second(s)' % retry_timer, file=sys.stderr, flush=True)
             time.sleep(retry_timer)
 
     # Method to run after all tests

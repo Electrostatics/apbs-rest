@@ -1,8 +1,8 @@
 from __future__ import print_function
 from flask import request, Blueprint
 
-import time
-from sys import path
+import time, traceback
+from sys import path, stderr
 from os import getenv, getcwd
 from requests import get, post
 
@@ -13,7 +13,7 @@ from . import task_utils
 task_app = Blueprint('task_app', __name__)
 task_handler = task_utils.TaskHandler()
 
-TMP_EXEC_HOST = getenv('TMP_EXEC_HOST', 'http://localhost:5005')
+EXEC_PROXY_HOST = getenv('TMP_EXEC_HOST', 'http://localhost:5005')
 END_STATES = ['complete', 'error', None]
 
 @task_app.route('/', methods=['GET'])
@@ -34,7 +34,8 @@ def task_action(job_id, task_name):
     elif request.method == 'POST':
         try:
             response, http_status = task_handler.post(job_id, task_name)
-        except:
+        except Exception as err:
+            print(traceback.format_exc(), file=stderr, flush=True)
             response = {}
             response['message'] = None
             response['error'] = ('Internal error while processing request. '

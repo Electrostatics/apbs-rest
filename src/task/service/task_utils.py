@@ -2,11 +2,11 @@ from flask import request
 import os, time, sys
 import requests
 try:
-    from simplejson import loads
+    from simplejson import loads, dumps
 except:
-    from json import loads
+    from json import loads, dumps
 
-TMP_EXEC_HOST = os.getenv('TMP_EXEC_HOST', 'http://localhost:5005')
+EXEC_PROXY_HOST = os.getenv('TMP_EXEC_HOST', 'http://localhost:5005')
 STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5001')
 STORAGE_URL  = os.environ.get('STORAGE_URL' , 'http://localhost:5001/api/storage')
 
@@ -32,13 +32,16 @@ class TaskHandler:
                     # return {'args': request.args['wait']}
                     wait_on_task = True
 
+            """
             # NOTE: can later optimize to only get end_time if state isn't 'running'
             start_time   = get_starttime(job_id, task_name)
             end_time     = get_endtime(job_id, task_name)
             run_state, progress = get_jobstatus_info(job_id, task_name)
             input_files  = get_input_files(job_id, task_name)
             output_files = get_output_files(job_id, task_name)
+            """
 
+            """
             if run_state not in END_STATES and wait_on_task:
                 while run_state not in END_STATES:
                     time.sleep(1)
@@ -48,7 +51,28 @@ class TaskHandler:
                 run_state, progress = get_jobstatus_info(job_id, task_name)
                 input_files  = get_input_files(job_id, task_name)
                 output_files = get_output_files(job_id, task_name)
+            """
 
+            # TODO: Get state, starttime, endtime, subtask details from Proxy service
+            run_state, start_time, end_time, subtask_states = get_cluster_job_info(job_id, task_name)
+            _, progress  = get_jobstatus_info(job_id, task_name)
+            input_files  = get_input_files(job_id, task_name)
+            output_files = get_output_files(job_id, task_name)
+            # If run_state, is complete, check if *_exit_code.txt exists
+            #   If exists and exit code != 0, run_state = 'failed'
+            if run_state == 'complete':
+                task_exit_code = get_subtask_exit_code(job_id, task_name, 'download')
+                print('task_exit_code:',task_exit_code)
+                if task_exit_code is not None and task_exit_code != 0:
+                    run_state = 'failed'
+                # else:
+                #     task_exit_code = get_subtask_exit_code(job_id, task_name, 'exec')
+                #     if task_exit_code is not None and task_exit_code != 0:
+                #         run_state = 'failed'
+                #     else:
+                #         task_exit_code = get_subtask_exit_code(job_id, task_name, 'upload')
+                #         if task_exit_code is not None and task_exit_code != 0:
+                #             run_state = 'failed'
 
             response['jobid'] = job_id
             response['jobtype'] = task_name
@@ -95,9 +119,9 @@ class TaskHandler:
                 # If 'infile' is in query-string and has value of true, proceed
                 #     assuming the user intends to use an APBS input file
                 if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
-                    data = request.data
+                    data = request.get_json()
                     if 'filename' in data:
-                        post_response = requests.post('%s/api/tesk/%s/%s?infile=true' % (TMP_EXEC_HOST, job_id, task_name), json=data)
+                        post_response = requests.post('%s/api/tesk/%s/%s?infile=true' % (EXEC_PROXY_HOST, job_id, task_name), json=data)
                         if post_response.status_code == 400:
                             http_status = post_response.status_code
                             response = post_response.json() # could probably just access/pass along raw data
@@ -112,7 +136,7 @@ class TaskHandler:
                         }
 
                 else:
-                    form = request.data
+                    form = request.get_json()
                     for key in list(form.keys()):
                         # unravels output parameters from form
                         if key == 'output_scalar':
@@ -123,7 +147,7 @@ class TaskHandler:
                             form[key] = str(form[key])
 
                     # Send task to placeholder executor service
-                    post_response = requests.post('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
+                    post_response = requests.post('%s/api/tesk/%s/%s' % (EXEC_PROXY_HOST, job_id, task_name), json=form)
                     if post_response.status_code == 400:
                         http_status = post_response.status_code
                         response = post_response.json() # could probably just access/pass along raw data
@@ -133,10 +157,10 @@ class TaskHandler:
 
 
             elif task_name == 'pdb2pqr':
-                form = request.data
+                form = request.get_json()
                 # Send task to placeholder executor service
-                print('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name))
-                post_response = requests.post('%s/api/tesk/%s/%s' % (TMP_EXEC_HOST, job_id, task_name), json=form)
+                print('%s/api/tesk/%s/%s' % (EXEC_PROXY_HOST, job_id, task_name))
+                post_response = requests.post('%s/api/tesk/%s/%s' % (EXEC_PROXY_HOST, job_id, task_name), json=form)
                 if post_response.status_code == 400 or post_response.status_code == 500:
                     http_status = post_response.status_code
                     response = post_response.json()
@@ -278,3 +302,43 @@ def get_jobstatus_info(jobid, task_name):
             job_progress[i] = '%s/%s' % (jobid, filename)
     
     return job_status, job_progress
+
+def get_cluster_job_info(job_id: str, task_name: str):
+    # Return: 
+    response = requests.get('%s/api/tesk/%s/%s' % (EXEC_PROXY_HOST, job_id, task_name))
+    data = response.json()
+    if response.ok:
+        state = data['status']
+        start_time = data['startTime']
+        end_time = data['endTime']
+        subtask_states = data['taskStatus']
+        # subtask_states = []
+        # for subtask in data['taskStatus']:
+        #     subtask_states.append()
+
+    elif response.status_code == 404:
+        state = None
+        start_time = None
+        end_time = None
+        subtask_states = None
+
+    else:
+        response.raise_for_status()
+
+    return state, start_time, end_time, subtask_states
+
+def get_subtask_exit_code(job_id: str, task_name: str, step_name: str) -> int:
+    exit_code = None
+    exit_code_filename = '%s_%s_exit_code.txt' % (task_name, step_name)
+    # exit_code_response = requests.get('%s/%s/%s_end_time?json=true' % (STORAGE_URL, job_id, task_name))
+    exit_code_response = requests.get('%s/%s/%s?json=true' % (STORAGE_URL, job_id, exit_code_filename))
+    if exit_code_response.ok:
+        data = exit_code_response.json()
+        object_name = '%s/%s' % (job_id, exit_code_filename)
+        exit_code = int( data[object_name].strip() )
+        # if task_exit_code != 0:
+        #     run_state = 'failed'
+    # else:
+    #     print( 'Could not find', exit_code_filename )
+
+    return exit_code
