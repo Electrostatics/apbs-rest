@@ -54,7 +54,7 @@ def test_storage_service():
     '''
         Methods: GET, POST, DELETE, OPTIONS
     '''
-    job_id = 'pytest-%s' % uuid.uuid4().hex[:8]
+    job_id = 'pytest-%s' % uuid.uuid4().hex[:3]
     url = '%s/storage' % APBS_URL
     object_name = 'sample_text.txt'
 
@@ -113,7 +113,7 @@ def test_storage_service():
     assert response.headers['Access-Control-Allow-Methods'] == str(['GET', 'POST', 'DELETE'])
 
 def test_task_service():
-    job_id = 'pytest-%s' % uuid.uuid4().hex[:8]
+    job_id = 'pytest-%s' % uuid.uuid4().hex[:3]
     task_url = '%s/task' % APBS_URL
     pdb_id = '1a1p'
 
@@ -153,6 +153,9 @@ def test_task_service():
         '''
         #TODO: POST: PDB2PQR task
         params = prepare_tests.prepare_task_v1('pdb2pqr', pdb_id='1a1p')
+        print( job_id )
+        pprint.pprint( params )
+        print('%s/%s/pdb2pqr' % (task_url, job_id))
         response = requests.post('%s/%s/pdb2pqr' % (task_url, job_id), json=params)
         assert response.status_code == 202
         json_dict = json.loads(response.content)
@@ -196,7 +199,7 @@ def test_task_service():
         requests.delete('%s/storage/%s' % (APBS_URL, job_id))
 
 def test_workflow_service():
-    job_id = 'pytest-%s' % uuid.uuid4().hex[:8]
+    job_id = 'pytest-%s' % uuid.uuid4().hex[:3]
     workflow_url = '%s/workflow' % APBS_URL
     # pdb_id = '1a1p'
     job_id_url = '%s/%s' % (workflow_url, job_id)
@@ -219,10 +222,14 @@ def test_workflow_service():
         infile_name = '1fas.in'
         with open('../sample_input/1fas.in', 'r') as fin:
             apbs_infile_data = fin.read()
+            # print()
+            # print('apbs_infile_data:', apbs_infile_data)
+            # print()
             response = requests.post('%s/storage/%s/1fas.in' % (APBS_URL, job_id), data=apbs_infile_data)
             assert response.status_code == 201
         with open('../sample_input/1fas.pqr', 'r') as fin:
             apbs_pqr_data = fin.read()
+            # print('apbs_pqr_data:', apbs_pqr_data)
             response = requests.post('%s/storage/%s/1fas.pqr' % (APBS_URL, job_id), data=apbs_pqr_data)
             assert response.status_code == 201
         params = prepare_tests.prepare_workflow_v2(workflow_name='apbs', infile_name=infile_name)
