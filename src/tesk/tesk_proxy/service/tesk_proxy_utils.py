@@ -367,7 +367,19 @@ def extract_pod_container_info_list(pod_info_dict):
 #     for status in status_list:
 #         if 
 
-def parse_volcano_job_info(vcjob_info_dict):
+def get_exit_code_from_storage(job_id, task_name, storage_host):
+    url = '%s/api/storage/%s/%s_exec_exit_code.txt' % (storage_host, job_id, task_name)
+    response = requests.get(url)
+    if response.ok:
+        data = response.content
+        data = data.strip()
+        return int(data)
+    else:
+        return None
+        # raise FileNotFoundError('Could not find file for exit code')
+    # pass
+
+def parse_volcano_job_info(vcjob_info_dict, storage_host):
     assert isinstance(vcjob_info_dict, dict)
     RFC3339_format = '%Y-%m-%dT%H:%M:%SZ'
     status     = None
@@ -403,7 +415,15 @@ def parse_volcano_job_info(vcjob_info_dict):
         
     elif 'succeeded' in vcjob_info_dict['status']: 
         # Set status
-        status = 'complete'
+        exit_code = get_exit_code_from_storage(job_id, tasks, storage_host)
+        if exit_code == 0: # TODO: will need to change 'tasks' once more tasks are implemented
+            status = 'complete'
+        elif exit_code == None:
+            # raise FileNotFoundError('Could not determine exit code of %s' % tasks)
+            raise OSError('Could not determine exit code of %s' % tasks)
+        else:
+            status = 'failed'
+        
         # Get end time
         end_time = vcjob_info_dict['status']['state']['lastTransitionTime']
         end_time = datetime.strptime(end_time, RFC3339_format) # convert from RFC3339 timestamp to datetime object
@@ -418,6 +438,8 @@ def parse_volcano_job_info(vcjob_info_dict):
         #     status = 'running'
 
         if pod_info is None:
+            status = 'pending'
+        elif not pod_container_list:
             status = 'pending'
         elif pod_container_list and pod_container_list[0]['state'] == 'waiting':
             status = 'pending'

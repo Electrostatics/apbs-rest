@@ -61,6 +61,8 @@ spec:
                 - -c
                 - |
                   apbs {{infile}} > apbs_stdout.txt 2> apbs_stderr.txt
+                  echo $? > apbs_exec_exit_code.txt
+                  exit 0
               resources:
                   requests:
                     memory: "512Mi"

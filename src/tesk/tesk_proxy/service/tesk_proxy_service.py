@@ -45,7 +45,7 @@ def submit_tesk_action(job_id, task_name):
                 response['message'] = "Could not find instance of task '%s' for jobid '%s'" % (task_name, job_id)
                 logging.info("Task '%s->%s' could not be found. Status: %s", job_id, task_name, json.dumps(vcjob_info['status'], indent=2))
             else:
-                response = parse_volcano_job_info(vcjob_info)
+                response = parse_volcano_job_info(vcjob_info, STORAGE_HOST)
                 http_status = 200
 
         except Exception as err:

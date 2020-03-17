@@ -33,6 +33,10 @@ spec:
                 - ../download_input_files.py
                 # - sample.pdb
                 # Add addtional elements to this command array
+                # - bash
+                # - -c
+                # - |
+                #   python ../download_input_files.py {{download_list}}
               env:
                 - name: JOB_ID
                   value: {{job_id}}
@@ -60,6 +64,8 @@ spec:
                 - -c
                 - |
                   /app/builds/pdb2pqr/pdb2pqr.py {{command_line_args}} > pdb2pqr_stdout.txt 2> pdb2pqr_stderr.txt
+                  echo $? > pdb2pqr_exec_exit_code.txt
+                  exit 0
               resources:
                   requests:
                     memory: "512Mi"
