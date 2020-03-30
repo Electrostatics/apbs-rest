@@ -31,6 +31,8 @@ spec:
             value: "main.py"
           - name: TASK_HOST
             value: http://{{ template "apbsrest.fullname" . }}-task
+          - name: GA_TRACKING_ID
+            value: {{ .Values.common.env.googleAnalyticsId }}
           ports:
             - name: http
               containerPort: 5000

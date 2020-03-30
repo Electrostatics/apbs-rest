@@ -4,6 +4,10 @@
 
 replicaCount: 1
 
+common:
+  env:
+    googleAnalyticsId:
+
 tesk:
   image:
     repository: eu.gcr.io/tes-wes/tesk-api

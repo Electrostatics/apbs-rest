@@ -49,6 +49,8 @@ spec:
             value: {{ .Values.teskproxy.env.apbsUploadMemoryLimit }}
           - name: PDB2PQR_JOB_MEM_LIMIT
             value: {{ .Values.teskproxy.env.pdb2pqrExecMemoryLimit }}
+          - name: GA_TRACKING_ID
+            value: {{ .Values.common.env.googleAnalyticsId }}
           ports:
             - name: http
               containerPort: 5007
