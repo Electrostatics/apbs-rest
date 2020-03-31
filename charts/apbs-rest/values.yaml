@@ -17,28 +17,28 @@ tesk:
 ui:
   image:
     repository: electrostatics/apbs-ui
-    tag: latest
+    tag: 0.2.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 viz:
   image:
     repository: electrostatics/apbs-viz-legacy
-    tag: latest
+    tag: 0.2.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 task:
   image:
     repository: electrostatics/apbs-task
-    tag: latest
+    tag: 0.2.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 teskproxy:
   image:
     repository: electrostatics/apbs-tesk-proxy
-    tag: latest
+    tag: 0.2.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
   env:
@@ -52,28 +52,28 @@ teskproxy:
 autofill:
   image:
     repository: electrostatics/apbs-autofill
-    tag: latest
+    tag: 0.2.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 id:
   image:
     repository: electrostatics/apbs-uid
-    tag: latest
+    tag: 0.2.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 storage:
   image:
     repository: electrostatics/apbs-storage
-    tag: latest
+    tag: 0.2.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 workflow:
   image:
     repository: electrostatics/apbs-workflow
-    tag: latest
+    tag: 0.2.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
