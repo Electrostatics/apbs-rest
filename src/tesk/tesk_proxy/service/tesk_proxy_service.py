@@ -11,6 +11,8 @@ PDB2PQR_BUILD_PATH = os.environ.get('PDB2PQR_BUILD_PATH')
 STORAGE_HOST = os.environ.get('STORAGE_HOST', 'http://localhost:5001')
 TESK_HOST = os.environ.get('TESK_HOST', 'http://localhost:5001')
 IMAGE_PULL_POLICY = os.environ.get('IMAGE_PULL_POLICY', 'Always')
+GA_TRACKING_ID = os.environ.get('GA_TRACKING_ID', None)
+if GA_TRACKING_ID == '': GA_TRACKING_ID = None
 
 try:
     config.load_incluster_config()
@@ -75,7 +77,7 @@ def submit_tesk_action(job_id, task_name):
                             raise apbs_runner.MissingFilesError('No APBS input file specified.')
 
                         runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, infile_name=infile_name)
-                        redirectURL = runner.start(STORAGE_HOST, TESK_HOST, IMAGE_PULL_POLICY)
+                        redirectURL = runner.start(STORAGE_HOST, TESK_HOST, IMAGE_PULL_POLICY, GA_TRACKING_ID)
                         
                         # Update response with URL to monitor on a browser
                         response['jobURL'] = redirectURL
@@ -92,7 +94,7 @@ def submit_tesk_action(job_id, task_name):
                                 form[key] = str(form[key])
 
                         runner = apbs_runner.Runner(STORAGE_HOST, job_id=job_id, form=form)
-                        redirectURL = runner.start(STORAGE_HOST, TESK_HOST, IMAGE_PULL_POLICY)
+                        redirectURL = runner.start(STORAGE_HOST, TESK_HOST, IMAGE_PULL_POLICY, GA_TRACKING_ID)
 
                         # Update response with URL to monitor on a browser
                         response['jobURL'] = redirectURL
@@ -123,7 +125,7 @@ def submit_tesk_action(job_id, task_name):
                 try:
                     form = request.json
                     runner = pdb2pqr_runner.Runner(form, request.files, STORAGE_HOST, job_id=job_id)
-                    redirectURL = runner.start(STORAGE_HOST, TESK_HOST, IMAGE_PULL_POLICY)
+                    redirectURL = runner.start(STORAGE_HOST, TESK_HOST, IMAGE_PULL_POLICY, GA_TRACKING_ID)
 
                     # Update response with URL to monitor on a browser
                     response['jobURL'] = redirectURL

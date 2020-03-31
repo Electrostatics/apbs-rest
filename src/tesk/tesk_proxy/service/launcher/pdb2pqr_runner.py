@@ -5,6 +5,7 @@ import logging
 from multiprocessing import Process
 from pprint import pprint
 from json import dumps
+from flask import request
 
 import kubernetes.client
 from kubernetes import config
@@ -248,14 +249,13 @@ class Runner:
             raise
 
                 
-        # raise Exception('Hopping out here. Job not submitted')
         # #TODO: create handler in case of non-200 response
         # response = requests.post(url, headers=headers, json=pdb2pqr_json_dict)
         
         # print(response.content)
         return
 
-    def start(self, storage_host, tesk_host, image_pull_policy):
+    def start(self, storage_host, tesk_host, image_pull_policy, analytics_id):
         # Acquire job ID
         self.starttime = time.time()
         # job_id = setID(self.starttime)
@@ -272,7 +272,7 @@ class Runner:
         self.run_job(job_id, storage_host, tesk_host, image_pull_policy)
 
         # Upload initial files to storage service
-        redirect = redirector(job_id, self.weboptions, 'pdb2pqr')
+        redirect = redirector(job_id, self.weboptions, 'pdb2pqr', request.remote_addr, analytics_id)
         # file_list = [
         #     'typemap',
         #     'pdb2pqr_status',

@@ -1,4 +1,6 @@
-import time, os
+import time, os, logging, requests
+import json, uuid
+from flask import request
 from src import utilities
 from src.aconf import (STYLESHEET, 
                        WEBSITE, 
@@ -26,7 +28,7 @@ def setID(time):
     return id
 
 
-def redirector(name, weboptions, jobtype=None):
+def redirector(name, weboptions, jobtype=None, client_ip=None, analytics_id=None):
     """
         Prints a page which redirects the user to querystatus.cgi and writes starting time to file
     """
@@ -49,7 +51,10 @@ def redirector(name, weboptions, jobtype=None):
         
         events = {}
         
-        events['submission'] = analiticsDict['pdb']+'|'+str("localhost:5000")
+        if client_ip is not None:
+            events['submission'] = analiticsDict['pdb']+'|'+str(client_ip)
+        else:
+            events['submission'] = analiticsDict['pdb']+'|'+str("localhost:5000")
         # events['submission'] = analiticsDict['pdb']+'|'+str(os.environ["REMOTE_ADDR"])
         del analiticsDict['pdb']
         
@@ -67,12 +72,34 @@ def redirector(name, weboptions, jobtype=None):
         options = ','.join(str(k)+':'+str(v) for k,v in analiticsDict.iteritems())
         events['options']=options
 
+
         eventsScriptString = ''
         for event in events:
             eventsScriptString += utilities.getEventTrackingString(category='submissionData',
                                                                 action=event, 
                                                                 label=events[event]) 
+
+        logging.debug('analytics_id: %s', analytics_id)
+        ga_event_request_body = ''
+        if analytics_id is not None:
+            ga_event_request_body = ''
+            ga_event_headers = {
+                'User-Agent': request.headers['User-Agent']
+            }
+            on_first = True
+            for event in events:
+                # Make Google Analytics request body
+                ga_event_request_body += 'v=1&tid=%s&cid=%s&t=event&ec=submissionData&ea=%s&el=%s\n' % (analytics_id, jobid, event, events[event])
             
+            try:
+                logging.info('GA request body:\n%s' % ga_event_request_body)
+                logging.info('Sending usage data through Google Analytics endpoint')
+                r = requests.post('https://www.google-analytics.com/batch', data=ga_event_request_body, headers=ga_event_headers)
+                if not r.ok:
+                    r.raise_for_status()
+            except Exception as err:
+                raise
+
         redirectURL = "{website}jobstatus?jobid={jobid}{jobtype}".format(website=WEBSITE, jobid=jobid, jobtype=jobtype_query)
 
         #     string = """

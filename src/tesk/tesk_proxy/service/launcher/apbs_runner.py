@@ -1,9 +1,9 @@
 import string, sys, os, time, errno, shutil, tempfile, urllib, copy, pickle, glob
 import subprocess
 import logging
-from multiprocessing import Process
 
 from pprint import pprint
+from flask import request
 from requests import get, post
 from json import loads, dumps
 
@@ -263,7 +263,7 @@ class Runner:
         # print(response.content)
         return
 
-    def start(self, storage_host, tesk_host, image_pull_policy):
+    def start(self, storage_host, tesk_host, image_pull_policy, analytics_id=None):
         # pass
         job_id = self.job_id
 
@@ -282,6 +282,19 @@ class Runner:
 
         # print('Getting redirector')
         redirect = redirector(job_id, 'apbs')
+
+        # Log event to Analytics
+        if analytics_id is not None:
+            e_category = 'apbs'
+            e_action = 'submission'
+            e_label = request.remote_addr
+            ga_user_agent_header = {'User-Agent': request.headers['User-Agent']}
+            ga_request_body = 'v=1&tid=%s&cid=%s&t=event&ec=%s&ea=%s&el=%s\n' % (analytics_id, job_id, e_category, e_action, e_label)
+
+            logging.info('Submitting analytics request - category: %s, action: %s', e_category, e_action)
+            resp = post('https://www.google-analytics.com/collect', data=ga_request_body, headers=ga_user_agent_header)
+            if not resp.ok:
+                resp.raise_for_status
 
         # Upload initial files to storage service
         # file_list = [
