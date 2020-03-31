@@ -1,12 +1,12 @@
 import sys, os
 from os import environ
 from flask import Flask
-from flask_api import FlaskAPI
+# from flask_api import FlaskAPI
 
 from service.task_service import task_app
 
-app = FlaskAPI(__name__)
-# app = Flask(__name__)
+# app = FlaskAPI(__name__)
+app = Flask(__name__)
 app.register_blueprint(task_app)
 
 if __name__ == "__main__":

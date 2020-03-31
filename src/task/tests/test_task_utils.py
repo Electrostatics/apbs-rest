@@ -1,5 +1,5 @@
 import time
-import os, json, tarfile, requests
+import os, sys, json, tarfile, requests
 import pytest, docker
 from multiprocessing import Process
 from minio import Minio
