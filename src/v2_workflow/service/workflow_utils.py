@@ -1,7 +1,9 @@
+import logging
 from flask import request, make_response
 from os import getenv
-from sys import stderr
+from sys import stderr, stdout
 from requests import get, post
+from json import dumps
 
 TASK_HOST = getenv('TASK_HOST')
 
@@ -72,8 +74,15 @@ class WorkflowHandler:
                 infile_url_query = '?infile=true'
             
             # Send the appropriate task parameters to the Task Service
-            print(f"sending workflow '{workflow_name}' for job '{job_id}' to the task service")
-            task_response = post('%s/api/task/%s/%s%s' % (TASK_HOST, job_id, workflow_name, infile_url_query), json=task_params)
+            # for key in request.headers.keys():
+            #     print('%s: %s' % (key, request.headers[key]) )
+            logging.info(f"sending workflow '{workflow_name}' for job '{job_id}' to the task service")
+            user_headers = {
+                'User-Agent': request.headers['User-Agent'],
+                'X-Forwarded-For': request.headers['X-Forwarded-For']
+            }
+            logging.debug( dumps(user_headers, indent=2) )
+            task_response = post('%s/api/task/%s/%s%s' % (TASK_HOST, job_id, workflow_name, infile_url_query), json=task_params, headers=user_headers)
             if task_response.status_code == 202:
                 http_status_code = task_response.status_code
                 response = task_response.json()
@@ -81,8 +90,11 @@ class WorkflowHandler:
             #TODO: write handler for a fail case if Task Service sends non-202 response
             #Solution: just pass along status/response from task service
             elif task_response.status_code in [400, 500]: # may want to predefine [400, 500] to avoid reinstantiating per request
+                logging.error('Received error status code from Task Service: %d', task_response.status_code)
                 http_status_code = task_response.status_code
                 response = task_response.json()
+
+                logging.error('Response from Task Service: \n%s', str(task_response.json()))
             else:
                 # may handle differently in future
                 http_status_code = task_response.status_code
@@ -92,6 +104,8 @@ class WorkflowHandler:
             http_status_code = 500
             print('Error: %s' % e, file=stderr)
 
+        stdout.flush()
+        stderr.flush()
         return response, http_status_code
 
     def options(self, job_id, task_name):

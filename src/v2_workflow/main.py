@@ -7,6 +7,10 @@ from dotenv import load_dotenv
 load_dotenv()
 from service.workflow_service import workflow_app
 
+from logging.config import dictConfig
+from LOGGING_CONFIG import LOGGING_CONFIG
+dictConfig(LOGGING_CONFIG)
+
 app = Flask(__name__)
 CORS(app)
 app.register_blueprint(workflow_app)

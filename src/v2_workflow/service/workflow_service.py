@@ -3,12 +3,16 @@ from os import getenv
 from sys import stderr
 from requests import get, post
 from . import workflow_utils
+import logging, traceback
 
 workflow_app = Blueprint('workflow_app', __name__)
 workflow_handler = workflow_utils.WorkflowHandler()
 
+ACCEPTED_WORKFLOWS = {'apbs', 'pdb2pqr'}
 END_STATES = ['complete', 'error', None]
 TASK_HOST = getenv('TASK_HOST')
+GA_TRACKING_ID = getenv('GA_TRACKING_ID', None)
+if GA_TRACKING_ID == '': GA_TRACKING_ID = None
 
 @workflow_app.route('/', methods=['GET'])
 @workflow_app.route('/check', methods=['GET'])
@@ -32,5 +36,56 @@ def submit_workflow_request(job_id, task_name=None):
     elif request.method == 'OPTIONS':
         http_status_code = 204
         response, http_status_code = workflow_handler.options(job_id, task_name)
+
+    return response, http_status_code
+
+
+@workflow_app.route('/api/workflow/<job_id>/<task_name>/event', methods=['POST'])
+def send_to_ga(job_id:str, task_name:str=None):
+    response = {}
+    http_status_code = None
+
+    if GA_TRACKING_ID is not None:
+        try:
+            category = 'queryData'
+            action = None
+            label = request.remote_addr
+
+            task_name = task_name.lower()
+            if task_name in ACCEPTED_WORKFLOWS:
+                if task_name == 'pdb2pqr':
+                    action = 'queryPDB2PQR'
+                elif task_name == 'apbs':
+                    action = 'queryAPBS'
+
+                user_agent_header = {'User-Agent': request.headers['User-Agent']}
+                ga_request_body = f'v=1&tid={GA_TRACKING_ID}&cid={job_id}&t=event&ec={category}&ea={action}&el={label}\n'
+
+                logging.info('GA request body: %s', ga_request_body)
+                resp = post('https://www.google-analytics.com/collect', data=ga_request_body, headers=user_agent_header)
+                if not resp.ok:
+                    resp.raise_for_status
+                logging.info('GA event sent: %s', action)
+
+                response['status'] = 'success'
+                response['message'] = f'Successful event push: {task_name}'
+                http_status_code = 200
+
+            else:
+                http_status_code = 400 # bad request
+                response['status'] = 'error'
+                response['message'] = "Workflow names must be in %s." % str(ACCEPTED_WORKFLOWS)
+                logging.error(f"{response['message']} Workflow specified: '{task_name}'.")
+
+        except Exception:
+            http_status_code = 500
+            response['status'] = 'error'
+            response['message'] = "Unexpected error while computing event request. See logs." % str(ACCEPTED_WORKFLOWS)
+
+            logging.error(traceback.format_exc())
+    else:
+        http_status_code = 400 # bad request
+        response['message'] = "Installation not configured with Google Analytics; no ID set."
+        logging.error( response['message'] )
 
     return response, http_status_code
