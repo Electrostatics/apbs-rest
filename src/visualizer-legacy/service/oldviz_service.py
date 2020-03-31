@@ -43,6 +43,23 @@ def render_3dmol():
         if http_status < 400:
             http_status = 400
 
+    if GA_TRACKING_ID is not None:
+        if job_id is not None:
+            cid = job_id
+        else:
+            cid = str( uuid4() )
+
+        e_category = 'apbs'
+        e_action = 'visualize'
+        e_label = request.remote_addr
+        ga_user_agent_header = {'User-Agent': request.headers['User-Agent']}
+        ga_request_body = 'v=1&tid=%s&cid=%s&t=event&ec=%s&ea=%s&el=%s\n' % (GA_TRACKING_ID, cid, e_category, e_action, e_label)
+
+        logging.info('Submitting analytics request - category: %s, action: %s', e_category, e_action)
+        ga_resp = requests.post('https://www.google-analytics.com/collect', data=ga_request_body, headers=ga_user_agent_header)
+        if not ga_resp.ok:
+            ga_resp.raise_for_status
+
     if http_status == 400:
         error_message = f'Missing arguments in URL query: <b>{missing_args}</b>'
         return error_message, http_status
