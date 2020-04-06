@@ -23,8 +23,6 @@ then
 
   output_basename=$2
 
-  # Record the end time for the job
-  date +%s.%N  | xargs printf '%.*f\n' 2 > pdb2pqr_end_time
 
   echo ''
   echo 'Writing pdb2pqr_status'
@@ -91,6 +89,8 @@ then
   echo $JOB_ID/pdb2pqr_stdout.txt >> ${task_name}_output_files
   echo $JOB_ID/pdb2pqr_stderr.txt >> ${task_name}_output_files
 
+  # Record the end time for the job
+  date +%s.%N  | xargs printf '%.*f\n' 2 > pdb2pqr_end_time
   
 elif [ ${task_name} = 'apbs' ]
 then
@@ -98,9 +98,6 @@ then
   pqr_name=$(ls *.pqr)
   pqr_prefix=${pqr_name%.*}
   # dx_name=*.dx
-
-  # Record the end time for the job
-  date +%s.%N  | xargs printf '%.*f\n' 2 > apbs_end_time 
 
   echo ''
   echo 'Writing apbs_status'
@@ -136,6 +133,10 @@ then
   echo $JOB_ID/apbs_stderr.txt >> ${task_name}_status
   echo $JOB_ID/apbs_stdout.txt >> ${task_name}_output_files
   echo $JOB_ID/apbs_stderr.txt >> ${task_name}_output_files
+
+  # Record the end time for the job
+  date +%s.%N  | xargs printf '%.*f\n' 2 > apbs_end_time 
+
 fi
 
 cd $cur_dir
