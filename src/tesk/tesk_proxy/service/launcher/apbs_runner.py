@@ -285,9 +285,15 @@ class Runner:
 
         # Log event to Analytics
         if analytics_id is not None:
+            if 'X-Forwarded-For' in request.headers:
+                source_ip = request.headers['X-Forwarded-For']
+            else:
+                logging.warning("Unable to find 'X-Forwarded-For' header in request")
+                source_ip = ''
+
             e_category = 'apbs'
             e_action = 'submission'
-            e_label = request.remote_addr
+            e_label = source_ip
             ga_user_agent_header = {'User-Agent': request.headers['User-Agent']}
             ga_request_body = 'v=1&tid=%s&cid=%s&t=event&ec=%s&ea=%s&el=%s\n' % (analytics_id, job_id, e_category, e_action, e_label)
 

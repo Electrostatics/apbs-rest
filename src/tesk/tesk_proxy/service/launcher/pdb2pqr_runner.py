@@ -272,7 +272,13 @@ class Runner:
         self.run_job(job_id, storage_host, tesk_host, image_pull_policy)
 
         # Upload initial files to storage service
-        redirect = redirector(job_id, self.weboptions, 'pdb2pqr', request.remote_addr, analytics_id)
+        if 'X-Forwarded-For' in request.headers:
+            source_ip = request.headers['X-Forwarded-For']
+        else:
+            logging.warning("Unable to find 'X-Forwarded-For' header in request")
+            source_ip = None
+
+        redirect = redirector(job_id, self.weboptions, 'pdb2pqr', source_ip, analytics_id)
         # file_list = [
         #     'typemap',
         #     'pdb2pqr_status',

@@ -19,6 +19,23 @@ if GA_TRACKING_ID == '': GA_TRACKING_ID = None
 def is_alive():
     return '', 200
 
+"""
+@workflow_app.route('/api/workflow/ip/', methods=['GET'])
+def dummy_path():
+    response = {}
+    logging.info('remote_addr: %s', request.remote_addr)
+    # response['remote_addr'] = request.remote_addr
+
+    if 'X-Forwarded-For' in request.headers:
+        logging.info('X-Forwarded-For: %s', request.headers['X-Forwarded-For'])
+        # response['X-Forwarded-For'] = request.headers['X-Forwarded-For']
+
+    for header in request.headers.keys():
+        response[header] = request.headers[header]
+    return response
+
+"""
+
 @workflow_app.route('/api/workflow/<job_id>/<task_name>', methods=['GET', 'POST', 'OPTIONS'])
 @workflow_app.route('/api/workflow/<job_id>', methods=['GET', 'POST', 'OPTIONS'])
 def submit_workflow_request(job_id, task_name=None):
@@ -49,7 +66,13 @@ def send_to_ga(job_id:str, task_name:str=None):
         try:
             category = 'queryData'
             action = None
-            label = request.remote_addr
+            label = None
+            
+            if 'X-Forwarded-For' in request.headers:
+                label = request.headers['X-Forwarded-For']
+            else:
+                logging.warning("Unable to find 'X-Forwarded-For' header within request")
+                label = ''
 
             task_name = task_name.lower()
             if task_name in ACCEPTED_WORKFLOWS:
@@ -61,7 +84,7 @@ def send_to_ga(job_id:str, task_name:str=None):
                 user_agent_header = {'User-Agent': request.headers['User-Agent']}
                 ga_request_body = f'v=1&tid={GA_TRACKING_ID}&cid={job_id}&t=event&ec={category}&ea={action}&el={label}\n'
 
-                logging.info('GA request body: %s', ga_request_body)
+                logging.debug('GA request body: %s', ga_request_body)
                 resp = post('https://www.google-analytics.com/collect', data=ga_request_body, headers=user_agent_header)
                 if not resp.ok:
                     resp.raise_for_status

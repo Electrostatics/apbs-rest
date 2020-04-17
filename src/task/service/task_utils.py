@@ -101,7 +101,10 @@ class TaskHandler:
         return response, http_status        
 
     def post(self, job_id, task_name):
-        user_agent_header = {'User-Agent': request.headers['User-Agent'] }
+        user_headers = {
+            'User-Agent': request.headers['User-Agent'],
+            'X-Forwarded-For': request.headers['X-Forwarded-For']
+        }
         available_tasks = ['apbs', 'pdb2pqr']
         http_status = 202
 
@@ -122,7 +125,7 @@ class TaskHandler:
                 if 'infile' in request.args.to_dict() and request.args['infile'].lower() == 'true':
                     data = request.get_json()
                     if 'filename' in data:
-                        post_response = requests.post('%s/api/tesk/%s/%s?infile=true' % (EXEC_PROXY_HOST, job_id, task_name), json=data, headers=user_agent_header)
+                        post_response = requests.post('%s/api/tesk/%s/%s?infile=true' % (EXEC_PROXY_HOST, job_id, task_name), json=data, headers=user_headers)
                         if post_response.status_code == 400:
                             http_status = post_response.status_code
                             response = post_response.json() # could probably just access/pass along raw data
@@ -148,7 +151,7 @@ class TaskHandler:
                             form[key] = str(form[key])
 
                     # Send task to placeholder executor service
-                    post_response = requests.post('%s/api/tesk/%s/%s' % (EXEC_PROXY_HOST, job_id, task_name), json=form, headers=user_agent_header)
+                    post_response = requests.post('%s/api/tesk/%s/%s' % (EXEC_PROXY_HOST, job_id, task_name), json=form, headers=user_headers)
                     if post_response.status_code == 400:
                         http_status = post_response.status_code
                         response = post_response.json() # could probably just access/pass along raw data
@@ -161,7 +164,7 @@ class TaskHandler:
                 form = request.get_json()
                 # Send task to placeholder executor service
                 print('%s/api/tesk/%s/%s' % (EXEC_PROXY_HOST, job_id, task_name))
-                post_response = requests.post('%s/api/tesk/%s/%s' % (EXEC_PROXY_HOST, job_id, task_name), json=form, headers=user_agent_header)
+                post_response = requests.post('%s/api/tesk/%s/%s' % (EXEC_PROXY_HOST, job_id, task_name), json=form, headers=user_headers)
                 if post_response.status_code == 400 or post_response.status_code == 500:
                     http_status = post_response.status_code
                     response = post_response.json()

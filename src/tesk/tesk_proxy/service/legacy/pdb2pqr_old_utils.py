@@ -54,7 +54,7 @@ def redirector(name, weboptions, jobtype=None, client_ip=None, analytics_id=None
         if client_ip is not None:
             events['submission'] = analiticsDict['pdb']+'|'+str(client_ip)
         else:
-            events['submission'] = analiticsDict['pdb']+'|'+str("localhost:5000")
+            events['submission'] = analiticsDict['pdb']+'|'+str(None)
         # events['submission'] = analiticsDict['pdb']+'|'+str(os.environ["REMOTE_ADDR"])
         del analiticsDict['pdb']
         

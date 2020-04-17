@@ -21,6 +21,6 @@ then
 elif [ $1 = 'tesk-proxy' -o $1 = 'proxy' ]
 then
     cd tesk_proxy
-    docker build -t electrostatics/apbs-tesk-proxy:latest .
-    docker push electrostatics/apbs-tesk-proxy:latest
+    docker build -t electrostatics/apbs-tesk-proxy:edge .
+    docker push electrostatics/apbs-tesk-proxy:edge
 fi
