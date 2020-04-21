@@ -85,7 +85,8 @@ class TaskHandler:
                 'inputFiles':  input_files,
                 'outputFiles': output_files,
                 'startTime':   start_time,
-                'endTime':     end_time
+                'endTime':     end_time,
+                'subtasks':    subtask_states
             }
 
             http_status = 200
