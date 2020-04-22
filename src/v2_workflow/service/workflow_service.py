@@ -64,6 +64,7 @@ def send_to_ga(job_id:str, task_name:str=None):
 
     if GA_TRACKING_ID is not None:
         try:
+            cid = None
             category = 'queryData'
             action = None
             label = None
@@ -74,6 +75,14 @@ def send_to_ga(job_id:str, task_name:str=None):
                 logging.warning("Unable to find 'X-Forwarded-For' header within request")
                 label = ''
 
+            if 'X-APBS-Client-ID' in request.headers:
+                cid = request.headers['X-APBS-Client-ID']
+            else:
+                http_status_code = 400
+                response['status'] = 'error'
+                response['message'] = "Missing 'X-APBS-Client-ID' header in request."
+                return response, http_status_code
+
             task_name = task_name.lower()
             if task_name in ACCEPTED_WORKFLOWS:
                 if task_name == 'pdb2pqr':
@@ -82,7 +91,7 @@ def send_to_ga(job_id:str, task_name:str=None):
                     action = 'queryAPBS'
 
                 user_agent_header = {'User-Agent': request.headers['User-Agent']}
-                ga_request_body = f'v=1&tid={GA_TRACKING_ID}&cid={job_id}&t=event&ec={category}&ea={action}&el={label}\n'
+                ga_request_body = f'v=1&tid={GA_TRACKING_ID}&cid={cid}&t=event&ec={category}&ea={action}&el={label}\n'
 
                 logging.debug('GA request body: %s', ga_request_body)
                 resp = post('https://www.google-analytics.com/collect', data=ga_request_body, headers=user_agent_header)

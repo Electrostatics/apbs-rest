@@ -291,11 +291,17 @@ class Runner:
                 logging.warning("Unable to find 'X-Forwarded-For' header in request")
                 source_ip = ''
 
+            if 'X-APBS-Client-ID' in request.headers:
+                client_id = request.headers['X-APBS-Client-ID']
+            else:
+                logging.warning("Unable to find 'X-APBS-Client-ID' header in request")
+                client_id = job_id
+                
             e_category = 'apbs'
             e_action = 'submission'
             e_label = source_ip
             ga_user_agent_header = {'User-Agent': request.headers['User-Agent']}
-            ga_request_body = 'v=1&tid=%s&cid=%s&t=event&ec=%s&ea=%s&el=%s\n' % (analytics_id, job_id, e_category, e_action, e_label)
+            ga_request_body = 'v=1&tid=%s&cid=%s&t=event&ec=%s&ea=%s&el=%s\n' % (analytics_id, client_id, e_category, e_action, e_label)
 
             logging.info('Submitting analytics request - category: %s, action: %s', e_category, e_action)
             resp = post('https://www.google-analytics.com/collect', data=ga_request_body, headers=ga_user_agent_header)

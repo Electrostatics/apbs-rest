@@ -271,14 +271,20 @@ class Runner:
 
         self.run_job(job_id, storage_host, tesk_host, image_pull_policy)
 
-        # Upload initial files to storage service
         if 'X-Forwarded-For' in request.headers:
             source_ip = request.headers['X-Forwarded-For']
         else:
             logging.warning("Unable to find 'X-Forwarded-For' header in request")
             source_ip = None
 
-        redirect = redirector(job_id, self.weboptions, 'pdb2pqr', source_ip, analytics_id)
+        if 'X-APBS-Client-ID' in request.headers:
+            client_id = request.headers['X-APBS-Client-ID']
+        else:
+            logging.warning("Unable to find 'X-APBS-Client-ID' header in request")
+            client_id = job_id
+
+        redirect = redirector(job_id, self.weboptions, 'pdb2pqr', source_ip, analytics_id, client_id)
+        # Upload initial files to storage service
         # file_list = [
         #     'typemap',
         #     'pdb2pqr_status',

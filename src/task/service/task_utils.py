@@ -106,6 +106,9 @@ class TaskHandler:
             'User-Agent': request.headers['User-Agent'],
             'X-Forwarded-For': request.headers['X-Forwarded-For']
         }
+        if 'X-APBS-Client-ID' in request.headers:
+            user_headers['X-APBS-Client-ID'] = request.headers['X-APBS-Client-ID']
+
         available_tasks = ['apbs', 'pdb2pqr']
         http_status = 202
 

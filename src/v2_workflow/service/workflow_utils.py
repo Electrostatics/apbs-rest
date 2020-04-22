@@ -81,6 +81,8 @@ class WorkflowHandler:
                 'User-Agent': request.headers['User-Agent'],
                 'X-Forwarded-For': request.headers['X-Forwarded-For']
             }
+            if 'X-APBS-Client-ID' in request.headers:
+                user_headers['X-APBS-Client-ID'] = request.headers['X-APBS-Client-ID']
             logging.debug( dumps(user_headers, indent=2) )
             task_response = post('%s/api/task/%s/%s%s' % (TASK_HOST, job_id, workflow_name, infile_url_query), json=task_params, headers=user_headers)
             if task_response.status_code == 202:
