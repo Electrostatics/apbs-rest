@@ -4,7 +4,8 @@ name: storage service test
 
 on:
   push:
-    branches: storage-test
+    branches: 
+      - '*'
 
 jobs:
   build:
@@ -12,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.8]
 
     steps:
     - uses: actions/checkout@v2
@@ -32,6 +33,7 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         #flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
+      working-directory: src/storage/
       run: |
-        pip install pytest
-        pytest
+        pip install -r requirements-dev.txt
+        pytest 
