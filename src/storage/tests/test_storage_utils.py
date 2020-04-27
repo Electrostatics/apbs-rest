@@ -1,4 +1,6 @@
 import unittest
+from pathlib import Path
+
 from minio import Minio
 from minio.error import ResponseError
 from os import environ, mkdir, path, rmdir, remove, getcwd, stat
@@ -6,7 +8,8 @@ from shutil import rmtree, copyfile
 import json, hashlib, docker, tarfile
 from service import storage_utils
 
-CONFIG = json.load(open('tests/config_vars.json', 'r'))
+THIS_DIR = Path(__file__).resolve().parent
+CONFIG = json.load((THIS_DIR / 'config_vars.json').open('r'))
 MINIO_URL=f'localhost:{CONFIG["PORT"]}'
 
 PORT = CONFIG["PORT"]
@@ -24,7 +27,7 @@ class StorageUtilsTest(unittest.TestCase):
         self.docker_client = docker.from_env()
         # docker_client.images.pull('minio/minio:latest')
         self.minio_container = self.docker_client.containers.run(
-                                    'minio/minio:%s' % MINIO_IMAGE_TAG, 
+                                    'minio/minio:%s' % MINIO_IMAGE_TAG,
                                     'server /data',
                                     name=self.minio_name,
                                     ports={'9000/tcp':PORT},
@@ -42,7 +45,7 @@ class StorageUtilsTest(unittest.TestCase):
                                                             job_bucket_name=MINIO_JOB_BUCKET
                                                         )
 
-        
+
         self.test_dir = 'test'
         self.test_file = 'test/testfile.txt'
         # self.test_file = path.join('.test', 'test_file.txt')
@@ -120,10 +123,10 @@ class StorageUtilsTest(unittest.TestCase):
                 - compute md5
             Assert
                 - compare both md5 hashes
-        ''' 
+        '''
         obj_name = self.test_file
         with open(self.test_file, 'rb') as fin:
-        
+
         # Control
             # obj_fpath   = path.join(STORAGE_CACHE_DIR, obj_name)
             obj_fpath   = '%s/%s' % (STORAGE_CACHE_DIR, obj_name)
@@ -134,7 +137,7 @@ class StorageUtilsTest(unittest.TestCase):
             # obj_data    = open(obj_fpath, 'rb').read()
             control_md5 = hashlib.md5(obj_data).hexdigest()
             fin.seek(0)
-            
+
         # Clean
             self.minio_client.remove_object(MINIO_JOB_BUCKET, obj_name)
             remove(obj_fpath)
@@ -180,8 +183,8 @@ class StorageUtilsTest(unittest.TestCase):
             with open(self.test_file, 'rb') as data:
                 self.minio_client.put_object(MINIO_JOB_BUCKET, copy_name, data, stat(self.test_file).st_size)
             expected_files.append(path.basename(copy_name))
-        
-        # Get tarfile 
+
+        # Get tarfile
         mkdir(job_dir)
         tar_path = self.storage_client.gzip_job_files(MINIO_JOB_BUCKET, self.test_dir)
         with tarfile.open(tar_path, 'r:gz') as tarfin:
@@ -224,7 +227,7 @@ class StorageUtilsTest(unittest.TestCase):
                 # print(f'{obj_name}-{num}')
                 self.minio_client.put_object(MINIO_JOB_BUCKET, f'{obj_name}-{num}', fin, stat(obj_name).st_size)
                 fin.seek(0)
-            
+
             for del_err in self.minio_client.remove_objects(MINIO_JOB_BUCKET, obj_list):
                 print("Deletion Error: {}".format(del_err))
             bucket_objs = self.minio_client.list_objects(MINIO_JOB_BUCKET, prefix=self.test_dir+'/')
