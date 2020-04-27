@@ -41,7 +41,7 @@ jobs:
         # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
     - name: Wait for deployments
-      run: python3 utilities/wait_for_deployments.py 30 10
+      run: python3 utilities/wait_for_deployments.py 30 20
 
     - name: Install PyTest and other Python dependencies
       working-directory: ./tests
