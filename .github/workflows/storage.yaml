@@ -36,4 +36,4 @@ jobs:
       working-directory: src/storage/tests
       run: |
         pip install -r ../requirements-dev.txt
-        pytest test_rest_api
+        pytest test_rest_api.py
