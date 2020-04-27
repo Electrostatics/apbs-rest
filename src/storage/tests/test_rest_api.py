@@ -60,7 +60,7 @@ def setup():
     try:
         subprocess.check_call(["docker-compose", "build"])
         subprocess.check_call(["docker-compose", "up", "-d"])
-        sleep(0.5)
+        sleep(2)
         yield
     finally:
         print("\n cleaning up")
