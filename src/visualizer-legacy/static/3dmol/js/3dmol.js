@@ -421,3 +421,24 @@ function toggleLabels(){
         modelLabels = true
     }
 }
+
+// Adapted from the savePng function from new versions of 3Dmol
+var savePng = function() {
+    // Get query string params
+    let querystring_params = (new URL(document.location)).searchParams
+    let job_id = querystring_params.get('jobid')
+    let pqr_name = querystring_params.get('pqr')
+
+    // Retrieve 3Dmol canvas data from GLViewer
+    let filename = `${job_id}_3dmol.png`;
+    let text = glviewer.pngURI();
+    let ImgData = text;
+
+    // Create anchor element from which to download image
+    let link = document.createElement('a');
+    link.href = ImgData;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}

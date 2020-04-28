@@ -28326,7 +28326,24 @@ $3Dmol.GLViewer = (function() {
         } catch (e) {
             // errors in callback shouldn't invalidate the viewer
             console.log("error with glviewer callback: " + e);
-        }
+		}
+		
+        /**
+         * Return image URI of viewer contents (base64 encoded).
+         * @function $3Dmol.GLViewer#pngURI
+         * 
+         */
+        this.pngURI = function() {
+            return this.getCanvas().toDataURL('image/png');
+        };
+        
+        /**
+         * Return underlying canvas element.         
+         */
+        this.getCanvas = function() {
+            return glDOM.get(0);
+        };
+		
     }
 
     return GLViewer;
