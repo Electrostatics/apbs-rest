@@ -70,36 +70,25 @@ def test_flask_server(setup):
 
     assert r.status_code == 200
 
-#
-# def test_upload():
-#
-#     job_id = "123"
-#     filename = "water.pdb"
-#     filepath = "/Users/marat/Downloads/"+filename
-#
-#     url = F'{STORAGE_ENDPOINT}/{job_id}/{filename}'
-#     files = {'file_data': open(filepath, 'rb')}
-#
-#     r = requests.post(url, files=files)
-#
-#     print("\n status code ", r.status_code, url)
-#     assert r.status_code == 201
-#
-#     filepath = "/Users/marat/tmp/bigfile1"
-#     filename = os.path.basename(filepath)
-#     # generate_big_random_bin_file(filepath, 500)
-#     gen_big_file(filepath, 500)
-#     job_id = 124
-#     url = F'{STORAGE_ENDPOINT}/{job_id}/{filename}'
-#     files = {'file_data': open(filepath, 'rb')}
-#     r = requests.post(url, files=files)
-#     assert r.status_code == 201
-#
-#     r = requests.get(url)
-#     print("\n status code ", r.status_code)
-#     with open(filepath+"_1", 'wb') as f:
-#         f.write(r.content)
-#
-#     assert filecmp.cmp(filepath+"_1",filepath)
-#
-#
+
+def test_upload(setup, tmp_path):
+
+    filepath = tmp_path / "bigfile1"
+    filename = filepath.name
+
+    gen_big_file(filepath, 100)
+    job_id = 124
+    url = F'{STORAGE_ENDPOINT}/{job_id}/{filename}'
+    files = {'file_data': filepath.open('rb')}
+    r = requests.post(url, files=files)
+    assert r.status_code == 201
+
+    r = requests.get(url)
+    filepath1 = tmp_path / "bigfile2"
+    print("\n status code ", r.status_code)
+    with filepath1.open('wb') as f:
+        f.write(r.content)
+
+    assert filecmp.cmp(filepath1,filepath)
+
+
