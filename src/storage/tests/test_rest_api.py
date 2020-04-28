@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 """This is the module."""
 
-#!/usr/bin/python
+# !/usr/bin/python
 # -*- coding: utf-8 -*-
 """This is the module."""
 import filecmp
 import os
 import subprocess
-import urllib
 import uuid
 from random import randint
 
@@ -18,7 +17,7 @@ from time import sleep
 import pytest
 
 FLASK_HOST = "http://localhost:5001"
-STORAGE_ENDPOINT = FLASK_HOST+"/api/storage"
+STORAGE_ENDPOINT = FLASK_HOST + "/api/storage"
 
 
 def generate_big_random_bin_file(filename, size):
@@ -32,15 +31,14 @@ def generate_big_random_bin_file(filename, size):
     https://www.bswen.com/2018/04/python-How-to-generate-random-large-file-using-python.html
     """
 
-    with open('%s'%filename, 'wb') as fp:
-        fp.write(os.urandom(size*1024*1024))
+    with open('%s' % filename, 'wb') as fp:
+        fp.write(os.urandom(size * 1024 * 1024))
 
 
 def gen_big_file(filename, size):
-
-    size = size*1024*1024
+    size = size * 1024 * 1024
     f = open(filename, "wb")
-    f.seek(randint(1, int(size/2)))
+    f.seek(randint(1, int(size / 2)))
     tag = uuid.uuid4()
     f.write(tag.bytes)
     f.seek(size - 1)
@@ -49,12 +47,12 @@ def gen_big_file(filename, size):
     f.close()
     pass
 
-# def test_gen_big_file():
-#     filepath = "/Users/marat/tmp/bigfile2"
-#     gen_big_file(filepath, 1024*1024*1024)
 
 @pytest.fixture(scope="module")
 def setup():
+    """
+    setup/teardown for storage rest service
+    """
     print("entered setup")
 
     try:
@@ -68,7 +66,6 @@ def setup():
 
 
 def test_flask_server(setup):
-
     r = requests.request("GET", FLASK_HOST)
 
     assert r.status_code == 200
@@ -106,4 +103,3 @@ def test_flask_server(setup):
 #     assert filecmp.cmp(filepath+"_1",filepath)
 #
 #
-
