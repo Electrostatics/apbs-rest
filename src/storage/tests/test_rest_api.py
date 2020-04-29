@@ -63,7 +63,7 @@ def services():
     try:
         subprocess.check_call(["docker-compose", "build"])
         subprocess.check_call(["docker-compose", "up", "-d"])
-        sleep(2)
+        # sleep(2)
         yield
     finally:
         print("\n stopping services")
