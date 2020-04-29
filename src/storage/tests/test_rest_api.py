@@ -4,6 +4,7 @@
 
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
+import tarfile
 from pathlib import Path
 
 """This is the module."""
@@ -116,7 +117,23 @@ def test_upload(services, test_data, tmp_path):
             f.write(r.content)
 
         assert filecmp.cmp(download_path, filepath)
-    #
+
+    url = F'{STORAGE_ENDPOINT}/{job_id}'
+    r = requests.get(url)
+    download_dir = tmp_path / "downloaded"
+    download_dir.mkdir()
+    download_path = download_dir / "test.tgz"
+    assert r.status_code == 200
+    with download_path.open('wb') as f:
+        f.write(r.content)
+
+    with tarfile.open(download_path) as tf:
+        tf.extractall(download_dir)  # specify which folder to extract to
+
+    for filepath in test_files:
+        filename = filepath.name
+        assert filecmp.cmp(download_dir / filename, filepath)
+
 
     # filepath = tmp_path / "bigfile1"
     # filename = filepath.name
