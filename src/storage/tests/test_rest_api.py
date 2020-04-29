@@ -22,6 +22,8 @@ import pytest
 FLASK_HOST = "http://localhost:5001"
 STORAGE_ENDPOINT = FLASK_HOST + "/api/storage"
 
+# RESPONSE CODES
+DELETE_OK = 204
 
 def generate_big_random_bin_file(filename, size):
     """
@@ -134,6 +136,11 @@ def test_upload(services, test_data, tmp_path):
         filename = filepath.name
         assert filecmp.cmp(download_dir / filename, filepath)
 
+    # test deletion
+    url = F'{STORAGE_ENDPOINT}/{job_id}'
+    r = requests.delete(url)
+
+    assert r.status_code == DELETE_OK
 
     # filepath = tmp_path / "bigfile1"
     # filename = filepath.name
