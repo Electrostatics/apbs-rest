@@ -3,8 +3,6 @@ version: '3'
 services:
   minio:
     image: minio/minio:latest
-    volumes:
-      - ${MINIO_DATA_FOLDER:?}:/data
     ports:
       - "${MINIO_PORT_HOST:?}:9000"
     environment:
