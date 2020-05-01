@@ -14,7 +14,7 @@ ENV STORAGE_CACHE_DIR="/app/.minio_cache" \
     FLASK_RUN_HOST="0.0.0.0" \
     FLASK_DEBUG="1" \
     FLASK_APP="main.py"
-RUN echo $FLASK_APP
+
 
 COPY . ./
 
