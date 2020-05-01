@@ -21,8 +21,8 @@ COPY . ./
 EXPOSE 5001
 ENTRYPOINT [ "python" ]
 CMD [ "main.py" ]
-ENTRYPOINT [ "flask" ]
-CMD [ "run" ]
+#ENTRYPOINT [ "flask" ]
+#CMD [ "run" ]
 
 #gunicorn fails on local
 #ENTRYPOINT [ "gunicorn" ]

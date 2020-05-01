@@ -29,9 +29,3 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:?}
       MINIO_URL: minio:9000
 
-  tester:
-    build:
-      context: ..
-      dockerfile: $PWD/Dockerfile-curl
-    links: ["flaskapp"]
-    command: ash -c "while ! curl -v --max-time 0.5 flaskapp:5001 ; do sleep 1; done"
