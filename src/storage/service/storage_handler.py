@@ -19,7 +19,7 @@ JOB_BUCKET_NAME  = os.environ.get('MINIO_JOB_BUCKET', 'jobs')
 class StorageHandler:
     def __init__(self):
         self.minioClient = storage_utils.get_minio_client(MINIO_URL, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
-        self.storageClient = storage_utils.StorageClient(MINIO_URL, MINIO_CACHE_DIR, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
+        self.storageClient = storage_utils.StorageClient(MINIO_URL, MINIO_CACHE_DIR, MINIO_ACCESS_KEY, MINIO_SECRET_KEY, job_bucket_name=JOB_BUCKET_NAME)
     
     def get(self, object_name, job_id, file_name=None):
         if file_name:
