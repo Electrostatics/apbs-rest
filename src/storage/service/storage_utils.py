@@ -24,6 +24,10 @@ class StorageClient:
         except NoSuchKey:
             return False
 
+    def presigned_get_object(self, bucket_name, object_name):
+        presigned_url = self.__minio_client.presigned_get_object(bucket_name, object_name)
+        return presigned_url
+
     def get_object(self, bucket_name, object_name, request_headers=None):
         data = None
         if not self.inside_cache(bucket_name, object_name):
