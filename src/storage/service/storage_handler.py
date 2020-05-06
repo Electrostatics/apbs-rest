@@ -55,6 +55,12 @@ class StorageHandler:
                             response.headers['Content-Type'] = 'text/plain; charset=utf-8'
                         else:
                             response.headers['Content-Disposition'] = 'attachment; filename="%s"' % file_name
+
+                        if 'Accept-Encoding' in request.headers and 'gzip' in request.headers['Accept-Encoding']:   
+                            if os.path.splitext(object_name)[1] == '.gz':
+                                # TODO: check that it is not a range request
+                                response.headers['Content-Encoding'] = 'gzip'
+
                     else:
                         if self.storageClient.object_exists(JOB_BUCKET_NAME, object_name):
                             http_response_code = 204
