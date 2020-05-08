@@ -118,13 +118,21 @@ then
     then
       echo 'Found a *.dx file:' $file
       echo $JOB_ID/${file} >> ${task_name}_status
-      echo $JOB_ID/${file} >> ${task_name}_output_files
+
+      echo 'Compressing *.dx file with gzip:' $file
+      gzip -k -9 $file
+      echo $JOB_ID/${file}.gz >> ${task_name}_output_files
+      echo 'Compression complete:' $file'.gz'
 
       echo 'Converting to *.cube file:' $pqr_prefix'.cube'
       python ../dx2cube.py $file $pqr_name $pqr_prefix.cube
       if [ -f $pqr_prefix.cube ]; then
-        echo $JOB_ID/${pqr_prefix}.cube >> ${task_name}_output_files
         echo 'Conversion complete:' $pqr_prefix'.cube'
+
+        echo 'Compressing *.cube file with gzip:' $pqr_prefix'.cube'
+        gzip -k -9 $pqr_prefix.cube
+        echo $JOB_ID/${pqr_prefix}.cube.gz >> ${task_name}_output_files
+        echo 'Compression complete:' $pqr_prefix'.cube.gz'
       fi
     fi
   done

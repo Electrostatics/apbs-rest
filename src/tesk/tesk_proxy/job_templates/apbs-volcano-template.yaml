@@ -96,10 +96,10 @@ spec:
               resources:
                   requests:
                     memory: "100Mi"
-                    cpu: "100m"
+                    cpu: "500m" # TODO: convert to template form
                   limits:
                     memory: {{uploader_memory_limit}}
-                    cpu: "100m"
+                    cpu: "1000m" # TODO: convert to template form
               image: electrostatics/apbs-uploader:latest
               imagePullPolicy: {{image_pull_policy}}
               name: apbs-rest-uploader
