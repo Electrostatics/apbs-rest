@@ -11,7 +11,8 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.16.2/cmake-3.16.2
     && git clone https://github.com/Electrostatics/apbs-pdb2pqr.git
 
 WORKDIR /app/apbs-pdb2pqr/apbs
-RUN git submodule init \
+RUN git checkout b3bfeec \
+    && git submodule init \
     && git submodule update \
     && mkdir -p /app/builds/apbs \
     && cd /app/builds/apbs \
