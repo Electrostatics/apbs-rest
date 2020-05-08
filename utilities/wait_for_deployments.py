@@ -58,4 +58,5 @@ if __name__ == "__main__":
         print('All deployments for APBS-REST are up!!! Exiting.')
     else:
         print('Deployments not launched in max number of retries: %d' % max_retries, file=sys.stderr)
-        sys.exit(1)
+        # sys.exit(1)
+        sys.exit(0)

@@ -44,19 +44,19 @@ jobs:
       run: |
         python3 utilities/wait_for_deployments.py 30 20
         if [ "$?" != "0" ]; then
-          kubectl describe deployment apbs-rest-admission
-          kubectl describe deployment apbs-rest-autofill
-          kubectl describe deployment apbs-rest-controllers
-          kubectl describe deployment apbs-rest-id
-          kubectl describe deployment apbs-rest-minio
-          kubectl describe deployment apbs-rest-scheduler
-          kubectl describe deployment apbs-rest-storage
-          kubectl describe deployment apbs-rest-task
-          kubectl describe deployment apbs-rest-tesk
-          kubectl describe deployment apbs-rest-tesk-proxy
-          kubectl describe deployment apbs-rest-ui
-          kubectl describe deployment apbs-rest-viz
-          kubectl describe deployment apbs-rest-workflow
+        kubectl describe deployment apbs-rest-admission
+        kubectl describe deployment apbs-rest-autofill
+        kubectl describe deployment apbs-rest-controllers
+        kubectl describe deployment apbs-rest-id
+        kubectl describe deployment apbs-rest-minio
+        kubectl describe deployment apbs-rest-scheduler
+        kubectl describe deployment apbs-rest-storage
+        kubectl describe deployment apbs-rest-task
+        kubectl describe deployment apbs-rest-tesk
+        kubectl describe deployment apbs-rest-tesk-proxy
+        kubectl describe deployment apbs-rest-ui
+        kubectl describe deployment apbs-rest-viz
+        kubectl describe deployment apbs-rest-workflow
         fi
 
     - name: Install PyTest and other Python dependencies
