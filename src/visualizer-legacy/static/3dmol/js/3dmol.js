@@ -442,3 +442,10 @@ var savePng = function() {
     link.click();
     document.body.removeChild(link);
 }
+
+// Callback function for adjusting transparency slider
+var adjustBackgroundTransparency = function(alpha_val) {
+    document.getElementById("bg_alpha_val").innerHTML = alpha_val;
+    glviewer.setBackgroundColor('black', 1-(alpha_val/100))
+    glviewer.render()
+}

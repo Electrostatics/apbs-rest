@@ -99,7 +99,15 @@ function build_page(jobid){
 
 
 "<div class='inner'><ul class='button-group round'><input type='button' button class='button-backbone pure-button' style='width: 85px; height: 30px; color: black' input type='button' value='Recenter' onclick='glviewer.zoomTo();'></button></input></ul></div>" +
+
+// Background Transparency slider
+"<br><font style='color:white; font-size:12pt'>Background Transparency:</font>" +
+" <p style='color:white; font-size: 16px'> <input type=range min=0 max=100 value=0 id='transparency_slider' step=5 oninput='adjustBackgroundTransparency(value)'>&nbsp;&nbsp;&nbsp;&nbsp; <span id='bg_alpha_val'> 0 </span> </p>  " +
+
+// Save PNG button
 "<div class='inner'><ul class='button-group round'><input type='button' button class='button-backbone pure-button' style='width: 85px; height: 30px; color: black' input type='button' value='Save PNG' onclick='savePng();'></button></input></ul></div>" +
+
+// End
 "<br></div></div>" +
 "<!--</td></tr></table>-->" 
 
