@@ -45,10 +45,15 @@ jobs:
         tar -xvf helm-v3.0.0-linux-amd64.tar
         mv linux-amd64/ helm-v3
 
+    - name: Verify Helm Installation
+      run: |
+        which helm
+        helm version
+
     - name: Install APBS-REST via Helm
       run: |
-        sudo minikube addons enable ingress
-        sudo ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+        minikube addons enable ingress
+        ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
         # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
     - name: Wait for deployments
