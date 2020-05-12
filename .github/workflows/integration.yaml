@@ -32,13 +32,20 @@ jobs:
       with:
         minikube version: 'v1.9.2'
         kubernetes version: 'v1.15.1'
+    
+    - name: Setup Minikube
+      run: |
+        curl -LO https://storage.googleapis.com/minikube/releases/v1.9.2/minikube-linux-amd64
+        chmod +x minikube
+        sudo mkdir -p /usr/local/bin/
+        sudo install minikube /usr/local/bin/
 
-    - name: Verify Minikube Installation and Enable Ingress
+    - name: Verify Minikube Installation and Start Cluster
       run: |
         which minikube
+        minikube start --kubernetes-version='v1.15.1' --memory='4096mb' --driver=none
         minikube status
-        MINKUBE_LOCATION=$(which minikube)
-        sudo $MINKUBE_LOCATION addons enable ingress
+        minikube addons enable ingress
 
     - name: Download Helm v3
       run: |
