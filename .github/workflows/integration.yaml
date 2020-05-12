@@ -33,6 +33,11 @@ jobs:
         minikube version: 'v1.9.2'
         kubernetes version: 'v1.15.1'
 
+    - name: Verify Minikube Installation
+      run: |
+        which minikube
+        minikube status
+
     - name: Download Helm v3
       run: |
         wget https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
