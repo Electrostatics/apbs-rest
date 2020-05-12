@@ -17,15 +17,21 @@ jobs:
     - name: Git checkout APBS-REST codebase
       uses: actions/checkout@v1
 
-    - name: Setup Minikube
-      uses: CodingNagger/minikube-setup-action@v1.0.2
-      with:
-        minikube-version: 1.9.2
-        k8s-version: 1.14.8
-      id: minikube
+    # - name: Setup Minikube
+    #   uses: CodingNagger/minikube-setup-action@v1.0.2
+    #   with:
+    #     minikube-version: 1.4.0
+    #     k8s-version: 1.15.1
+    #   id: minikube
 
-    - name: Launch Minikube
-      run: eval ${{ steps.minikube.outputs.launcher }}
+    # - name: Launch Minikube
+    #   run: eval ${{ steps.minikube.outputs.launcher }}
+
+    - name: Setup Minikube
+      uses: manusa/actions-setup-minikube@v1.0.2
+      with:
+        minikube version: 'v1.9.2'
+        kubernetes version: 'v1.15.1'
 
     - name: Download Helm v3
       run: |
