@@ -38,7 +38,7 @@ jobs:
         which minikube
         minikube status
         MINKUBE_LOCATION=$(which minikube)
-        sudo MINKUBE_LOCATION addons enable ingress
+        sudo $MINKUBE_LOCATION addons enable ingress
 
     - name: Download Helm v3
       run: |
