@@ -20,8 +20,8 @@ jobs:
     - name: Setup Minikube
       uses: CodingNagger/minikube-setup-action@v1.0.2
       with:
-        minikube-version: 1.4.0
-        k8s-version: 1.16.0
+        minikube-version: 1.9.2
+        k8s-version: 1.14.8
       id: minikube
 
     - name: Launch Minikube
