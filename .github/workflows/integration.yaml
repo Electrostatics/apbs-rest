@@ -33,7 +33,7 @@ jobs:
     #     minikube version: 'v1.9.2'
     #     kubernetes version: 'v1.15.1'
     
-    - name: Setup Minikube
+    - name: Install Minikube
       run: |
         curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.9.2/minikube-linux-amd64
         chmod +x minikube
@@ -43,7 +43,7 @@ jobs:
     - name: Verify Minikube Installation and Start Cluster
       run: |
         which minikube
-        minikube start --kubernetes-version='v1.15.1' --memory='4096mb' --driver=none
+        minikube start --kubernetes-version='v1.15.1' --driver=none
         minikube status
         minikube addons enable ingress
 
