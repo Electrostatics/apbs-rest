@@ -43,9 +43,9 @@ jobs:
     - name: Verify Minikube Installation and Start Cluster
       run: |
         which minikube
-        sudo minikube start --kubernetes-version='v1.15.1' --driver=none
+        minikube start --kubernetes-version='v1.15.1' --driver=docker
         minikube status
-        sudo minikube addons enable ingress
+        minikube addons enable ingress
 
     - name: Download Helm v3
       run: |
