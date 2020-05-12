@@ -33,10 +33,11 @@ jobs:
         minikube version: 'v1.9.2'
         kubernetes version: 'v1.15.1'
 
-    - name: Verify Minikube Installation
+    - name: Verify Minikube Installation and Enable Ingress
       run: |
         which minikube
         minikube status
+        sudo minikube addons enable ingress
 
     - name: Download Helm v3
       run: |
@@ -52,7 +53,6 @@ jobs:
 
     - name: Install APBS-REST via Helm
       run: |
-        minikube addons enable ingress
         ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
         # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
