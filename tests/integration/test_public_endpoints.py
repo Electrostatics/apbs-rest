@@ -129,7 +129,7 @@ def test_task_service():
 
         assert json_dict['jobtype'] in json_dict.keys()
         assert set(['jobtype', 'error', 'jobid', json_dict['jobtype']]) == json_dict.keys()
-        assert set(['status', 'startTime', 'endTime', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()
+        assert set(['status', 'startTime', 'endTime', 'subtasks', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()
         
         # GET: nonexistent task for invalid taskname
         response = requests.get('%s/%s/nonexistent_task_name' % (task_url, dummy_job_id))

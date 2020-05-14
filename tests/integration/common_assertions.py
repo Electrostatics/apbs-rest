@@ -15,7 +15,7 @@ def assert_task_status(task_url: str, job_id: str, jobtype: str, timeout_minutes
     assert json_dict['jobtype'] in json_dict.keys()
     assert set(['jobtype', 'jobid', json_dict['jobtype']]) == json_dict.keys()
     # time.sleep(2)
-    assert set(['status', 'startTime', 'endTime', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()    
+    assert set(['status', 'startTime', 'endTime', 'subtasks', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()    
     assert json_dict[json_dict['jobtype']]['status'] in {'pending', 'running'}
 
 
@@ -54,7 +54,7 @@ def assert_task_status(task_url: str, job_id: str, jobtype: str, timeout_minutes
 
     assert json_dict['jobtype'] in json_dict.keys()
     assert set(['jobtype', 'jobid', json_dict['jobtype']]) == json_dict.keys()
-    assert set(['status', 'startTime', 'endTime', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()
+    assert set(['status', 'startTime', 'endTime', 'subtasks', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()
     assert json_dict[json_dict['jobtype']]['status'] == 'complete'
 
 def assert_workflow_status(workflow_url: str, job_id: str, jobtype: str, timeout_minutes: int=10):
@@ -69,7 +69,7 @@ def assert_workflow_status(workflow_url: str, job_id: str, jobtype: str, timeout
     assert json_dict['jobtype'] in json_dict.keys()
     # pprint(json_dict)
     assert set(['jobtype', 'jobid', json_dict['jobtype']]) == json_dict.keys()
-    assert set(['status', 'startTime', 'endTime', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()    
+    assert set(['status', 'startTime', 'endTime', 'subtasks', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()    
     assert json_dict[json_dict['jobtype']]['status'] in {'running', 'pending'}
 
     # GET: continually check status of running task till completion
@@ -94,5 +94,5 @@ def assert_workflow_status(workflow_url: str, job_id: str, jobtype: str, timeout
 
     assert json_dict['jobtype'] in json_dict.keys()
     assert set(['jobtype', 'jobid', json_dict['jobtype']]) == json_dict.keys()
-    assert set(['status', 'startTime', 'endTime', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()
+    assert set(['status', 'startTime', 'endTime', 'subtasks', 'files', 'inputFiles', 'outputFiles']) ==  json_dict[json_dict['jobtype']].keys()
     assert json_dict[json_dict['jobtype']]['status'] == 'complete'

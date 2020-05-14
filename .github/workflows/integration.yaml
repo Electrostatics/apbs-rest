@@ -47,12 +47,12 @@ jobs:
         minikube status
         minikube addons enable ingress
 
-    - name: Download Helm v3
-      run: |
-        wget https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
-        gunzip helm-v3.0.0-linux-amd64.tar.gz
-        tar -xvf helm-v3.0.0-linux-amd64.tar
-        mv linux-amd64/ helm-v3
+    # - name: Download Helm v3
+    #   run: |
+    #     wget https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
+    #     gunzip helm-v3.0.0-linux-amd64.tar.gz
+    #     tar -xvf helm-v3.0.0-linux-amd64.tar
+    #     mv linux-amd64/ helm-v3
 
     - name: Verify Helm Installation
       run: |
@@ -61,8 +61,7 @@ jobs:
 
     - name: Install APBS-REST via Helm
       run: |
-        ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
-        # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
+        helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).nip.io
 
     - name: Wait for deployments
       run: |
@@ -83,5 +82,5 @@ jobs:
       working-directory: ./tests/integration
       run: |
         source ../venv/bin/activate
-        APBS_HOST=apbs.$(minikube ip).xip.io pytest -n 3
+        APBS_HOST=apbs.$(minikube ip).nip.io pytest -n 3
         

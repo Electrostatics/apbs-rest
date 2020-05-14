@@ -17,34 +17,34 @@ tesk:
 ui:
   image:
     repository: electrostatics/apbs-ui
-    tag: 0.2.0
+    tag: 0.2.2
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 viz:
   image:
     repository: electrostatics/apbs-viz-legacy
-    tag: 0.2.0
+    tag: 0.2.2
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 task:
   image:
     repository: electrostatics/apbs-task
-    tag: 0.2.0
+    tag: 0.2.2
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 teskproxy:
   image:
     repository: electrostatics/apbs-tesk-proxy
-    tag: 0.2.0
+    tag: 0.2.2
     #pullPolicy: IfNotPresent
     pullPolicy: Always
   env:
     workloadPullPolicy: Always
     apbsExecMemoryLimit: 8192Mi
-    apbsUploadMemoryLimit: 100Mi
+    apbsUploadMemoryLimit: 8192Mi
     pdb2pqrExecMemoryLimit: 512Mi
 
     # volcanoNamespace: volcano-system
@@ -52,35 +52,35 @@ teskproxy:
 autofill:
   image:
     repository: electrostatics/apbs-autofill
-    tag: 0.2.0
+    tag: 0.2.2
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 id:
   image:
     repository: electrostatics/apbs-uid
-    tag: 0.2.0
+    tag: 0.2.2
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 storage:
   image:
     repository: electrostatics/apbs-storage
-    tag: 0.2.0
+    tag: 0.2.2
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 workflow:
   image:
     repository: electrostatics/apbs-workflow
-    tag: 0.2.0
+    tag: 0.2.2
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 minio:
   image:
     repository: minio/minio
-    tag: RELEASE.2019-07-10T00-34-56Z
+    tag: RELEASE.2020-04-04T05-39-31Z
     pullPolicy: IfNotPresent
 
 service:
@@ -94,7 +94,8 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   path: /
   hosts:
-    - chart-example.local
+    # Hostname specified here is flexible. Using below as default
+    - apbs.localhost
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
