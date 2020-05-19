@@ -255,7 +255,7 @@ class Runner:
         # print(response.content)
         return
 
-    def start(self, storage_host, tesk_host, image_pull_policy, analytics_id):
+    def start(self, storage_host, tesk_host, image_pull_policy, analytics_id, analytics_dim_index=None):
         # Acquire job ID
         self.starttime = time.time()
         # job_id = setID(self.starttime)
@@ -283,7 +283,7 @@ class Runner:
             logging.warning("Unable to find 'X-APBS-Client-ID' header in request")
             client_id = job_id
 
-        redirect = redirector(job_id, self.weboptions, 'pdb2pqr', source_ip, analytics_id, client_id)
+        redirect = redirector(job_id, self.weboptions, 'pdb2pqr', source_ip, analytics_id, analytics_dim_index, client_id)
         # Upload initial files to storage service
         # file_list = [
         #     'typemap',

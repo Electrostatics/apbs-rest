@@ -28,7 +28,7 @@ def setID(time):
     return id
 
 
-def redirector(name, weboptions, jobtype=None, client_ip=None, analytics_id=None, ga_client_id=None):
+def redirector(name, weboptions, jobtype=None, client_ip=None, analytics_id=None, analytics_dim_index=None, ga_client_id=None):
     """
         Prints a page which redirects the user to querystatus.cgi and writes starting time to file
     """
@@ -87,9 +87,14 @@ def redirector(name, weboptions, jobtype=None, client_ip=None, analytics_id=None
                 'User-Agent': request.headers['User-Agent']
             }
             on_first = True
+
+            custom_dim = ''
+            if analytics_dim_index is not None:
+                custom_dim = '&cd%s=%s' % ( str(analytics_dim_index), jobid )
+
             for event in events:
                 # Make Google Analytics request body
-                ga_event_request_body += 'v=1&tid=%s&cid=%s&t=event&ec=submissionData&ea=%s&el=%s\n' % (analytics_id, ga_client_id, event, events[event])
+                ga_event_request_body += 'v=1&tid=%s&cid=%s&t=event&ec=submissionData&ea=%s&el=%s%s\n' % (analytics_id, ga_client_id, event, events[event], custom_dim)
             
             try:
                 logging.info('GA request body:\n%s' % ga_event_request_body)

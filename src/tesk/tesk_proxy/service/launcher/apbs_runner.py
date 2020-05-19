@@ -263,7 +263,7 @@ class Runner:
         # print(response.content)
         return
 
-    def start(self, storage_host, tesk_host, image_pull_policy, analytics_id=None):
+    def start(self, storage_host, tesk_host, image_pull_policy, analytics_id=None, analytics_dim_index=None):
         # pass
         job_id = self.job_id
 
@@ -300,8 +300,13 @@ class Runner:
             e_category = 'apbs'
             e_action = 'submission'
             e_label = source_ip
+            custom_dim = ''
+
+            if analytics_dim_index is not None:
+                custom_dim = '&cd%s=%s' % ( str(analytics_dim_index), job_id )
+
             ga_user_agent_header = {'User-Agent': request.headers['User-Agent']}
-            ga_request_body = 'v=1&tid=%s&cid=%s&t=event&ec=%s&ea=%s&el=%s\n' % (analytics_id, client_id, e_category, e_action, e_label)
+            ga_request_body = 'v=1&tid=%s&cid=%s&t=event&ec=%s&ea=%s&el=%s%s\n' % (analytics_id, client_id, e_category, e_action, e_label, custom_dim)
 
             logging.info('Submitting analytics request - category: %s, action: %s', e_category, e_action)
             resp = post('https://www.google-analytics.com/collect', data=ga_request_body, headers=ga_user_agent_header)

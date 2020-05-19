@@ -11,8 +11,15 @@ workflow_handler = workflow_utils.WorkflowHandler()
 ACCEPTED_WORKFLOWS = {'apbs', 'pdb2pqr'}
 END_STATES = ['complete', 'error', None]
 TASK_HOST = getenv('TASK_HOST')
+
 GA_TRACKING_ID = getenv('GA_TRACKING_ID', None)
 if GA_TRACKING_ID == '': GA_TRACKING_ID = None
+GA_JOBID_INDEX = getenv('GA_JOBID_INDEX', None)
+if GA_JOBID_INDEX == '': GA_JOBID_INDEX = None
+
+# Bail if GA_TRACKING_ID is set but GA_JOBID_INDEX is not
+if GA_TRACKING_ID is not None and GA_JOBID_INDEX is None:
+    raise ValueError("GA_TRACKING_ID is set in environment but not GA_JOBID_INDEX. GA_JOBID_INDEX must be an integer.")
 
 @workflow_app.route('/', methods=['GET'])
 @workflow_app.route('/check', methods=['GET'])
@@ -68,6 +75,7 @@ def send_to_ga(job_id:str, task_name:str=None):
             category = 'queryData'
             action = None
             label = None
+            custom_dim = ''
             
             if 'X-Forwarded-For' in request.headers:
                 label = request.headers['X-Forwarded-For']
@@ -83,6 +91,9 @@ def send_to_ga(job_id:str, task_name:str=None):
                 response['message'] = "Missing 'X-APBS-Client-ID' header in request."
                 return response, http_status_code
 
+            if GA_JOBID_INDEX is not None:
+                custom_dim = f'&cd{GA_JOBID_INDEX}={job_id}'
+
             task_name = task_name.lower()
             if task_name in ACCEPTED_WORKFLOWS:
                 if task_name == 'pdb2pqr':
@@ -91,7 +102,7 @@ def send_to_ga(job_id:str, task_name:str=None):
                     action = 'queryAPBS'
 
                 user_agent_header = {'User-Agent': request.headers['User-Agent']}
-                ga_request_body = f'v=1&tid={GA_TRACKING_ID}&cid={cid}&t=event&ec={category}&ea={action}&el={label}\n'
+                ga_request_body = f'v=1&tid={GA_TRACKING_ID}&cid={cid}&t=event&ec={category}&ea={action}&el={label}{custom_dim}\n'
 
                 logging.debug('GA request body: %s', ga_request_body)
                 resp = post('https://www.google-analytics.com/collect', data=ga_request_body, headers=user_agent_header)

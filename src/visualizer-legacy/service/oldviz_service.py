@@ -7,6 +7,12 @@ import os, logging, requests
 STORAGE_URL  = os.environ.get('STORAGE_URL' , 'http://localhost:5001/api/storage')
 GA_TRACKING_ID = os.environ.get('GA_TRACKING_ID', None)
 if GA_TRACKING_ID == '': GA_TRACKING_ID = None
+GA_JOBID_INDEX = os.environ.get('GA_JOBID_INDEX', None)
+if GA_JOBID_INDEX == '': GA_JOBID_INDEX = None
+
+# Bail if GA_TRACKING_ID is set but GA_JOBID_INDEX is not
+if GA_TRACKING_ID is not None and GA_JOBID_INDEX is None:
+    raise ValueError("GA_TRACKING_ID is set in environment but not GA_JOBID_INDEX. GA_JOBID_INDEX must be an integer.")
 
 viz_service = Blueprint('viz_service', __name__)
 
@@ -57,6 +63,7 @@ def render_3dmol():
         e_category = 'apbs'
         e_action = 'visualize'
         e_label = request.headers['X-Forwarded-For']
+        custom_dim_name = 'jobid'
         ga_user_agent_header = {'User-Agent': request.headers['User-Agent']}
         ga_request_body = 'v=1&tid=%s&cid=%s&t=event&ec=%s&ea=%s&el=%s\n' % (GA_TRACKING_ID, cid, e_category, e_action, e_label)
 
@@ -72,13 +79,18 @@ def render_3dmol():
                         function gtag(){dataLayer.push(arguments);}
                         gtag('js', new Date());
 
-                        gtag('config', '%s');
+                        gtag('config', '%s', {
+                            'custom_map': {
+                                'dimension%s': '%s',
+                            }
+                        });
                         gtag('event', '%s', {
                             'event_category': '%s',
                             'event_label': '%s',
+                            '%s': '%s',
                         });
                         </script>
-                    """ % (GA_TRACKING_ID, GA_TRACKING_ID, e_action, e_category, e_label)
+                    """ % (GA_TRACKING_ID, GA_TRACKING_ID, GA_JOBID_INDEX, custom_dim_name, e_action, e_category, e_label, custom_dim_name, job_id)
 
     if http_status == 400:
         error_message = f'Missing arguments in URL query: <b>{missing_args}</b>'
