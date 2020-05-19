@@ -51,6 +51,8 @@ spec:
             value: {{ .Values.teskproxy.env.pdb2pqrExecMemoryLimit }}
           - name: GA_TRACKING_ID
             value: {{ .Values.common.env.googleAnalyticsId }}
+          - name: GA_JOBID_INDEX
+            value: {{ .Values.common.env.googleAnalyticsJobidIndex | quote }}
           ports:
             - name: http
               containerPort: 5007

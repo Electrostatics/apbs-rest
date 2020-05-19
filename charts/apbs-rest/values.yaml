@@ -7,6 +7,7 @@ replicaCount: 1
 common:
   env:
     googleAnalyticsId:
+    googleAnalyticsJobidIndex:
 
 tesk:
   image:
