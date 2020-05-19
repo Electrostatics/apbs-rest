@@ -49,10 +49,10 @@ function build_page(jobid){
 "<br><font style='color:white; font-size:12pt'>Surface Potential:</font>" +
 
 //change min isoval
-" <p style='color:white; font-size: 16px'> Min<input type=range min=-50 max=50 value=-5 id='min_isoval2' step=1 oninput='set_min_isoval2(value)'>&nbsp;&nbsp;&nbsp;&nbsp;<span id='min_isoval'>-5 </span> kT/e </p>  " +
+" <p style='color:white; font-size: 16px'> Min <input type=range min=-50 max=50 value=-5 id='min_isoval2' step=1 oninput='set_min_isoval2(value)'>&nbsp;&nbsp;&nbsp;&nbsp;<span id='min_isoval'>-5 </span> kT/e </p>  " +
 
 //change max isoval
-" <p style='color:white; font-size: 16px'> Max<input type=range min=-50 max=50 value=5 id='max_isoval2' step=1 oninput='set_max_isoval2(value)'>&nbsp;&nbsp;&nbsp;&nbsp;<span id='max_isoval'> 5 </span> kT/e </p>  " +
+" <p style='color:white; font-size: 16px'> Max <input type=range min=-50 max=50 value=5 id='max_isoval2' step=1 oninput='set_max_isoval2(value)'>&nbsp;&nbsp;&nbsp;&nbsp;<span id='max_isoval'> 5 </span> kT/e </p>  " +
 
 //reset button
 "<div class='inner'><ul class='button-group round'></input>" +
