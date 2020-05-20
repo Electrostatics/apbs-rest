@@ -38,14 +38,26 @@ jobs:
 
       - name: 'Build Container: ID Service'
         working-directory: ./src/uid
-        run: |
-          docker build -t apbs-uid .
+        run: docker build -t apbs-uid .
 
-      # - name: 'Build Container: Storage Service'
-      # - name: 'Build Container: Workflow Service'
-      # - name: 'Build Container: Task Service'
+      - name: 'Build Container: Storage Service'
+        working-directory: ./src/storage
+        run: docker build -t apbs-storage .
+
+      - name: 'Build Container: Workflow Service'
+        working-directory: ./src/v2_workflow
+        run: docker build -t apbs-workflow .
+        
+      - name: 'Build Container: Task Service'
+        working-directory: ./src/task
+        run: docker build -t apbs-task .
+      
       # - name: 'Build Container: Proxy Service'
-      # - name: 'Build Container: Visualization Service'
+
+      - name: 'Build Container: Visualization Service'
+        working-directory: ./src/visualizer-legacy
+        run: docker build -t apbs-viz-legacy .
+        
       # - name: 'Build Container: Autofill Service'
       # - name: 'Build Container: Uploader'
       # - name: 'Build Container: Downloader'
