@@ -1,0 +1,121 @@
+# Default values for apbsrest.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+tesk:
+  image:
+    repository: eu.gcr.io/tes-wes/tesk-api
+    tag: v0.4.2
+    pullPolicy: IfNotPresent
+
+ui:
+  image:
+    repository: apbs-ui
+    tag: latest
+    pullPolicy: IfNotPresent
+    # pullPolicy: Always
+
+viz:
+  image:
+    repository: apbs-viz-legacy
+    tag: latest
+    pullPolicy: IfNotPresent
+    # pullPolicy: Always
+
+task:
+  image:
+    repository: apbs-task
+    tag: latest
+    pullPolicy: IfNotPresent
+    # pullPolicy: Always
+
+teskproxy:
+  image:
+    repository: apbs-tesk-proxy
+    tag: latest
+    pullPolicy: IfNotPresent
+    # pullPolicy: Always
+  env:
+    workloadPullPolicy: Always
+    apbsExecMemoryLimit: 8192Mi
+    apbsUploadMemoryLimit: 8192Mi
+    pdb2pqrExecMemoryLimit: 512Mi
+    # volcanoNamespace: volcano-system
+
+autofill:
+  image:
+    repository: apbs-autofill
+    tag: latest
+    pullPolicy: IfNotPresent
+    # pullPolicy: Always
+
+id:
+  image:
+    repository: apbs-uid
+    tag: latest
+    pullPolicy: IfNotPresent
+    # pullPolicy: Always
+
+storage:
+  image:
+    repository: apbs-storage
+    tag: latest
+    pullPolicy: IfNotPresent
+    # pullPolicy: Always
+
+workflow:
+  image:
+    repository: apbs-workflow
+    tag: latest
+    pullPolicy: IfNotPresent
+    # pullPolicy: Always
+
+minio:
+  image:
+    repository: minio/minio
+    # tag: RELEASE.2019-10-12T01-39-57Z
+    # tag: RELEASE.2019-07-10T00-34-56Z
+    tag: RELEASE.2020-04-04T05-39-31Z
+    pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  # enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - apbs.127.0.0.1.xip.io
+    - apbs.127.0.0.1.nip.io
+    # - "127.0.0.1"
+    - apbs.localhost
+    # - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

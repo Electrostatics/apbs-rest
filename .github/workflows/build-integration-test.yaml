@@ -1,0 +1,128 @@
+name: Build APBS-REST Containers + Integration
+on: 
+  push:
+    paths:
+      - '.github/workflows/build-integration-test.yaml'
+      - 'src/**'
+
+      - 'utilities/wait_for_deployments.py'
+      - 'tests/integration/**'
+      - 'tests/requirements.txt'
+      - 'charts/**'
+      
+
+jobs:
+  build-images:
+    name: Build All Images
+    runs-on: ubuntu-latest
+    steps:
+    # - continue-on-error: false
+    - name: Git checkout APBS-REST codebase
+      uses: actions/checkout@v1
+
+    - name: Install Minikube
+      run: |
+        curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.9.2/minikube-linux-amd64
+        chmod +x minikube
+        sudo mkdir -p /usr/local/bin/
+        sudo install minikube /usr/local/bin/
+
+    - name: Verify Minikube Installation and Start Cluster
+      run: |
+        which minikube
+        minikube start --kubernetes-version='v1.15.1' --driver=docker
+        minikube status
+        minikube addons enable ingress
+
+    - name: Enter Minikube's Docker Context
+      env:
+        SHELL: /bin/bash
+      run: |
+        minikube docker-env
+        eval $(minikube docker-env)
+
+    # Build all the service containers given the current commit state
+    # TODO: run all 'docker build' commands in parallel then 'wait' capture output after all are finished
+
+    - name: 'Build Container: ID Service'
+      working-directory: ./src/uid
+      run: docker build -t apbs-uid .
+
+    - name: 'Build Container: Storage Service'
+      working-directory: ./src/storage
+      run: docker build -t apbs-storage .
+
+    - name: 'Build Container: Workflow Service'
+      working-directory: ./src/v2_workflow
+      run: docker build -t apbs-workflow .
+      
+    - name: 'Build Container: Task Service'
+      working-directory: ./src/task
+      run: docker build -t apbs-task .
+    
+    - name: 'Build Container: Proxy Service'
+      working-directory: ./src/tesk/tesk_proxy
+      run: docker build -t apbs-tesk-proxy:edge .
+
+    - name: 'Build Container: Visualization Service'
+      working-directory: ./src/visualizer-legacy
+      run: docker build -t apbs-viz-legacy .
+      
+    - name: 'Build Container: Autofill Service'
+      working-directory: ./src/autofill
+      run: |
+        cp ../pdb2pqr_build_materials/apbs_cgi.py .
+        docker build -t apbs-autofill:edge .
+
+    - name: 'Build Container: Uploader'
+      working-directory: ./src/runner/uploader
+      run: docker build -t apbs-uploader -f uploader.dockerfile .
+
+    - name: 'Build Container: Downloader'
+      working-directory: ./src/runner/downloader
+      run: docker build -t apbs-downloader -f downloader.dockerfile .
+
+    - name: 'Build Container: APBS Runner'
+      working-directory: ./src/tesk/tesk_execution
+      run: docker build -t apbs-bin:latest -f apbs-bin.dockerfile .
+
+    - name: 'Build Container: PDB2PQR Runner'
+      working-directory: ./src/tesk/tesk_execution
+      run: |
+        cp ../../pdb2pqr_build_materials/main.py .
+        docker build -t pdb2pqr-bin:source -f pdb2pqr-bin-source.dockerfile .
+        rm main.py
+
+    # Install via Helm and run integration tests
+    - name: Verify Helm Installation
+      run: |
+        which helm
+        helm version
+
+    - name: Install APBS-REST via Helm
+      run: |
+        helm install apbs-rest charts/apbs-rest \
+          -f tests/integration/config/github-actions-values.yaml \
+          --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).nip.io
+
+    - name: Wait for deployments
+      run: |
+        python3 utilities/wait_for_deployments.py 30 20
+        kubectl get pods --no-headers=true | awk '/apbs-rest/{print $1}' | xargs kubectl describe pod
+
+    - name: Install PyTest and other Python dependencies
+      working-directory: ./tests
+      run: |
+        python3 -m pip install --upgrade pip
+        sudo apt install python3-venv
+        python3 -m venv venv
+        source venv/bin/activate
+        which pip
+        pip install -r requirements.txt
+
+    - name: Run tests
+      working-directory: ./tests/integration
+      run: |
+        source ../venv/bin/activate
+        APBS_HOST=apbs.$(minikube ip).nip.io pytest -n 3
+        
