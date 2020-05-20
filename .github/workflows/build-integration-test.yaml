@@ -62,7 +62,7 @@ jobs:
     
     - name: 'Build Container: Proxy Service'
       working-directory: ./src/tesk/tesk_proxy
-      run: docker build -t apbs-tesk-proxy:edge .
+      run: docker build -t apbs-tesk-proxy .
 
     - name: 'Build Container: Visualization Service'
       working-directory: ./src/visualizer-legacy
@@ -72,7 +72,7 @@ jobs:
       working-directory: ./src/autofill
       run: |
         cp ../pdb2pqr_build_materials/apbs_cgi.py .
-        docker build -t apbs-autofill:edge .
+        docker build -t apbs-autofill .
 
     - name: 'Build Container: Uploader'
       working-directory: ./src/runner/uploader
@@ -84,7 +84,7 @@ jobs:
 
     - name: 'Build Container: APBS Runner'
       working-directory: ./src/tesk/tesk_execution
-      run: docker build -t apbs-bin:latest -f apbs-bin.dockerfile .
+      run: docker build -t apbs-bin -f apbs-bin.dockerfile .
 
     - name: 'Build Container: PDB2PQR Runner'
       working-directory: ./src/tesk/tesk_execution
@@ -92,6 +92,9 @@ jobs:
         cp ../../pdb2pqr_build_materials/main.py .
         docker build -t pdb2pqr-bin:source -f pdb2pqr-bin-source.dockerfile .
         rm main.py
+
+    - name: 'Check Currently Present Docker Images'
+      run: docker images
 
     # Install via Helm and run integration tests
     - name: Verify Helm Installation
