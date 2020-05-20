@@ -17,22 +17,6 @@ jobs:
     - name: Git checkout APBS-REST codebase
       uses: actions/checkout@v1
 
-    # - name: Setup Minikube
-    #   uses: CodingNagger/minikube-setup-action@v1.0.2
-    #   with:
-    #     minikube-version: 1.4.0
-    #     k8s-version: 1.15.1
-    #   id: minikube
-
-    # - name: Launch Minikube
-    #   run: eval ${{ steps.minikube.outputs.launcher }}
-
-    # - name: Setup Minikube
-    #   uses: manusa/actions-setup-minikube@v1.0.2
-    #   with:
-    #     minikube version: 'v1.9.2'
-    #     kubernetes version: 'v1.15.1'
-    
     - name: Install Minikube
       run: |
         curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.9.2/minikube-linux-amd64
