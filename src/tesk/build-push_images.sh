@@ -5,8 +5,8 @@ set -e
 if [ $1 = 'apbs' ]
 then
     cd tesk_execution
-    docker build -t electrostatics/apbs-tesk:latest -f apbs-tesk.dockerfile .
-    docker push electrostatics/apbs-tesk:latest
+    docker build -t electrostatics/apbs-bin:latest -f apbs-bin.dockerfile .
+    docker push electrostatics/apbs-bin:latest
 elif [ $1 = 'pdb2pqr' ]
 then
     # cd tesk_execution
