@@ -12,7 +12,7 @@ tesk:
 
 ui:
   image:
-    repository: apbs-ui
+    repository: electrostatics/apbs-ui
     tag: latest
     pullPolicy: IfNotPresent
     # pullPolicy: Always

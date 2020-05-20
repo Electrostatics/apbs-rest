@@ -134,7 +134,7 @@ jobs:
 
     - name: Wait for deployments
       run: |
-        python3 utilities/wait_for_deployments.py 30 20
+        python3 utilities/wait_for_deployments.py 30 10
         kubectl get pods --no-headers=true | awk '/apbs-rest/{print $1}' | xargs kubectl describe pod
 
     - name: Install PyTest and other Python dependencies
