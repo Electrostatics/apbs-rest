@@ -3,18 +3,14 @@ on:
   push:
     paths:
       - '.github/workflows/build-test.yaml'
-      - 'utilities/wait_for_deployments.py'
-      - 'tests/integration/**'
-      - 'tests/requirements.txt'
       - 'src/**'
-      - 'charts/**'
 
 jobs:
   build-images:
     name: Build All Images
     runs-on: ubuntu-latest
     steps:
-      - continue-on-error: false
+      # - continue-on-error: false
       - name: Git checkout APBS-REST codebase
         uses: actions/checkout@v1
 
