@@ -58,7 +58,14 @@ jobs:
         run: docker build -t apbs-viz-legacy .
         
       # - name: 'Build Container: Autofill Service'
-      # - name: 'Build Container: Uploader'
-      # - name: 'Build Container: Downloader'
+
+      - name: 'Build Container: Uploader'
+        working-directory: ./src/runner/uploader
+        run: docker build -t apbs-uploader -f uploader.dockerfile .
+        
+      - name: 'Build Container: Downloader'
+        working-directory: ./src/runner/downloader
+        run: docker build -t apbs-downloader -f downloader.dockerfile .
+
       # - name: 'Build Container: APBS Runner'
       # - name: 'Build Container: PDB2PQR Runner'
