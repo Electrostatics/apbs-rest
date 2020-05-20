@@ -30,8 +30,9 @@ jobs:
 
       - name: Verify and Enter Minikube's Docker Context
         run: |
-          minikube docker-env --shell bash
-          eval $(minikube -p minikube docker-env --shell bash)
+          # minikube docker-env --shell bash
+          # eval $(minikube -p minikube docker-env --shell bash)
+          eval $(minikube docker-env)
 
       - name: 'Build Container: ID Service'
         working-directory: ./src/uid
