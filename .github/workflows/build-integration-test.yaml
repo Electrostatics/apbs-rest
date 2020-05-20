@@ -15,6 +15,8 @@ jobs:
   build-images:
     name: Build All Images
     runs-on: ubuntu-latest
+    env:
+      SHELL: /bin/bash
     steps:
     # - continue-on-error: false
     - name: Git checkout APBS-REST codebase
@@ -35,8 +37,8 @@ jobs:
         minikube addons enable ingress
 
     - name: Enter Minikube's Docker Context
-      env:
-        SHELL: /bin/bash
+      # env:
+      #   SHELL: /bin/bash
       run: |
         minikube docker-env
         eval $(minikube docker-env)
