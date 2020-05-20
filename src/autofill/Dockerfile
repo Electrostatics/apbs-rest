@@ -26,7 +26,7 @@ COPY apbs_cgi.py .
 
 WORKDIR /app
 RUN rm /app/apbs_cgi.py \
-    if $(ls -1 *.pyc 2>/dev/null | wc -l); then /app/legacy/*.pyc; fi
+    && if $(ls -1 *.pyc 2>/dev/null | wc -l); then /app/legacy/*.pyc; fi
     # rm /app/legacy/*.pyc 
 
 # ENV FLASK_APP=server.py
