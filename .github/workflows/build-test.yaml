@@ -1,4 +1,4 @@
-name: Service Integration
+name: Build APBS-REST Containers
 on: 
   push:
     paths:
