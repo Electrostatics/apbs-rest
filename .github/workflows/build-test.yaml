@@ -42,13 +42,13 @@ jobs:
         run: |
           docker build -t apbs-uid .
 
-      - name: 'Build Container: Storage Service'
-      - name: 'Build Container: Workflow Service'
-      - name: 'Build Container: Task Service'
-      - name: 'Build Container: Proxy Service'
-      - name: 'Build Container: Visualization Service'
-      - name: 'Build Container: Autofill Service'
-      - name: 'Build Container: Uploader'
-      - name: 'Build Container: Downloader'
-      - name: 'Build Container: APBS Runner'
-      - name: 'Build Container: PDB2PQR Runner'
+      # - name: 'Build Container: Storage Service'
+      # - name: 'Build Container: Workflow Service'
+      # - name: 'Build Container: Task Service'
+      # - name: 'Build Container: Proxy Service'
+      # - name: 'Build Container: Visualization Service'
+      # - name: 'Build Container: Autofill Service'
+      # - name: 'Build Container: Uploader'
+      # - name: 'Build Container: Downloader'
+      # - name: 'Build Container: APBS Runner'
+      # - name: 'Build Container: PDB2PQR Runner'
