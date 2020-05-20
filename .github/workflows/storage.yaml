@@ -6,6 +6,11 @@ on:
   push:
     branches: 
       - '*'
+    paths:
+      - '.github/workflows/storage.yaml'
+      - '.github/workflows/unit.yaml'
+      - '.github/workflows/integration.yaml'
+      - 'src/**'
 
 jobs:
   build:
