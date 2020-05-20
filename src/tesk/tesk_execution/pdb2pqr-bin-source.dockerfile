@@ -22,6 +22,9 @@ RUN git clone https://github.com/Electrostatics/apbs-pdb2pqr.git \
     && gunzip cmake-3.15.4-Linux-x86_64.tar.gz \
     && tar -xf cmake-3.15.4-Linux-x86_64.tar \
     && export PATH=$PATH:/app/misc/cmake-3.15.4-Linux-x86_64/bin \
+    # Checkout commit before PDB2PQR v3.0 changes
+    && cd /app/apbs-pdb2pqr \
+    && git checkout b3bfeec \
     # Install APBS
     && cd /app/apbs-pdb2pqr/apbs \
     && git submodule init \

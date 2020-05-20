@@ -3,7 +3,10 @@ FROM ubuntu:18.04 as apbs_pdb2pqr-build
 WORKDIR /app
 RUN apt update -y \
     && apt install -y python-pip swig cmake g++ make git \
-    && git clone https://github.com/Electrostatics/apbs-pdb2pqr.git
+    && git clone https://github.com/Electrostatics/apbs-pdb2pqr.git \
+    # Checkout commit before PDB2PQR v3.0 changes
+    && cd /app/apbs-pdb2pqr \
+    && git checkout b3bfeec
 
 
 COPY build_config.py /app/apbs-pdb2pqr/pdb2pqr/build_config.py
