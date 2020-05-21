@@ -19,21 +19,21 @@ ui:
 
 viz:
   image:
-    repository: apbs-viz-legacy
+    repository: sample/apbs-viz-legacy
     tag: latest
     pullPolicy: IfNotPresent
     # pullPolicy: Always
 
 task:
   image:
-    repository: apbs-task
+    repository: sample/apbs-task
     tag: latest
     pullPolicy: IfNotPresent
     # pullPolicy: Always
 
 teskproxy:
   image:
-    repository: apbs-tesk-proxy
+    repository: sample/apbs-tesk-proxy
     tag: latest
     pullPolicy: IfNotPresent
     # pullPolicy: Always
@@ -46,28 +46,28 @@ teskproxy:
 
 autofill:
   image:
-    repository: apbs-autofill
+    repository: sample/apbs-autofill
     tag: latest
     pullPolicy: IfNotPresent
     # pullPolicy: Always
 
 id:
   image:
-    repository: apbs-uid
+    repository: sample/apbs-uid
     tag: latest
     pullPolicy: IfNotPresent
     # pullPolicy: Always
 
 storage:
   image:
-    repository: apbs-storage
+    repository: sample/apbs-storage
     tag: latest
     pullPolicy: IfNotPresent
     # pullPolicy: Always
 
 workflow:
   image:
-    repository: apbs-workflow
+    repository: sample/apbs-workflow
     tag: latest
     pullPolicy: IfNotPresent
     # pullPolicy: Always

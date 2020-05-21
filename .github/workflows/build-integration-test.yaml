@@ -13,7 +13,7 @@ on:
 
 jobs:
   build-images:
-    name: Build All Images
+    name: Build All Images, Run Integration Tests
     runs-on: ubuntu-latest
     env:
       SHELL: /bin/bash
@@ -50,56 +50,56 @@ jobs:
       working-directory: ./src/uid
       run: |
         eval $(minikube docker-env)
-        docker build -t apbs-uid .
+        docker build -t sample/apbs-uid .
 
     - name: 'Build Container: Storage Service'
       working-directory: ./src/storage
       run: |
         eval $(minikube docker-env)
-        docker build -t apbs-storage .
+        docker build -t sample/apbs-storage .
 
     - name: 'Build Container: Workflow Service'
       working-directory: ./src/v2_workflow
       run: |
         eval $(minikube docker-env)
-        docker build -t apbs-workflow .
+        docker build -t sample/apbs-workflow .
       
     - name: 'Build Container: Task Service'
       working-directory: ./src/task
       run: |
         eval $(minikube docker-env)
-        docker build -t apbs-task .
+        docker build -t sample/apbs-task .
     
     - name: 'Build Container: Proxy Service'
       working-directory: ./src/tesk/tesk_proxy
       run: |
         eval $(minikube docker-env)
-        docker build -t apbs-tesk-proxy .
+        docker build -t sample/apbs-tesk-proxy .
 
     - name: 'Build Container: Visualization Service'
       working-directory: ./src/visualizer-legacy
       run: |
         eval $(minikube docker-env)
-        docker build -t apbs-viz-legacy .
+        docker build -t sample/apbs-viz-legacy .
       
     - name: 'Build Container: Autofill Service'
       working-directory: ./src/autofill
       run: |
         cp ../pdb2pqr_build_materials/apbs_cgi.py .
         eval $(minikube docker-env)
-        docker build -t apbs-autofill .
+        docker build -t sample/apbs-autofill .
 
     - name: 'Build Container: Uploader'
       working-directory: ./src/runner/uploader
       run: |
         eval $(minikube docker-env)
-        docker build -t apbs-uploader -f uploader.dockerfile .
+        docker build -t sample/apbs-uploader -f uploader.dockerfile .
 
     - name: 'Build Container: Downloader'
       working-directory: ./src/runner/downloader
       run: |
         eval $(minikube docker-env)
-        docker build -t apbs-downloader -f downloader.dockerfile .
+        docker build -t sample/apbs-downloader -f downloader.dockerfile .
 
     - name: 'Build Container: APBS Runner'
       working-directory: ./src/tesk/tesk_execution
