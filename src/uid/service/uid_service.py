@@ -6,6 +6,8 @@ from random import choices
 from string import ascii_lowercase, digits
 import uuid, logging
 
+from service.uid_registry import uid_register_job
+
 uid_gen = Blueprint('uid_gen', __name__)
 
 ''' 
@@ -27,6 +29,8 @@ def uid_generator():
         # job_id = uuid.uuid4().hex
         # job_id = uuid.uuid4().int
         job_id = ''.join(choices(ascii_lowercase+digits, k=10)) # random 10-character alphanumeric string
+
+        uid_register_job(job_id)
 
         http_code = 200
         response = {'job_id': str(job_id)}
