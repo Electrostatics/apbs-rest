@@ -47,6 +47,8 @@ teskproxy:
     apbsExecMemoryLimit: 8192Mi
     apbsUploadMemoryLimit: 8192Mi
     pdb2pqrExecMemoryLimit: 512Mi
+    apbsExecImageRepo: electrostatics/apbs-bin
+    apbsExecImageTag: "3.0"
 
     # volcanoNamespace: volcano-system
 

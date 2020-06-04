@@ -43,6 +43,10 @@ spec:
           - name: VOLCANO_NAMESPACE
             value: {{ .Release.Namespace }}
             # value: {{ .Values.teskproxy.env.volcanoNamespace }}
+          - name: APBS_JOB_IMAGE_REPO
+            value: {{ .Values.teskproxy.env.apbsExecImageRepo | quote }}
+          - name: APBS_JOB_IMAGE_TAG
+            value: {{ .Values.teskproxy.env.apbsExecImageTag | quote }}
           - name: APBS_JOB_MEM_LIMIT
             value: {{ .Values.teskproxy.env.apbsExecMemoryLimit }}
           - name: APBS_UPLOAD_MEM_LIMIT
