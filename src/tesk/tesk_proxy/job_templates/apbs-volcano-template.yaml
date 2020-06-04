@@ -70,7 +70,7 @@ spec:
                   limits:
                     memory: {{executor_memory_limit}}
                     cpu: "1000m"
-              image: electrostatics/apbs-bin:1.5
+              image: {{executor_image_name}}
               imagePullPolicy: {{image_pull_policy}}
               name: apbs-executor
               workingDir: /app/run

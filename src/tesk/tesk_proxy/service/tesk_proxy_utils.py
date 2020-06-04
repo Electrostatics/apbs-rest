@@ -142,11 +142,26 @@ def apbs_yaml_config(job_id, kube_namespace, image_pull_policy, infile_name, sto
     template_name = 'apbs-volcano-template.yaml'
     job_memory_limit = os.environ.get('APBS_JOB_MEM_LIMIT', None)
     uploader_memory_limit = os.environ.get('APBS_UPLOAD_MEM_LIMIT', None)
+    job_image_repo = os.environ.get('APBS_JOB_IMAGE_REPO', None)
+    job_image_tag = os.environ.get('APBS_JOB_IMAGE_TAG', None)
+
+    # uploader_cpu_request = os.environ.get('APBS_UPLOAD_CPU_REQUEST', None)
+    # uploader_cpu_limit = os.environ.get('APBS_UPLOAD_CPU_LIMIT', None)
 
     if job_memory_limit is None:
         raise ValueError("Missing environment variable 'APBS_JOB_MEM_LIMIT'.")
     if uploader_memory_limit is None:
         raise ValueError("Missing environment variable 'APBS_UPLOAD_MEM_LIMIT'.")
+    if job_image_repo is None:
+        raise ValueError("Missing environment variable 'APBS_JOB_IMAGE_REPO'.")
+    if job_image_tag is None:
+        raise ValueError("Missing environment variable 'APBS_JOB_IMAGE_TAG'.")
+    # if uploader_cpu_request is None:
+    #     raise ValueError("Missing environment variable 'APBS_UPLOAD_CPU_REQUEST'.")
+    # if uploader_cpu_limit is None:
+    #     raise ValueError("Missing environment variable 'APBS_UPLOAD_CPU_LIMIT'.")
+
+    job_image_name = '%s:%s' % (job_image_repo, job_image_tag)
 
     json_template_str = open(os.path.join(os.getcwd(), 'job_templates', template_name)).read() 
     # json_template_str = open(os.path.join(os.getcwd(), 'apbs', template_name)).read() 
@@ -156,6 +171,7 @@ def apbs_yaml_config(job_id, kube_namespace, image_pull_policy, infile_name, sto
     json_template_str = json_template_str.replace(b'{{infile}}', infile_name)
     json_template_str = json_template_str.replace(b'{{namespace}}', kube_namespace)
     json_template_str = json_template_str.replace(b'{{image_pull_policy}}', image_pull_policy) 
+    json_template_str = json_template_str.replace(b'{{executor_image_name}}', job_image_name)
     json_template_str = json_template_str.replace(b'{{executor_memory_limit}}', job_memory_limit)
     json_template_str = json_template_str.replace(b'{{uploader_memory_limit}}', uploader_memory_limit)
 
