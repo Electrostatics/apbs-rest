@@ -142,12 +142,20 @@ def apbs_yaml_config(job_id, kube_namespace, image_pull_policy, infile_name, sto
     template_name = 'apbs-volcano-template.yaml'
     job_memory_limit = os.environ.get('APBS_JOB_MEM_LIMIT', None)
     uploader_memory_limit = os.environ.get('APBS_UPLOAD_MEM_LIMIT', None)
+
     job_image_repo = os.environ.get('APBS_JOB_IMAGE_REPO', None)
     job_image_tag = os.environ.get('APBS_JOB_IMAGE_TAG', None)
+
+    downloader_image_repo = os.environ.get('DOWNLOADER_JOB_IMAGE_REPO', None)
+    downloader_image_tag = os.environ.get('DOWNLOADER_JOB_IMAGE_TAG', None)
+
+    uploader_image_repo = os.environ.get('UPLOADER_JOB_IMAGE_REPO', None)
+    uploader_image_tag = os.environ.get('UPLOADER_JOB_IMAGE_TAG', None)
 
     # uploader_cpu_request = os.environ.get('APBS_UPLOAD_CPU_REQUEST', None)
     # uploader_cpu_limit = os.environ.get('APBS_UPLOAD_CPU_LIMIT', None)
 
+    # Check that none of the environment variables are None TODO: convert to function, pass in a list
     if job_memory_limit is None:
         raise ValueError("Missing environment variable 'APBS_JOB_MEM_LIMIT'.")
     if uploader_memory_limit is None:
@@ -156,13 +164,25 @@ def apbs_yaml_config(job_id, kube_namespace, image_pull_policy, infile_name, sto
         raise ValueError("Missing environment variable 'APBS_JOB_IMAGE_REPO'.")
     if job_image_tag is None:
         raise ValueError("Missing environment variable 'APBS_JOB_IMAGE_TAG'.")
+    if downloader_image_repo is None:
+        raise ValueError("Missing environment variable 'DOWNLOADER_JOB_IMAGE_REPO'.")
+    if downloader_image_tag is None:
+        raise ValueError("Missing environment variable 'DOWNLOADER_JOB_IMAGE_TAG'.")
+    if uploader_image_repo is None:
+        raise ValueError("Missing environment variable 'UPLOADER_JOB_IMAGE_REPO'.")
+    if uploader_image_tag is None:
+        raise ValueError("Missing environment variable 'UPLOADER_JOB_IMAGE_TAG'.")
     # if uploader_cpu_request is None:
     #     raise ValueError("Missing environment variable 'APBS_UPLOAD_CPU_REQUEST'.")
     # if uploader_cpu_limit is None:
     #     raise ValueError("Missing environment variable 'APBS_UPLOAD_CPU_LIMIT'.")
 
+    # Construct image names from environment vars
     job_image_name = '%s:%s' % (job_image_repo, job_image_tag)
+    downloader_image_name = '%s:%s' % (downloader_image_repo, downloader_image_tag)
+    uploader_image_name = '%s:%s' % (uploader_image_repo, uploader_image_tag)
 
+    # Replace template strings in variables
     json_template_str = open(os.path.join(os.getcwd(), 'job_templates', template_name)).read() 
     # json_template_str = open(os.path.join(os.getcwd(), 'apbs', template_name)).read() 
     json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
@@ -171,9 +191,11 @@ def apbs_yaml_config(job_id, kube_namespace, image_pull_policy, infile_name, sto
     json_template_str = json_template_str.replace(b'{{infile}}', infile_name)
     json_template_str = json_template_str.replace(b'{{namespace}}', kube_namespace)
     json_template_str = json_template_str.replace(b'{{image_pull_policy}}', image_pull_policy) 
-    json_template_str = json_template_str.replace(b'{{executor_image_name}}', job_image_name)
     json_template_str = json_template_str.replace(b'{{executor_memory_limit}}', job_memory_limit)
     json_template_str = json_template_str.replace(b'{{uploader_memory_limit}}', uploader_memory_limit)
+    json_template_str = json_template_str.replace(b'{{downloader_image_name}}', downloader_image_name)
+    json_template_str = json_template_str.replace(b'{{executor_image_name}}', job_image_name)
+    json_template_str = json_template_str.replace(b'{{uploader_image_name}}', uploader_image_name)
 
     # Append required download files to downloader container
     # infile_name = 'apbsinput.in'
@@ -196,11 +218,45 @@ def apbs_yaml_config(job_id, kube_namespace, image_pull_policy, infile_name, sto
 # def pdb2pqr_yaml_config(job_id, kube_namespace, command_line_args, storage_host, pqr_name=None):
 def pdb2pqr_yaml_config(job_id, kube_namespace, image_pull_policy, command_line_args, storage_host, local_upload_dir, pqr_name=None):
     # Load job template JSON string; insert job_id and storage_host into
+
     # template_name = 'pdb2pqr-volcano-template.yaml'
     template_name = 'pdb2pqr-volcano-template.yaml'
+
+    # Get job config environment variables
     job_memory_limit = os.environ.get('PDB2PQR_JOB_MEM_LIMIT', None)
+    uploader_memory_limit = os.environ.get('PDB2PQR_UPLOAD_MEM_LIMIT', None)
+
+    job_image_repo = os.environ.get('PDB2PQR_JOB_IMAGE_REPO', None)
+    job_image_tag = os.environ.get('PDB2PQR_JOB_IMAGE_TAG', None)
+
+    downloader_image_repo = os.environ.get('DOWNLOADER_JOB_IMAGE_REPO', None)
+    downloader_image_tag = os.environ.get('DOWNLOADER_JOB_IMAGE_TAG', None)
+
+    uploader_image_repo = os.environ.get('UPLOADER_JOB_IMAGE_REPO', None)
+    uploader_image_tag = os.environ.get('UPLOADER_JOB_IMAGE_TAG', None)
+
+    # Check that none of the environment variables are None TODO: convert to function, pass in a list
     if job_memory_limit is None:
         raise ValueError("Missing environment variable 'PDB2PQR_JOB_MEM_LIMIT'.")
+    if uploader_memory_limit is None:
+        raise ValueError("Missing environment variable 'PDB2PQR_UPLOAD_MEM_LIMIT'.")
+    if job_image_repo is None:
+        raise ValueError("Missing environment variable 'PDB2PQR_JOB_IMAGE_REPO'.")
+    if job_image_tag is None:
+        raise ValueError("Missing environment variable 'PDB2PQR_JOB_IMAGE_TAG'.")
+    if downloader_image_repo is None:
+        raise ValueError("Missing environment variable 'DOWNLOADER_JOB_IMAGE_REPO'.")
+    if downloader_image_tag is None:
+        raise ValueError("Missing environment variable 'DOWNLOADER_JOB_IMAGE_TAG'.")
+    if uploader_image_repo is None:
+        raise ValueError("Missing environment variable 'UPLOADER_JOB_IMAGE_REPO'.")
+    if uploader_image_tag is None:
+        raise ValueError("Missing environment variable 'UPLOADER_JOB_IMAGE_TAG'.")
+
+    # Construct image names from environment vars
+    job_image_name = '%s:%s' % (job_image_repo, job_image_tag)
+    downloader_image_name = '%s:%s' % (downloader_image_repo, downloader_image_tag)
+    uploader_image_name = '%s:%s' % (uploader_image_repo, uploader_image_tag)
 
     json_template_str = open(os.path.join(os.getcwd(), 'job_templates', template_name)).read()
     json_template_str = json_template_str.replace(b'{{job_id}}', job_id)
@@ -208,6 +264,10 @@ def pdb2pqr_yaml_config(job_id, kube_namespace, image_pull_policy, command_line_
     json_template_str = json_template_str.replace(b'{{namespace}}', kube_namespace)
     json_template_str = json_template_str.replace(b'{{image_pull_policy}}', image_pull_policy) 
     json_template_str = json_template_str.replace(b'{{executor_memory_limit}}', job_memory_limit)
+    json_template_str = json_template_str.replace(b'{{uploader_memory_limit}}', uploader_memory_limit)
+    json_template_str = json_template_str.replace(b'{{downloader_image_name}}', downloader_image_name)
+    json_template_str = json_template_str.replace(b'{{executor_image_name}}', job_image_name)
+    json_template_str = json_template_str.replace(b'{{uploader_image_name}}', uploader_image_name)
 
     # Insert PDB2PQR command line arguments
     json_template_str = json_template_str.replace(b'{{command_line_args}}', command_line_args) 
