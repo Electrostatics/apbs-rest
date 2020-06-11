@@ -50,7 +50,7 @@ spec:
                   limits:
                     memory: "100Mi"
                     cpu: "100m"
-              image: electrostatics/apbs-downloader:latest
+              image: {{downloader_image_name}}
               imagePullPolicy: {{image_pull_policy}}
               name: apbs-rest-downloader
               workingDir: /app/run
@@ -73,7 +73,7 @@ spec:
                   limits:
                     memory: {{executor_memory_limit}}
                     cpu: "1000m"
-              image: electrostatics/pdb2pqr-bin:latest
+              image: {{executor_image_name}}
               imagePullPolicy: {{image_pull_policy}}
               name: apbs-executor
               workingDir: /app/run
@@ -102,9 +102,9 @@ spec:
                     memory: "100Mi"
                     cpu: "100m"
                   limits:
-                    memory: "100Mi"
+                    memory: {{uploader_memory_limit}}
                     cpu: "100m"
-              image: electrostatics/apbs-uploader:latest
+              image: {{uploader_image_name}}
               imagePullPolicy: {{image_pull_policy}}
               name: apbs-rest-uploader
               workingDir: /app/run

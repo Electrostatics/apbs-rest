@@ -7,8 +7,7 @@ upload_dir=/app/_upload
 # upload_dir=_upload
 
 # mkdir _upload
-# TODO: tar, gzip, then copy over pdb2pka_output directory; Perhaps delegate to the PDB2PQR container
-cp * $upload_dir
+cp -r * $upload_dir
 
 cd $upload_dir
 
@@ -20,6 +19,7 @@ then
   userff_name=$(ls *.DAT)
   usernames_name=$(ls *.names)
   ligand_name=$(ls *.mol2)
+  pdb2pka_dirname=$(ls -d pdb2pka_output)
 
   output_basename=$2
 
@@ -83,7 +83,16 @@ then
     fi
   fi
 
+  # Gzip the PDB2PKA output directory
+  if [ $pdb2pka_dirname != '' ]
+  then
+    tar -cf $JOB_ID-$pdb2pka_dirname.tar $pdb2pka_dirname/ \
+    && gzip $JOB_ID-$pdb2pka_dirname.tar \
+    && rm -r $pdb2pka_dirname \
+    && echo $JOB_ID/$JOB_ID-$pdb2pka_dirname.tar.gz >> ${task_name}_output_files
+  fi
 
+  # Write stdout/stderr filenames to output files
   echo $JOB_ID/pdb2pqr_stdout.txt >> ${task_name}_status
   echo $JOB_ID/pdb2pqr_stderr.txt >> ${task_name}_status
   echo $JOB_ID/pdb2pqr_stdout.txt >> ${task_name}_output_files
