@@ -83,12 +83,6 @@ then
     fi
   fi
 
-  # Write stdout/stderr filenames to output files
-  echo $JOB_ID/pdb2pqr_stdout.txt >> ${task_name}_status
-  echo $JOB_ID/pdb2pqr_stderr.txt >> ${task_name}_status
-  echo $JOB_ID/pdb2pqr_stdout.txt >> ${task_name}_output_files
-  echo $JOB_ID/pdb2pqr_stderr.txt >> ${task_name}_output_files
-
   # Gzip the PDB2PKA output directory
   if [ $pdb2pka_dirname != '' ]
   then
@@ -97,6 +91,12 @@ then
     && rm -r $pdb2pka_dirname \
     && echo $JOB_ID/$JOB_ID-$pdb2pka_dirname.tar.gz >> ${task_name}_output_files
   fi
+
+  # Write stdout/stderr filenames to output files
+  echo $JOB_ID/pdb2pqr_stdout.txt >> ${task_name}_status
+  echo $JOB_ID/pdb2pqr_stderr.txt >> ${task_name}_status
+  echo $JOB_ID/pdb2pqr_stdout.txt >> ${task_name}_output_files
+  echo $JOB_ID/pdb2pqr_stderr.txt >> ${task_name}_output_files
 
   # Record the end time for the job
   date +%s.%N  | xargs printf '%.*f\n' 2 > pdb2pqr_end_time
