@@ -18,28 +18,28 @@ tesk:
 ui:
   image:
     repository: electrostatics/apbs-ui
-    tag: 0.2.3
+    tag: 0.3.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 viz:
   image:
     repository: electrostatics/apbs-viz-legacy
-    tag: 0.2.3
+    tag: 0.3.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 task:
   image:
     repository: electrostatics/apbs-task
-    tag: 0.2.3
+    tag: 0.3.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 teskproxy:
   image:
     repository: electrostatics/apbs-tesk-proxy
-    tag: 0.2.3
+    tag: 0.3.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
   env:
@@ -49,34 +49,40 @@ teskproxy:
     pdb2pqrExecMemoryLimit: 512Mi
     apbsExecImageRepo: electrostatics/apbs-bin
     apbsExecImageTag: "3.0"
+    pdb2pqrExecImageRepo: electrostatics/pdb2pqr-bin
+    pdb2pqrExecImageTag:  latest
+    downloaderImageRepo: electrostatics/apbs-downloader
+    downloaderImageTag:  0.3.0
+    uploaderImageRepo: electrostatics/apbs-uploader
+    uploaderImageTag:  0.3.0
 
     # volcanoNamespace: volcano-system
 
 autofill:
   image:
     repository: electrostatics/apbs-autofill
-    tag: 0.2.3
+    tag: 0.3.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 id:
   image:
     repository: electrostatics/apbs-uid
-    tag: 0.2.3
+    tag: 0.3.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 storage:
   image:
     repository: electrostatics/apbs-storage
-    tag: 0.2.3
+    tag: 0.3.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
 workflow:
   image:
     repository: electrostatics/apbs-workflow
-    tag: 0.2.3
+    tag: 0.3.0
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
