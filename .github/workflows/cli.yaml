@@ -160,8 +160,8 @@ jobs:
     - name: (Unix) Install APBS-REST via Helm
       if: matrix.os != 'windows-latest'
       run: |
-        sudo minikube addons enable ingress
-        sudo ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).nip.io
+        minikube addons enable ingress
+        ./helm-v3/helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).nip.io
         # helm install charts/apbs-rest -n apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).xip.io
 
     # - name: (Windows) Install APBS-REST via Helm
