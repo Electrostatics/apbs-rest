@@ -31,6 +31,8 @@ def uid_register_job(job_id, metadata=None):
 
     """
 
+    logging.info(F"AUTH_BUCKET: {AUTH_BUCKET_NAME}")
+    logging.info(F"MINIO_URL:  {MINIO_URL}")
     minioClient = Minio(MINIO_URL,
                         access_key=MINIO_ACCESS_KEY,
                         secret_key=MINIO_SECRET_KEY,
@@ -107,31 +109,9 @@ def uid_validate_job(job_id):
     try:
         obj = minioClient.stat_object(AUTH_BUCKET_NAME, object_name)
         metadata = {"created_dt": obj.last_modified, **obj.metadata}
+        metadata.pop("Content-Type",None)
     except NoSuchKey as err:
         metadata = None
 
     return metadata
 
-def uid_register_job1(job_id, info=""):
-    minioClient = Minio(MINIO_URL,
-                        access_key=MINIO_ACCESS_KEY,
-                        secret_key=MINIO_SECRET_KEY,
-                        secure=False)
-
-    if not minioClient.bucket_exists(AUTH_BUCKET_NAME):
-        minioClient.make_bucket(AUTH_BUCKET_NAME)
-
-    object_name = str(job_id)
-
-    # look for previous registration
-    try:
-        minioClient.stat_object(AUTH_BUCKET_NAME, object_name)
-        logging.error(F"Job id {object_name} has been registered previously")
-        raise ValueError
-    except NoSuchKey as err:
-        pass
-
-    object_data = info.encode("utf-8")
-    minioClient.put_object(AUTH_BUCKET_NAME, object_name,
-                           data=io.BytesIO(object_data),
-                           length=len(object_data))

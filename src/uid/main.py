@@ -3,7 +3,7 @@ from os import environ
 from logging.config import dictConfig
 from flask import Flask
 from flask_cors import CORS
-from .service.uid_service import uid_gen
+from service.uid_service import uid_gen
 
 dictConfig({
     'version': 1,
