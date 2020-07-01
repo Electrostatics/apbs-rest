@@ -3,9 +3,10 @@ from StringIO import StringIO
 from service.legacy.src import utilities
 
 def sanitizeFileName(fileName):
+    # TODO: 2020/06/30, Elvis - log that sanitization is happening if pattern is seen
     fileName = re.split(r'[/\\]',fileName)[-1]
     fileName = fileName.replace(' ', '_')
-    fileName = fileName.replace('-', '_')
+    # fileName = fileName.replace('-', '_')
     return fileName
 
 class WebOptionsError(Exception):
