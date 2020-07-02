@@ -29,7 +29,8 @@ def uid_generator():
         # job_id = uuid.uuid4().int
         job_id = ''.join(choices(ascii_lowercase+digits, k=10)) # random 10-character alphanumeric string
 
-        uid_register_job(job_id)
+        # TODO: 2020/07/02, Elvis - Leave uid_register_job() commented until Storage service is updated to validate jobIDs
+        # uid_register_job(job_id)
 
         http_code = 200
         response = {'job_id': str(job_id)}
@@ -43,7 +44,7 @@ def uid_generator():
 def uid_validate(job_id):
     """On GET validate job_id"""
     # logging.info("in uid validate")
-    logging.info(f"Validating job_id: {job_id}")
+    logging.info(f"{job_id}: Validating")
 
     if request.method == 'GET':
         metadata = uid_validate_job(job_id)
