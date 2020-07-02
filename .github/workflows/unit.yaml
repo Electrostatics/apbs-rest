@@ -38,10 +38,7 @@ jobs:
       - name: Launch MinIO container for ID registrator/validator
         working-directory: ./src/uid
         run: |
-          docker run -it -d -p $MINIO_PORT:9000 \
-          -e MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY\
-          -e MINIO_SECRET_KEY=$MINIO_SECRET_KEY\
-          minio/minio server /data
+          docker run -it -d -p $MINIO_PORT:9000 -e MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY -e MINIO_SECRET_KEY=$MINIO_SECRET_KEY minio/minio server /data
 
       - name: Run unit tests
         working-directory: ./src/uid
