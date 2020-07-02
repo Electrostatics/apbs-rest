@@ -62,10 +62,11 @@ def services():
     """
     setup/teardown for storage rest services
     """
+    os.chdir('./tests') # Assumes pytest is executed from apbs-rest/src/storage/
     logging.info("Bringing up services via docker-compose")
 
     try:
-        subprocess.check_call(["docker-compose", "build"])
+        subprocess.check_call(["docker-compose", "build", "--no-cache"])
         subprocess.check_call(["docker-compose", "up", "-d"])
         if not flask_ready_check():
             raise IOError('Failed to bring up Flask service')

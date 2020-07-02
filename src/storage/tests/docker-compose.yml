@@ -18,7 +18,8 @@ services:
   flaskapp:
     build:
       context: ..
-      dockerfile: $PWD/Dockerfile-flask
+      # TODO: 2020/07/01, Elvis - With gunicorn's execution issue resolved, consider removing 'Dockerfile-flask'
+      dockerfile: Dockerfile
     image: flask_app
     ports:
       - "5001:5001"
