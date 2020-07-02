@@ -1,6 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-"""This is the module."""
 import io
 import os
 import logging
@@ -30,9 +27,9 @@ def uid_register_job(job_id, metadata=None):
         job has been previously registered
 
     """
-
-    logging.info(F"AUTH_BUCKET: {AUTH_BUCKET_NAME}")
-    logging.info(F"MINIO_URL:  {MINIO_URL}")
+    # TODO: 2020/07/02, Elvis - consider moving these log statements to avoid flooding of feed
+    logging.debug(F"AUTH_BUCKET: {AUTH_BUCKET_NAME}")
+    logging.debug(F"MINIO_URL:  {MINIO_URL}")
     minioClient = Minio(MINIO_URL,
                         access_key=MINIO_ACCESS_KEY,
                         secret_key=MINIO_SECRET_KEY,
@@ -111,6 +108,8 @@ def uid_validate_job(job_id):
         metadata = {"created_dt": obj.last_modified, **obj.metadata}
         metadata.pop("Content-Type",None)
     except NoSuchKey as err:
+        # raised when ID is not found
+        logging.info(f'{job_id}: Job ID not found')
         metadata = None
 
     return metadata

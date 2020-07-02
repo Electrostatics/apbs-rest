@@ -1,10 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-"""This is the module."""
-from dotenv import load_dotenv
-load_dotenv()
+from uid.service.uid_registry import uid_register_job, uid_void_job, uid_validate_job
 
-from service.uid_registry import uid_register_job, uid_void_job, uid_validate_job
 
 def test_uid_register_job():
 

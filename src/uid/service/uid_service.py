@@ -5,7 +5,7 @@ from random import choices
 from string import ascii_lowercase, digits
 import logging
 
-from service.uid_registry import uid_register_job, uid_validate_job
+from .uid_registry import uid_register_job, uid_validate_job
 
 uid_gen = Blueprint('uid_gen', __name__)
 
@@ -42,7 +42,8 @@ def uid_generator():
 @uid_gen.route('/api/uid/validate/<job_id>', methods=['GET'])
 def uid_validate(job_id):
     """On GET validate job_id"""
-    logging.info("in uid validate")
+    # logging.info("in uid validate")
+    logging.info(f"Validating job_id: {job_id}")
 
     if request.method == 'GET':
         metadata = uid_validate_job(job_id)

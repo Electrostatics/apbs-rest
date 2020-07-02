@@ -44,6 +44,9 @@ class UIDServiceTest(unittest.TestCase):
             data_json = json.loads(response.data)
             uid_list.append(data_json['job_id'])
 
+            if len(uid_list) % 100 == 0:
+                print(f'Job ID count: {len(uid_list)}')
+
         # Checks that all the IDs generated are unique
         self.assertEqual(len(uid_list), len(set(uid_list)), msg='IDs generated not always unique')
 
