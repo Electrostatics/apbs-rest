@@ -2,23 +2,16 @@
 FROM ubuntu:18.04
 WORKDIR /app
 RUN apt update -y \
-    && apt install -y wget libgfortran3
+    && apt install -y wget zip libreadline7 libgomp1
 
-RUN wget https://github.com/Electrostatics/apbs-pdb2pqr/releases/download/apbs-1.5/APBS-1.5-linux64.tar.gz \
-         http://mirrors.kernel.org/ubuntu/pool/main/r/readline6/libreadline6_6.3-8ubuntu2_amd64.deb
+RUN wget https://github.com/Electrostatics/apbs-pdb2pqr/releases/download/vAPBS-3.0.0/APBS-3.0.0_Linux.zip \
+    && unzip APBS-3.0.0_Linux.zip \
+    && rm APBS-3.0.0_Linux.zip \
+    && rm -r APBS-3.0.0.Linux/share/apbs/examples
 
-RUN apt install -y ./libreadline6_6.3-8ubuntu2_amd64.deb
-
-RUN gunzip APBS-1.5-linux64.tar.gz \
-    && tar -xf APBS-1.5-linux64.tar \
-    && cd APBS-1.5-linux64/bin/
-
-RUN rm APBS-1.5-linux64.tar
-
-ENV LD_LIBRARY_PATH=/app/APBS-1.5-linux64/lib
-ENV PATH="${PATH}:/app/APBS-1.5-linux64/bin"
+ENV LD_LIBRARY_PATH=/app/APBS-3.0.0.Linux/lib
+ENV PATH="${PATH}:/app/APBS-3.0.0.Linux/bin"
 
 WORKDIR /app/run
 
 ENTRYPOINT [ "apbs" ]
-# ENTRYPOINT [ "bash" ]

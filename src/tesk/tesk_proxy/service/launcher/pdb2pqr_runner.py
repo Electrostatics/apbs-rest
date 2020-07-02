@@ -52,7 +52,7 @@ class Runner:
             # if 'invoke_method' in form and isinstance(form['invoke_method'], str):
             if 'invoke_method' in form :
                 logging.info('invoke_method found, value: %s' % str(form['invoke_method']) )
-                if form['invoke_method'].lower() == 'cli':
+                if form['invoke_method'].lower() == 'v2' or form['invoke_method'].lower() == 'cli':
                     self.invoke_method = 'cli'
                     self.cli_params = {
                         'pdb_name' : form['pdb_name'],
@@ -60,7 +60,7 @@ class Runner:
                         'flags' : form['flags']
                     }
                     
-                elif form['invoke_method'].lower() == 'gui':
+                elif form['invoke_method'].lower() == 'v1' or form['invoke_method'].lower() == 'gui':
                     self.invoke_method = 'gui'
                     self.weboptions = WebOptions(form, files)
             else:

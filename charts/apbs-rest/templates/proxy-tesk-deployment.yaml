@@ -43,12 +43,30 @@ spec:
           - name: VOLCANO_NAMESPACE
             value: {{ .Release.Namespace }}
             # value: {{ .Values.teskproxy.env.volcanoNamespace }}
+          - name: APBS_JOB_IMAGE_REPO
+            value: {{ .Values.teskproxy.env.apbsExecImageRepo | quote }}
+          - name: APBS_JOB_IMAGE_TAG
+            value: {{ .Values.teskproxy.env.apbsExecImageTag | quote }}
+          - name: PDB2PQR_JOB_IMAGE_REPO
+            value: {{ .Values.teskproxy.env.pdb2pqrExecImageRepo | quote }}
+          - name: PDB2PQR_JOB_IMAGE_TAG
+            value: {{ .Values.teskproxy.env.pdb2pqrExecImageTag | quote }}
+          - name: DOWNLOADER_JOB_IMAGE_REPO
+            value: {{ .Values.teskproxy.env.downloaderImageRepo | quote }}
+          - name: DOWNLOADER_JOB_IMAGE_TAG
+            value: {{ .Values.teskproxy.env.downloaderImageTag | quote }}
+          - name: UPLOADER_JOB_IMAGE_REPO
+            value: {{ .Values.teskproxy.env.uploaderImageRepo | quote }}
+          - name: UPLOADER_JOB_IMAGE_TAG
+            value: {{ .Values.teskproxy.env.uploaderImageTag | quote }}
           - name: APBS_JOB_MEM_LIMIT
             value: {{ .Values.teskproxy.env.apbsExecMemoryLimit }}
           - name: APBS_UPLOAD_MEM_LIMIT
             value: {{ .Values.teskproxy.env.apbsUploadMemoryLimit }}
           - name: PDB2PQR_JOB_MEM_LIMIT
             value: {{ .Values.teskproxy.env.pdb2pqrExecMemoryLimit }}
+          - name: PDB2PQR_UPLOAD_MEM_LIMIT
+            value: {{ .Values.teskproxy.env.pdb2pqrUploadMemoryLimit }}
           - name: GA_TRACKING_ID
             value: {{ .Values.common.env.googleAnalyticsId }}
           - name: GA_JOBID_INDEX

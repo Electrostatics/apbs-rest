@@ -56,10 +56,11 @@ class StorageHandler:
                         else:
                             response.headers['Content-Disposition'] = 'attachment; filename="%s"' % file_name
 
-                        if 'Accept-Encoding' in request.headers and 'gzip' in request.headers['Accept-Encoding']:   
-                            if os.path.splitext(object_name)[1] == '.gz':
-                                # TODO: check that it is not a range request
-                                response.headers['Content-Encoding'] = 'gzip'
+                        # if 'Accept-Encoding' in request.headers and 'gzip' in request.headers['Accept-Encoding']:   
+                        #     # if os.path.splitext(object_name)[1] == '.gz':
+                        #     if os.path.splitext(object_name)[1] in self._extensions_to_compress:
+                        #         # TODO: check that it is not a range request
+                        #         response.headers['Content-Encoding'] = 'gzip'
 
                     else:
                         if self.storageClient.object_exists(JOB_BUCKET_NAME, object_name):
@@ -161,8 +162,16 @@ class StorageHandler:
 
         if file_data.filename:
             uploaded_file_name = secure_filename(file_data.filename)
+            # print(f'object_name: {object_name} --- file_data.filename: {file_data.filename}')
             if file_name is None:
+                # TODO: 2020/07/01, Elvis - Investigate why Autofill service sends file with 'file_data' (autofill_utils.py, handle_upload())
+                # TODO: 2020/07/01, Elvis - Use condition below to check if secure_filename() changed the name
+                # if file_name is None or uploaded_file_name != file_name:
+                # TODO: 2020/07/01, Elvis - Replace print statements with logging info/debug as appropriate
+                cur_object_name = object_name
                 object_name = os.path.join(job_id, uploaded_file_name)
+                file_name = uploaded_file_name
+                print(f"Reassigning object_name: '{cur_object_name}' -> '{object_name}'", flush=True)
             if file_data.filename and uploaded_file_name:
                 etag_str = self.storageClient.put_object(JOB_BUCKET_NAME, object_name, file_data)
 
@@ -174,7 +183,12 @@ class StorageHandler:
                 else:
                     # Create success response
                     response['status'] = 'success'
-                    response['message'] = "Data uploaded to %s/%s." % (job_id, file_name)
+                    response['message'] = f"Data uploaded to {object_name}."
+                    response['metadata'] = {
+                        "job_id": job_id,
+                        "file_name": uploaded_file_name
+                    }
+                    # print(dumps(response, indent=2), flush=True)
                     http_response_code = 201
 
         return response, http_response_code

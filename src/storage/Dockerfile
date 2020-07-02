@@ -1,8 +1,8 @@
 # FROM python:2.7-alpine
 FROM python:3.7
 WORKDIR /app
-COPY requirements.txt /app
-RUN python -m pip install -r requirements.txt gunicorn==19.9.0
+COPY requirements.txt requirements-prod.txt /app/
+RUN python -m pip install -r requirements-prod.txt
 
         # && rm .env
         # && ls -la

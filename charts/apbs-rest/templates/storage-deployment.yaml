@@ -35,6 +35,8 @@ spec:
           - name: MINIO_CACHE_DIR
             value: /app/.minio_cache
 #FIXME pull from secret
+          - name: MINIO_JOB_BUCKET
+            value: jobs
           - name: MINIO_ACCESS_KEY
             value: admin
           - name: MINIO_SECRET_KEY
