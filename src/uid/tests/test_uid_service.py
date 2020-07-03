@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import unittest
 from uid.main import app
 
@@ -5,6 +8,8 @@ try:
     import simplejson as json
 except ImportError:
     import json
+
+
 
 class UIDServiceTest(unittest.TestCase):
     def setUp(self):
@@ -26,18 +31,21 @@ class UIDServiceTest(unittest.TestCase):
     def test_get_uid_generator(self):
         response = self.client.get('/api/uid/')
         data_json = json.loads(response.data)
-        
+
         self.assertEqual(response.content_type, 'application/json')
         self.assertIn('job_id', data_json.keys())
         self.assertIsInstance(data_json['job_id'], str)
 
-        
+
     def test_uid_uniqueness(self):
         uid_list = []
         for i in range(5000):
             response = self.client.get('/api/uid/')
             data_json = json.loads(response.data)
             uid_list.append(data_json['job_id'])
+
+            if len(uid_list) % 100 == 0:
+                print(f'Job ID count: {len(uid_list)}')
 
         # Checks that all the IDs generated are unique
         self.assertEqual(len(uid_list), len(set(uid_list)), msg='IDs generated not always unique')

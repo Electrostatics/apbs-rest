@@ -13,6 +13,11 @@ jobs:
   id-service:
     name: ID Service
     runs-on: ubuntu-latest
+    env:
+      MINIO_PORT: 9000
+      MINIO_URL:  localhost:9000
+      MINIO_ACCESS_KEY: github
+      MINIO_SECRET_KEY: githubaction
     steps:
       - name: Git checkout APBS-REST codebase
         uses: actions/checkout@v1
@@ -29,6 +34,11 @@ jobs:
         run: |
           source venv/bin/activate
           pip install -r requirements-dev.txt
+
+      - name: Launch MinIO container for ID registrator/validator
+        working-directory: ./src/uid
+        run: |
+          docker run -it -d -p $MINIO_PORT:9000 -e MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY -e MINIO_SECRET_KEY=$MINIO_SECRET_KEY minio/minio server /data
 
       - name: Run unit tests
         working-directory: ./src/uid
