@@ -12,9 +12,9 @@ metadata:
     heritage: {{ .Release.Service }}
     storage: id
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /api/uid/
+    #nginx.ingress.kubernetes.io/rewrite-target: /api/uid/
     # TODO: 2020/07/02, Elvis - commenting out line below for now since user doesn't need access beyond retrieving a new ID
-    # nginx.ingress.kubernetes.io/rewrite-target: /api/uid/$2
+    nginx.ingress.kubernetes.io/rewrite-target: /api/uid/$2
 spec:
 {{- if .Values.ingress.tls }}
   tls:
@@ -31,9 +31,9 @@ spec:
     - host: {{ . }}
       http:
         paths:
-          - path: /id(/?)$
+          # - path: /id(/?)$
           # TODO: 2020/07/02, Elvis - commenting out line below for now since user doesn't need access beyond retrieving a new ID
-          # - path: /id(/|$)(.*)
+          - path: /id(/|$)(.*)
             backend:
               serviceName: {{ $fullName }}-id
               servicePort: http

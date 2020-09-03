@@ -41,6 +41,8 @@ spec:
             value: admin
           - name: MINIO_SECRET_KEY
             value: adminadmin
+          - name: UID_VALIDATE_URL
+            value: http://{{ template "apbsrest.fullname" . }}-id/api/uid/validate
           ports:
             - name: http
               containerPort: 5001
