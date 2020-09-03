@@ -145,18 +145,23 @@ class StorageHandler:
     def post(self, object_name, job_id, file_name=None):
         # EXTENSION_WHITELIST = set(['pqr', 'pdb', 'in', 'p'])
         response = { 'status': None, 'message': None }
-        job_validate_url = F'{VALIDATE_URL}/{job_id}'
-        # response['validate'] = F'{VALIDATE_URL}/{job_id}'
-
-        print('job_validate_url=',job_validate_url)
-        response_validate = requests.request("GET", job_validate_url).json()
-        # response['validate'] = response_validate.text
-        # response['validate'] = response_validate.json()
-        response['validate'] = response_validate['valid']
-
 
         # response = 'Success'
         http_response_code = 201
+
+        # check if job id has been properly registered
+        job_validate_url = F'{VALIDATE_URL}/{job_id}'
+
+        response_validate = requests.request("GET", job_validate_url).json()
+        is_valid = response_validate['valid']
+
+        if not is_valid:
+            http_response_code = 403
+            response['status'] = 'failed'
+            response['message'] = "Bad job id"
+            return response, http_response_code
+
+
 
         try:
             file_data = request.files['file_data']
