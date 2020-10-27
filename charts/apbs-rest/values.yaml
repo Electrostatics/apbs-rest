@@ -8,6 +8,8 @@ common:
   env:
     googleAnalyticsId:
     googleAnalyticsJobidIndex:
+    minioAccessKey: admin
+    minioSecretKey: adminadmin
 
 tesk:
   image:
@@ -79,6 +81,8 @@ storage:
     tag: 0.3.1
     #pullPolicy: IfNotPresent
     pullPolicy: Always
+  env:
+    minioJobBucketName: jobs
 
 workflow:
   image:
@@ -105,6 +109,7 @@ ingress:
   path: /
   hosts:
     # Hostname specified here is flexible. Using below as default
+    # If deploying on a website, replace the below with your domain name
     - apbs.localhost
   tls: []
   #  - secretName: chart-example-tls
