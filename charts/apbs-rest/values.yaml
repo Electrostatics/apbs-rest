@@ -11,12 +11,6 @@ common:
     minioAccessKey: admin
     minioSecretKey: adminadmin
 
-tesk:
-  image:
-    repository: eu.gcr.io/tes-wes/tesk-api
-    tag: v0.4.2
-    pullPolicy: IfNotPresent
-
 ui:
   image:
     repository: electrostatics/apbs-ui
