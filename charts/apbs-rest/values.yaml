@@ -52,8 +52,8 @@ teskproxy:
     downloaderImageTag:  0.3.1
     uploaderImageRepo: electrostatics/apbs-uploader
     uploaderImageTag:  0.3.1
+    # volcanoNamespace: apbs-jobs
 
-    # volcanoNamespace: volcano-system
 
 autofill:
   image:

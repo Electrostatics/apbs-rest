@@ -31,7 +31,7 @@ spec:
           - name: FLASK_APP
             value: "main.py"
           - name: STORAGE_HOST
-            value: http://{{ template "apbsrest.fullname" . }}-storage
+            value: http://{{ template "apbsrest.fullname" . }}-storage.{{ .Release.Namespace }}
           - name: TESK_HOST
             value: http://{{ template "apbsrest.fullname" . }}-tesk
           - name: UI_HOST
@@ -41,8 +41,7 @@ spec:
           - name: IMAGE_PULL_POLICY
             value: {{ .Values.teskproxy.env.workloadPullPolicy }}
           - name: VOLCANO_NAMESPACE
-            value: {{ .Release.Namespace }}
-            # value: {{ .Values.teskproxy.env.volcanoNamespace }}
+            value: {{ default .Release.Namespace .Values.teskproxy.env.volcanoNamespace }}
           - name: APBS_JOB_IMAGE_REPO
             value: {{ .Values.teskproxy.env.apbsExecImageRepo | quote }}
           - name: APBS_JOB_IMAGE_TAG
