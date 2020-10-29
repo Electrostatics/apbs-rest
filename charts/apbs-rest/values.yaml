@@ -32,7 +32,7 @@ task:
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
-teskproxy:
+proxy:
   image:
     repository: electrostatics/apbs-tesk-proxy
     tag: 0.3.1

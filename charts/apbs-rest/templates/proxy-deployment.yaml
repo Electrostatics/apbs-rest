@@ -1,32 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "apbsrest.fullname" . }}-tesk-proxy
+  name: {{ template "apbsrest.fullname" . }}-proxy
   labels:
     app: {{ template "apbsrest.name" . }}
     chart: {{ template "apbsrest.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    service: tesk-proxy
+    service: proxy
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: {{ template "apbsrest.name" . }}
       release: {{ .Release.Name }}
-      service: tesk-proxy
+      service: proxy
   template:
     metadata:
       labels:
         app: {{ template "apbsrest.name" . }}
         release: {{ .Release.Name }}
-        service: tesk-proxy
+        service: proxy
     spec:
-      serviceAccountName: {{ template "apbsrest.fullname" . }}-tesk-proxy
+      serviceAccountName: {{ template "apbsrest.fullname" . }}-proxy
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.teskproxy.image.repository }}:{{ .Values.teskproxy.image.tag }}"
-          imagePullPolicy: {{ .Values.teskproxy.image.pullPolicy }}
+          image: "{{ .Values.proxy.image.repository }}:{{ .Values.proxy.image.tag }}"
+          imagePullPolicy: {{ .Values.proxy.image.pullPolicy }}
           env:
           - name: FLASK_APP
             value: "main.py"
@@ -39,33 +39,33 @@ spec:
           - name: FLASK_RUN_PORT
             value: "5007"
           - name: IMAGE_PULL_POLICY
-            value: {{ .Values.teskproxy.env.workloadPullPolicy }}
+            value: {{ .Values.proxy.env.workloadPullPolicy }}
           - name: VOLCANO_NAMESPACE
-            value: {{ default .Release.Namespace .Values.teskproxy.env.volcanoNamespace }}
+            value: {{ default .Release.Namespace .Values.proxy.env.volcanoNamespace }}
           - name: APBS_JOB_IMAGE_REPO
-            value: {{ .Values.teskproxy.env.apbsExecImageRepo | quote }}
+            value: {{ .Values.proxy.env.apbsExecImageRepo | quote }}
           - name: APBS_JOB_IMAGE_TAG
-            value: {{ .Values.teskproxy.env.apbsExecImageTag | quote }}
+            value: {{ .Values.proxy.env.apbsExecImageTag | quote }}
           - name: PDB2PQR_JOB_IMAGE_REPO
-            value: {{ .Values.teskproxy.env.pdb2pqrExecImageRepo | quote }}
+            value: {{ .Values.proxy.env.pdb2pqrExecImageRepo | quote }}
           - name: PDB2PQR_JOB_IMAGE_TAG
-            value: {{ .Values.teskproxy.env.pdb2pqrExecImageTag | quote }}
+            value: {{ .Values.proxy.env.pdb2pqrExecImageTag | quote }}
           - name: DOWNLOADER_JOB_IMAGE_REPO
-            value: {{ .Values.teskproxy.env.downloaderImageRepo | quote }}
+            value: {{ .Values.proxy.env.downloaderImageRepo | quote }}
           - name: DOWNLOADER_JOB_IMAGE_TAG
-            value: {{ .Values.teskproxy.env.downloaderImageTag | quote }}
+            value: {{ .Values.proxy.env.downloaderImageTag | quote }}
           - name: UPLOADER_JOB_IMAGE_REPO
-            value: {{ .Values.teskproxy.env.uploaderImageRepo | quote }}
+            value: {{ .Values.proxy.env.uploaderImageRepo | quote }}
           - name: UPLOADER_JOB_IMAGE_TAG
-            value: {{ .Values.teskproxy.env.uploaderImageTag | quote }}
+            value: {{ .Values.proxy.env.uploaderImageTag | quote }}
           - name: APBS_JOB_MEM_LIMIT
-            value: {{ .Values.teskproxy.env.apbsExecMemoryLimit }}
+            value: {{ .Values.proxy.env.apbsExecMemoryLimit }}
           - name: APBS_UPLOAD_MEM_LIMIT
-            value: {{ .Values.teskproxy.env.apbsUploadMemoryLimit }}
+            value: {{ .Values.proxy.env.apbsUploadMemoryLimit }}
           - name: PDB2PQR_JOB_MEM_LIMIT
-            value: {{ .Values.teskproxy.env.pdb2pqrExecMemoryLimit }}
+            value: {{ .Values.proxy.env.pdb2pqrExecMemoryLimit }}
           - name: PDB2PQR_UPLOAD_MEM_LIMIT
-            value: {{ .Values.teskproxy.env.pdb2pqrUploadMemoryLimit }}
+            value: {{ .Values.proxy.env.pdb2pqrUploadMemoryLimit }}
           - name: GA_TRACKING_ID
             value: {{ .Values.common.env.googleAnalyticsId }}
           - name: GA_JOBID_INDEX
