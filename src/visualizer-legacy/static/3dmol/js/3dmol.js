@@ -449,3 +449,194 @@ var adjustBackgroundTransparency = function(alpha_val) {
     glviewer.setBackgroundColor('black', 1-(alpha_val/100))
     glviewer.render()
 }
+
+// Adjust export button text
+var renderExportButtonText = function(select_val) {
+    console.log('function:   renderExportButtonText()')
+    console.log(`select_val: ${select_val}`)
+    console.log(`val jquery: ${ $("#select_export_type").val() }`)
+
+    // Extract text from selected export type
+    // let export_text = $("#select_export_type option:selected").text().trim()
+    // $("#export-button").val( `Export as ${export_text}` )
+
+    // Show opacity slider if exporting to PNG
+    if( select_val === "png" ){ showTransparancySlider(true) }
+    else{ showTransparancySlider(false) }
+
+    // Set export function corresponding to export type
+    if( select_val === "png" )
+        $("#export-button").attr("onclick", "savePng()")
+
+    else if( select_val === "pymol" )
+        $("#export-button").attr("onclick", "savePymol()")
+
+    else if( select_val === "unitymol" )
+        $("#export-button").attr("onclick", "saveUnitymol()")
+}
+
+var showTransparancySlider = function(hide_button){
+    $("#transparency-div").attr("hidden", !hide_button)
+}
+
+var downloadFile = function(filename, data) {
+    console.log(filename)
+    console.log(data)
+
+    // Create anchor element from which to download image
+    let link = document.createElement('a');
+    // let link = document.createElement('downloadFileAnchor');
+    link.href = data;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+var downloadTextAsBlob = function(filename, data, content_type) {
+    const blob = new Blob([data], {
+        type: content_type
+        // type: 'text/plain'
+    });
+
+    // Convert your blob into a Blob URL (a special url that points to an object in the browser's memory)
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Create a link element
+    const link = document.createElement("a");
+
+    // Set link's href to point to the Blob URL
+    link.href = blobUrl;
+    link.download = filename;
+
+    // Append link to the body
+    document.body.appendChild(link);
+
+    // Dispatch click event on the link
+    // This is necessary as link.click() does not work on the latest firefox
+    link.dispatchEvent(
+        new MouseEvent('click', { 
+            bubbles: true, 
+            cancelable: true, 
+            view: window 
+        })
+    );
+
+    // Remove link from body
+    document.body.removeChild(link);
+
+}
+
+// Create and download PyMol script
+var savePymol = function() {
+    let querystring_params = (new URL(document.location)).searchParams
+    let job_id = querystring_params.get('jobid')
+    let exported_filename = `${job_id}_PyMol.pml`
+
+    // Set beginning text
+    const heading_text = 
+        '# The aboslute location of your files must be input below\n'
+        + '# Rename lines 10, 11, and 27 to match your system\n'
+        + '# Assuming you are on a windows machine and downloaded the files to your downloads folder, \n'
+        + '# replace your username inplace of USERNAME to the path below\n\n'
+
+        + '# Drag this script into an open PyMOL window\n'
+        + '# The model will be loaded and also saved as a .pse file for ease of starting over\n\n'
+
+        + '# Load the files\n'
+
+    // Check OS to determine path style
+    let template_dirpath_text = null
+    if( navigator.platform.includes('Win') ){
+        template_dirpath_text = 'C:\\<PATH_TO_DIRECTORY>\\'
+    }else{
+        template_dirpath_text = '/<PATH_TO_DIRECTORY>/'
+    }
+
+    // Set file/path names
+    const structure_name = `${job_id}_APBS`
+    const pqr_filepath = `${template_dirpath_text}${job_id}.pqr`
+    const dx_filepath = `${template_dirpath_text}${job_id}-pot.dx`
+
+    // Write remainder text
+    const remaining_text = 
+        `load ${pqr_filepath}, molecule\n`
+        + `load ${dx_filepath}, electrostaticmap\n\n`
+
+        + `# Set scale for coloring protein surface\n`
+        + `ramp_new espramp, electrostaticmap, [ -3, 0, 3]\n\n`
+        
+        + `# Show the surface\n`
+        + `show surface\n\n`
+        
+        + `# Set surface colors from dx\n`
+        + `set surface_color, espramp\n`
+        + `set surface_ramp_above_mode\n\n`
+        
+        + `# Setup export\n`
+        + `set pse_export_version, 1.7\n\n`
+
+        + `# Save file as .pse\n`
+        + `save ${template_dirpath_text}${structure_name}.pse\n`
+
+
+    // Combine and create full script text
+    const all_data = heading_text + remaining_text
+
+    // Download PyMol file
+    downloadTextAsBlob(exported_filename, all_data, 'text/plain')
+
+}
+
+// Create and download UnityMol script
+var saveUnitymol = function() {
+    let querystring_params = (new URL(document.location)).searchParams
+    let job_id = querystring_params.get('jobid')
+    let exported_filename = `${job_id}_UnityMol.py`
+
+    // Set beginning text
+    const heading_text = 
+        '# The aboslute location of your files must be input below\n'
+        + '# Rename lines 9 and 10 to match your system\n'
+        + '# Assuming you are on a windows machine and downloaded the files to your downloads folder, \n'
+        + '# replace your username inplace of USERNAME to the path below\n\n'
+        
+        + '# Open this file in UnityMol using the "Load Script" button\n\n'
+
+        + '# Load files\n'
+
+
+    // Check OS to determine path style
+    let template_dirpath_text = null
+    if( navigator.platform.includes('Win') ){
+        template_dirpath_text = 'C:/<PATH_TO_DIRECTORY>'
+    }else{
+        template_dirpath_text = '/<PATH_TO_DIRECTORY>'
+    }
+
+    // Set file/path names
+    const structure_name = `${job_id}_APBS`
+    const pqr_filepath = `${template_dirpath_text}/${job_id}.pqr`
+    const dx_filepath = `${template_dirpath_text}/${job_id}-pot.dx`
+
+    // Write remainder text
+    const remaining_text = 
+        `load(filePath="${pqr_filepath}", readHetm=True, forceDSSP=False, showDefaultRep=True, center=False);\n`
+        + `loadDXmap("${structure_name}", "${dx_filepath}")\n\n`
+        
+        + `# Set selection and center\n`
+        + `setCurrentSelection("all(${structure_name})")\n`
+        + `centerOnSelection("all(${structure_name})", True)\n\n`
+        
+        + `# Show surface\n`
+        + `showSelection("all(${structure_name})", "s")\n\n`
+
+        + `# Color surface by charge\n`
+        + `colorByCharge("all(${structure_name})", False, -10.000, 10.000)\n\n`
+
+    // Combine and create full script text
+    const all_data = heading_text + remaining_text
+
+    // Download UnityMol file
+    downloadTextAsBlob(exported_filename, all_data, 'text/plain')
+}
