@@ -456,14 +456,6 @@ var renderExportButtonText = function(select_val) {
     console.log(`select_val: ${select_val}`)
     console.log(`val jquery: ${ $("#select_export_type").val() }`)
 
-    // Extract text from selected export type
-    // let export_text = $("#select_export_type option:selected").text().trim()
-    // $("#export-button").val( `Export as ${export_text}` )
-
-    // Show opacity slider if exporting to PNG
-    if( select_val === "png" ){ showTransparancySlider(true) }
-    else{ showTransparancySlider(false) }
-
     // Set export function corresponding to export type
     if( select_val === "png" )
         $("#export-button").attr("onclick", "savePng()")
