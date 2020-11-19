@@ -1,4 +1,6 @@
-function build_page(jobid){
+var STORAGE_URL
+function build_page(jobid, storage_url){
+	STORAGE_URL = storage_url
 	//jobid = 1234;
 	document.title = "3Dmol Visualization " + jobid
 
@@ -110,7 +112,7 @@ function build_page(jobid){
 // Export Options
 "<div>" + 
 "	<font style='color:white; font-size:12pt'>Export as: </font>" +
-"	<select class='styled-select' id='select_export_type' onchange='renderExportButtonText(value)' style='max-width:50%;'>"+
+`	<select class='styled-select' id='select_export_type' onchange='renderExportButtonText(value)' style='max-width:50%;'>`+
 "       <option style='color: black;' value='png'> PNG </option> "+
 "       <option style='color: black;' value='pymol'> PyMol </option>" +
 "   	<option style='color: black;' value='unitymol'> UnityMol </option>"+
