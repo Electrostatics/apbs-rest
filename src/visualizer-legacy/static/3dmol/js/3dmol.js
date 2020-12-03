@@ -526,6 +526,7 @@ var downloadTextAsBlob = function(filename, data, content_type) {
 }
 
 // Create and download PyMol script
+// TODO: 2020/12/06, Elvis - Explore writing export script based on template file rather than in code
 var savePymol = function() {
     let querystring_params = (new URL(document.location)).searchParams
     let job_id = querystring_params.get('jobid')
@@ -577,6 +578,7 @@ var savePymol = function() {
 }
 
 // Create and download UnityMol script
+// TODO: 2020/12/06, Elvis - Explore writing export script based on template file rather than in code
 var saveUnitymol = function() {
     let querystring_params = (new URL(document.location)).searchParams
     let job_id = querystring_params.get('jobid')
