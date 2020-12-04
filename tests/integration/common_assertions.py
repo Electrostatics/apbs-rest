@@ -3,7 +3,7 @@ from pprint import pprint
 
 def assert_task_status(task_url: str, job_id: str, jobtype: str, timeout_minutes: int=10):
     # GET: check status of running task
-    # print('%s/%s/%s' % (task_url, job_id, jobtype))
+    time.sleep(3) # Wait 3 seconds before checking status
     response = requests.get('%s/%s/%s' % (task_url, job_id, jobtype))
     # print(response.content)
     # print(json.dumps(response.json(), indent=2))
@@ -59,8 +59,7 @@ def assert_task_status(task_url: str, job_id: str, jobtype: str, timeout_minutes
 
 def assert_workflow_status(workflow_url: str, job_id: str, jobtype: str, timeout_minutes: int=10):
     # GET: check status of running task
-    # time.sleep(3)
-    # print('%s/%s/%s' % (workflow_url, job_id, jobtype))
+    time.sleep(3) # Wait 3 seconds before checking status
     response = requests.get('%s/%s/%s' % (workflow_url, job_id, jobtype))
     assert response.status_code == 200
     assert 'Content-Type' in response.headers.keys() and response.headers['Content-Type'] == 'application/json'
