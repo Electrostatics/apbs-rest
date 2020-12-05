@@ -34,7 +34,7 @@ spec:
           - name: STORAGE_HOST
             value: http://{{ template "apbsrest.fullname" . }}-storage
           - name: TMP_EXEC_HOST
-            value: http://{{ template "apbsrest.fullname" . }}-tesk-proxy
+            value: http://{{ template "apbsrest.fullname" . }}-proxy
           - name: FLASK_RUN_PORT
             value: "5004"
           ports:
