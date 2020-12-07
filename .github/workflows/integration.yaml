@@ -33,7 +33,7 @@ jobs:
         minikube addons enable ingress
 
     - name: Add custom Minikube entry to /etc/hosts
-      run: echo "$(minikube ip)  minikubehost" >> /etc/hosts
+      run: sudo echo "$(minikube ip)  minikubehost" >> /etc/hosts
       # run: printf "$(minikube ip)  localhost-minikube\n$(cat /etc/hosts)\n" > /etc/hosts
 
     # - name: Download Helm v3
