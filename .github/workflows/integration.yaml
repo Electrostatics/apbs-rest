@@ -49,17 +49,17 @@ jobs:
         # helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).nip.io
         helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs-testing.action
 
-    - name: Add custom Minikube entry to /etc/hosts
-      run: |
-        echo "$(minikube ip)  apbs-testing.action" | sudo tee -a /etc/hosts
-        sudo cat /etc/hosts
-        curl -v 7 apbs-testing.action
-
     - name: Wait for deployments
       run: |
         # Checks 20 times, in 30-second intervals (hence '30 20')
         python3 utilities/wait_for_deployments.py 30 20
         kubectl get pods --no-headers=true | awk '/apbs-rest/{print $1}' | xargs kubectl describe pod
+
+    - name: Add custom Minikube host entry to /etc/hosts
+      run: |
+        echo "$(minikube ip)  apbs-testing.action" | sudo tee -a /etc/hosts
+        sudo cat /etc/hosts
+        curl -s -D - -o /dev/null apbs-testing.action
 
     - name: Install PyTest and other Python dependencies
       working-directory: ./tests
