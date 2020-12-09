@@ -38,7 +38,7 @@ def assert_task_status(task_url: str, job_id: str, jobtype: str, timeout_minutes
     assert 'Content-Type' in response.headers.keys() and response.headers['Content-Type'] == 'application/json'
     start_time = int(time.time())
     while json_dict[json_dict['jobtype']]['status'] in {'pending', 'running'}:
-        time.sleep(1) # wait 1 second before checking status again
+        time.sleep(3) # wait 3 second before checking status again
         response = requests.get('%s/%s/%s' % (task_url, job_id, jobtype))
         print(response.content)
         assert response.ok
@@ -82,7 +82,7 @@ def assert_workflow_status(workflow_url: str, job_id: str, jobtype: str, timeout
     assert 'Content-Type' in response.headers.keys() and response.headers['Content-Type'] == 'application/json'
     start_time = int(time.time())
     while json_dict[json_dict['jobtype']]['status'] in {'pending', 'running'}:
-        time.sleep(1) # wait 1 second before checking status again
+        time.sleep(3) # wait 3 second before checking status again
         response = requests.get('%s/%s/%s' % (workflow_url, job_id, jobtype))
         json_dict = json.loads(response.content)
         cur_time = int(time.time())
