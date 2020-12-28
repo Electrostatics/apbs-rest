@@ -4,6 +4,11 @@
 
 replicaCount: 1
 
+common:
+  env:
+    googleAnalyticsId:
+    googleAnalyticsJobidIndex:
+
 tesk:
   image:
     repository: eu.gcr.io/tes-wes/tesk-api
@@ -38,10 +43,19 @@ teskproxy:
     pullPolicy: IfNotPresent
     # pullPolicy: Always
   env:
-    workloadPullPolicy: Always
-    apbsExecMemoryLimit: 8192Mi
-    apbsUploadMemoryLimit: 8192Mi
+    workloadPullPolicy: IfNotPresent
+    apbsExecMemoryLimit: 2048Mi
+    apbsUploadMemoryLimit: 2048Mi
     pdb2pqrExecMemoryLimit: 512Mi
+    pdb2pqrUploadMemoryLimit: 1024Mi
+    apbsExecImageRepo: apbs-bin
+    apbsExecImageTag: latest
+    pdb2pqrExecImageRepo: pdb2pqr-bin
+    pdb2pqrExecImageTag:  source
+    downloaderImageRepo: sample/apbs-uploader
+    downloaderImageTag:  latest
+    uploaderImageRepo: sample/apbs-downloader
+    uploaderImageTag:  latest
     # volcanoNamespace: volcano-system
 
 autofill:
