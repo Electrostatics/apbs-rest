@@ -20,7 +20,7 @@ body {
   /* font-size: 18px; */
   font-weight: 300;
   color: #fff; 
-  background: #555 url('http://www.poissonboltzmann.org/img/bg.jpg') no-repeat;
+  background: #555;
   /* background: black; */
   background-size: cover;
   height: 100%
