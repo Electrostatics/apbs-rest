@@ -14,23 +14,30 @@ jobs:
     name: Install Dependencies and Run Integration Tests
     runs-on: ubuntu-latest
     steps:
+    # - name: Git checkout APBS-REST codebase
+    #   uses: actions/checkout@v1
+
+    # - name: Install Minikube
+    #   run: |
+    #     # curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.9.2/minikube-linux-amd64
+    #     curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.15.1/minikube-linux-amd64
+    #     chmod +x minikube
+    #     sudo mkdir -p /usr/local/bin/
+    #     sudo install minikube /usr/local/bin/
+
+    # - name: Verify Minikube Installation and Start Cluster
+    #   run: |
+    #     which minikube
+    #     minikube start --kubernetes-version='v1.15.1' --driver=docker
+    #     minikube status
+    #     minikube addons enable ingress
+
     - name: Git checkout APBS-REST codebase
-      uses: actions/checkout@v1
-
-    - name: Install Minikube
-      run: |
-        # curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.9.2/minikube-linux-amd64
-        curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.15.1/minikube-linux-amd64
-        chmod +x minikube
-        sudo mkdir -p /usr/local/bin/
-        sudo install minikube /usr/local/bin/
-
-    - name: Verify Minikube Installation and Start Cluster
-      run: |
-        which minikube
-        minikube start --kubernetes-version='v1.15.1' --driver=docker
-        minikube status
-        minikube addons enable ingress
+      uses: actions/checkout@v2
+    - name: Start minikube
+      uses: medyagh/setup-minikube@master
+    - name: Try the cluster !
+      run: kubectl get pods -A
 
     # - name: Download Helm v3
     #   run: |
