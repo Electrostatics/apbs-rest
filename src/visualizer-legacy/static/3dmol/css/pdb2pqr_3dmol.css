@@ -17,11 +17,11 @@ body {
   display: block;
   display: block;
   font-family: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  //font-size: 18px;
+  /* font-size: 18px; */
   font-weight: 300;
   color: #fff; 
   background: #555 url('http://www.poissonboltzmann.org/img/bg.jpg') no-repeat;
-  //background: black;
+  /* background: black; */
   background-size: cover;
   height: 100%
 }
@@ -176,7 +176,7 @@ div#content {
   position: absolute; 
   overflow: auto;
   padding: 1em;
-  //background: #ccc url('http://www.poissonboltzmann.org/img/bg.jpg') no-repeat;
+  /* background: #ccc url('http://www.poissonboltzmann.org/img/bg.jpg') no-repeat; */
   
 }
 
