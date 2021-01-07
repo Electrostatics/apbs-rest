@@ -13,37 +13,37 @@ tesk:
   image:
     repository: eu.gcr.io/tes-wes/tesk-api
     tag: v0.4.2
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
 
 ui:
   image:
     repository: electrostatics/apbs-ui
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
     # pullPolicy: Always
 
 viz:
   image:
     repository: sample/apbs-viz-legacy
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
     # pullPolicy: Always
 
 task:
   image:
     repository: sample/apbs-task
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
     # pullPolicy: Always
 
 teskproxy:
   image:
     repository: sample/apbs-tesk-proxy
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
     # pullPolicy: Always
   env:
-    workloadPullPolicy: IfNotPresent
+    workloadPullPolicy: Never
     apbsExecMemoryLimit: 2048Mi
     apbsUploadMemoryLimit: 2048Mi
     pdb2pqrExecMemoryLimit: 512Mi
@@ -62,28 +62,28 @@ autofill:
   image:
     repository: sample/apbs-autofill
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
     # pullPolicy: Always
 
 id:
   image:
     repository: sample/apbs-uid
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
     # pullPolicy: Always
 
 storage:
   image:
     repository: sample/apbs-storage
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
     # pullPolicy: Always
 
 workflow:
   image:
     repository: sample/apbs-workflow
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
     # pullPolicy: Always
 
 minio:
@@ -92,7 +92,7 @@ minio:
     # tag: RELEASE.2019-10-12T01-39-57Z
     # tag: RELEASE.2019-07-10T00-34-56Z
     tag: RELEASE.2020-04-04T05-39-31Z
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
 
 service:
   type: ClusterIP
