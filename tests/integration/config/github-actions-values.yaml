@@ -8,18 +8,14 @@ common:
   env:
     googleAnalyticsId:
     googleAnalyticsJobidIndex:
-
-tesk:
-  image:
-    repository: eu.gcr.io/tes-wes/tesk-api
-    tag: v0.4.2
-    pullPolicy: Never
+    minioAccessKey: admin
+    minioSecretKey: adminadmin
 
 ui:
   image:
     repository: electrostatics/apbs-ui
     tag: latest
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
     # pullPolicy: Always
 
 viz:
@@ -36,7 +32,7 @@ task:
     pullPolicy: Never
     # pullPolicy: Always
 
-teskproxy:
+proxy:
   image:
     repository: sample/apbs-tesk-proxy
     tag: latest
@@ -78,6 +74,8 @@ storage:
     tag: latest
     pullPolicy: Never
     # pullPolicy: Always
+  env:
+    minioJobBucketName: jobs
 
 workflow:
   image:
@@ -92,7 +90,7 @@ minio:
     # tag: RELEASE.2019-10-12T01-39-57Z
     # tag: RELEASE.2019-07-10T00-34-56Z
     tag: RELEASE.2020-04-04T05-39-31Z
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
