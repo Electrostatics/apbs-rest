@@ -82,3 +82,8 @@ jobs:
         # APBS_HOST=apbs.$(minikube ip).nip.io pytest -n 3
         APBS_HOST=apbs-testing.action pytest -n 3
         
+    - name: Describe job pods upon PyTest failure
+      if: ${{ failure() }}
+      run: |
+        kubectl get pods
+        kubectl get pods --no-headers=true | awk '/task-(.*)-(apbs|pdb)/{print $1}' | xargs kubectl describe pod
