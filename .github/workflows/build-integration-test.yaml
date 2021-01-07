@@ -19,8 +19,8 @@ jobs:
       SHELL: /bin/bash
     steps:
     # - continue-on-error: false
-    # - name: Git checkout APBS-REST codebase
-    #   uses: actions/checkout@v1
+    - name: Git checkout APBS-REST codebase
+      uses: actions/checkout@v2
 
     - name: Install Minikube
       run: |
