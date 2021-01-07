@@ -34,9 +34,9 @@ spec:
           env:
 #FIXME
           - name: MINIO_ACCESS_KEY
-            value: admin
+            value: {{ .Values.common.env.minioAccessKey }}
           - name: MINIO_SECRET_KEY
-            value: adminadmin
+            value: {{ .Values.common.env.minioSecretKey }}
           ports:
             - name: http
               containerPort: 9000
