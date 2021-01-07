@@ -17,27 +17,20 @@ jobs:
     # - name: Git checkout APBS-REST codebase
     #   uses: actions/checkout@v1
 
-    # - name: Install Minikube
-    #   run: |
-    #     # curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.9.2/minikube-linux-amd64
-    #     curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.15.1/minikube-linux-amd64
-    #     chmod +x minikube
-    #     sudo mkdir -p /usr/local/bin/
-    #     sudo install minikube /usr/local/bin/
+    - name: Install Minikube
+      run: |
+        # curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.9.2/minikube-linux-amd64
+        curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.15.1/minikube-linux-amd64
+        chmod +x minikube
+        sudo mkdir -p /usr/local/bin/
+        sudo install minikube /usr/local/bin/
 
-    # - name: Verify Minikube Installation and Start Cluster
-    #   run: |
-    #     which minikube
-    #     minikube start --kubernetes-version='v1.15.1' --driver=docker
-    #     minikube status
-    #     minikube addons enable ingress
-
-    - name: Git checkout APBS-REST codebase
-      uses: actions/checkout@v2
-    - name: Start minikube
-      uses: medyagh/setup-minikube@master
-    - name: Try the cluster !
-      run: kubectl get pods -A
+    - name: Verify Minikube Installation and Start Cluster
+      run: |
+        which minikube
+        minikube start --kubernetes-version='v1.15.1' --driver=docker
+        minikube status
+        minikube addons enable ingress
 
     # - name: Download Helm v3
     #   run: |
@@ -60,6 +53,10 @@ jobs:
       run: |
         # Checks 20 times, in 30-second intervals (hence '30 20')
         python3 utilities/wait_for_deployments.py 30 20
+
+    - name: Describe pods within Installation
+      run: |
+        kubectl get pods
         kubectl get pods --no-headers=true | awk '/apbs-rest/{print $1}' | xargs kubectl describe pod
 
     - name: Add custom Minikube host entry to /etc/hosts
