@@ -94,7 +94,7 @@ jobs:
         kubectl get pods --no-headers=true | awk '/task-(.*)-(apbs|pdb)/{print $1}' | xargs -L 1 kubectl logs -c apbs-executor
         
         printf "\nUploader Log \n"
-        kubectl get pods --no-headers=true | awk '/task-(.*)-(apbs|pdb)/{print $1}' | xargs -L 1 kubectl logs -c apbs-rest-downloader
+        kubectl get pods --no-headers=true | awk '/task-(.*)-(apbs|pdb)/{print $1}' | xargs -L 1 kubectl logs -c apbs-rest-uploader
 
         printf "\nPod Description \n"
         kubectl get pods --no-headers=true | awk '/task-(.*)-(apbs|pdb)/{print $1}' | xargs kubectl describe pod
