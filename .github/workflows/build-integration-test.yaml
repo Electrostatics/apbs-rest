@@ -179,3 +179,75 @@ jobs:
 
         printf "\nPod Description \n"
         kubectl get pods --no-headers=true | awk '/task-(.*)-(apbs|pdb)/{print $1}' | xargs kubectl describe pod
+
+    - name: PyTest failure - Get ID Service logs
+      if: ${{ failure() }}
+      run: |
+        kubectl get pods
+
+        printf "\nID Service Log \n"
+        kubectl get pods --no-headers=true | awk '/apbs-rest-id/{print $1}' | xargs -L 1 kubectl logs 
+
+    - name: PyTest failure - Get Storage Service logs
+      if: ${{ failure() }}
+      run: |
+        kubectl get pods
+
+        printf "\nStorage Service Log \n"
+        kubectl get pods --no-headers=true | awk '/apbs-rest-storage/{print $1}' | xargs -L 1 kubectl logs 
+
+    - name: PyTest failure - Get Proxy Service logs
+      if: ${{ failure() }}
+      run: |
+        kubectl get pods
+
+        printf "\nProxy Service Log \n"
+        kubectl get pods --no-headers=true | awk '/apbs-rest-proxy/{print $1}' | xargs -L 1 kubectl logs 
+
+    - name: PyTest failure - Get Task Service logs
+      if: ${{ failure() }}
+      run: |
+        kubectl get pods
+
+        printf "\nTask Service Log \n"
+        kubectl get pods --no-headers=true | awk '/apbs-rest-task/{print $1}' | xargs -L 1 kubectl logs 
+
+    - name: PyTest failure - Get Workflow Service logs
+      if: ${{ failure() }}
+      run: |
+        kubectl get pods
+
+        printf "\nWorkflow Service Log \n"
+        kubectl get pods --no-headers=true | awk '/apbs-rest-workflow/{print $1}' | xargs -L 1 kubectl logs 
+
+    - name: PyTest failure - Get Autofill Service logs
+      if: ${{ failure() }}
+      run: |
+        kubectl get pods
+
+        printf "\nAutofill Service Log \n"
+        kubectl get pods --no-headers=true | awk '/apbs-rest-Autofill/{print $1}' | xargs -L 1 kubectl logs 
+
+    - name: PyTest failure - Get Visualizer Service logs
+      if: ${{ failure() }}
+      run: |
+        kubectl get pods
+
+        printf "\nVisualizer Service Log \n"
+        kubectl get pods --no-headers=true | awk '/apbs-rest-visualizer/{print $1}' | xargs -L 1 kubectl logs 
+
+    - name: PyTest failure - Get UI Service logs
+      if: ${{ failure() }}
+      run: |
+        kubectl get pods
+
+        printf "\nUI Service Log \n"
+        kubectl get pods --no-headers=true | awk '/apbs-rest-ui/{print $1}' | xargs -L 1 kubectl logs 
+
+    - name: PyTest failure - Get Minio logs
+      if: ${{ failure() }}
+      run: |
+        kubectl get pods
+
+        printf "\nMinIO Log \n"
+        kubectl get pods --no-headers=true | awk '/apbs-rest-minio/{print $1}' | xargs -L 1 kubectl logs 
