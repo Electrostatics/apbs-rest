@@ -48,9 +48,9 @@ proxy:
     apbsExecImageTag: latest
     pdb2pqrExecImageRepo: pdb2pqr-bin
     pdb2pqrExecImageTag:  source
-    downloaderImageRepo: sample/apbs-uploader
+    downloaderImageRepo: sample/apbs-downloader
     downloaderImageTag:  latest
-    uploaderImageRepo: sample/apbs-downloader
+    uploaderImageRepo: sample/apbs-uploader
     uploaderImageTag:  latest
     # volcanoNamespace: volcano-system
 
