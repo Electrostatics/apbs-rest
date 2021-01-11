@@ -12,6 +12,10 @@
         <link rel="stylesheet" href="/viz/static/3dmol/css/toggles.css" type="text/css">
         <link rel="stylesheet" href="/viz/static/3dmol/css/ui_css.css" type="text/css">
         <script type="text/JavaScript" src="/viz/static/3dmol/js/pitt_3Dmol.js"></script>
+        <script type="text/JavaScript" src="/viz/static/lib/jszip.min.js"></script>
+        <!-- <script type="text/JavaScript" src="/viz/static/lib/jszip.js"></script> -->
+        <script type="text/JavaScript" src="/viz/static/lib/FileSaver.min.js"></script>
+        <!-- <script type="text/JavaScript" src="/viz/static/lib/FileSaver.js"></script> -->
         
        
 
@@ -21,7 +25,7 @@
         <script type="text/JavaScript" src="/viz/static/3dmol/js/3dmol.js"></script>
     </head>
     <body>
-        <script type="text/javascript">build_page('{{ jobid }}')</script>
+        <script type="text/javascript">build_page('{{ jobid }}', '{{ storage_url }}')</script>
         <script type="text/javascript">getpqr('{{ jobid }}', '{{ pqr_prefix }}', '{{ storage_url }}')</script>
         <script type="text/javascript">getcube('{{ jobid }}', '{{ pqr_prefix }}', '{{ storage_url }}')</script>
     </body>
