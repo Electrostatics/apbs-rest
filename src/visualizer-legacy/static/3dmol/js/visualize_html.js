@@ -1,4 +1,6 @@
-function build_page(jobid){
+var STORAGE_URL
+function build_page(jobid, storage_url){
+	STORAGE_URL = storage_url
 	//jobid = 1234;
 	document.title = "3Dmol Visualization " + jobid
 
@@ -101,11 +103,29 @@ function build_page(jobid){
 "<div class='inner'><ul class='button-group round'><input type='button' button class='button-backbone pure-button' style='width: 85px; height: 30px; color: black' input type='button' value='Recenter' onclick='glviewer.zoomTo();'></button></input></ul></div>" +
 
 // Background Transparency slider
-"<br><font style='color:white; font-size:12pt'>Background Transparency:</font>" +
+"<div id='transparency-div'>"+
+// "<br><font style='color:white; font-size:12pt'>Background Transparency:</font>" +
+"<font style='color:white; font-size:12pt'>Background Transparency:</font>" +
 " <p style='color:white; font-size: 16px'> <input type=range min=0 max=100 value=0 id='transparency_slider' step=5 oninput='adjustBackgroundTransparency(value)'>&nbsp;&nbsp;&nbsp;&nbsp; <span id='bg_alpha_val'> 0 </span> </p>  " +
+"</div>"+
+
+// Export Options
+"<div>" + 
+"	<font style='color:white; font-size:12pt'>Export as: </font>" +
+`	<select class='styled-select' id='select_export_type' onchange='renderExportButtonText(value)' style='max-width:50%;'>`+
+"       <option style='color: black;' value='png'> PNG </option> "+
+"       <option style='color: black;' value='pymol'> PyMol </option>" +
+"   	<option style='color: black;' value='unitymol'> UnityMol </option>"+
+"   </select>" +
+
+
+// Export button
+"	<div class='inner'><ul class='button-group round'><input type='button' button class='button-backbone pure-button' style='width: 85px; height: 30px; color: black; margin-top: 10px' input type='button' id='export-button' value='Export' onclick='savePng()'></button></input></ul></div>" +
+"</div>" + 
+
 
 // Save PNG button
-"<div class='inner'><ul class='button-group round'><input type='button' button class='button-backbone pure-button' style='width: 85px; height: 30px; color: black' input type='button' value='Save PNG' onclick='savePng();'></button></input></ul></div>" +
+// "<div class='inner'><ul class='button-group round'><input type='button' button class='button-backbone pure-button' style='width: 85px; height: 30px; color: black' input type='button' value='Save PNG' onclick='savePng();'></button></input></ul></div>" +
 
 // End
 "<br></div></div>" +
