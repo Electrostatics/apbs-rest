@@ -96,7 +96,7 @@ jobs:
         docker build -t sample/apbs-uploader -f uploader.dockerfile .
 
         echo "Check directories in uploader"
-        docker run --rm -it --entrypoint sh sample/apbs-uploader -c "pwd; ls -la; echo; cd ..; pwd; ls -la"
+        docker run --rm --entrypoint sh sample/apbs-uploader -c "pwd; ls -la; echo; cd ..; pwd; ls -la"
 
     - name: 'Build Container: Downloader'
       working-directory: ./src/runner/downloader
@@ -105,7 +105,7 @@ jobs:
         docker build -t sample/apbs-downloader -f downloader.dockerfile .
 
         echo "Check directories in downloader"
-        docker run --rm -it --entrypoint sh sample/apbs-downloader -c "pwd; ls -la; echo; cd ..; pwd; ls -la"
+        docker run --rm --entrypoint sh sample/apbs-downloader -c "pwd; ls -la; echo; cd ..; pwd; ls -la"
 
     - name: 'Build Container: APBS Runner'
       working-directory: ./src/tesk/tesk_execution
