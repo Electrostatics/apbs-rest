@@ -226,7 +226,7 @@ jobs:
         kubectl get pods
 
         printf "\nAutofill Service Log \n"
-        kubectl get pods --no-headers=true | awk '/apbs-rest-Autofill/{print $1}' | xargs -L 1 kubectl logs 
+        kubectl get pods --no-headers=true | awk '/apbs-rest-autofill/{print $1}' | xargs -L 1 kubectl logs 
 
     - name: PyTest failure - Get Visualizer Service logs
       if: ${{ failure() }}
@@ -234,7 +234,7 @@ jobs:
         kubectl get pods
 
         printf "\nVisualizer Service Log \n"
-        kubectl get pods --no-headers=true | awk '/apbs-rest-visualizer/{print $1}' | xargs -L 1 kubectl logs 
+        kubectl get pods --no-headers=true | awk '/apbs-rest-viz/{print $1}' | xargs -L 1 kubectl logs 
 
     - name: PyTest failure - Get UI Service logs
       if: ${{ failure() }}
