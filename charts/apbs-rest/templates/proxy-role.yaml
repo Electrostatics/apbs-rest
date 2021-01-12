@@ -1,14 +1,14 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ template "apbsrest.fullname" . }}-tesk-proxy
+  name: {{ template "apbsrest.fullname" . }}-proxy
   # name: volcano-jobs
   labels:
     app: {{ template "apbsrest.name" . }}
     chart: {{ template "apbsrest.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    service: tesk-proxy
+    service: proxy
 rules:
 - apiGroups:
   - batch.volcano.sh

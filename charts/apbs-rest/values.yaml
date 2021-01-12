@@ -8,12 +8,8 @@ common:
   env:
     googleAnalyticsId:
     googleAnalyticsJobidIndex:
-
-tesk:
-  image:
-    repository: eu.gcr.io/tes-wes/tesk-api
-    tag: v0.4.2
-    pullPolicy: IfNotPresent
+    minioAccessKey: admin
+    minioSecretKey: adminadmin
 
 ui:
   image:
@@ -36,7 +32,7 @@ task:
     #pullPolicy: IfNotPresent
     pullPolicy: Always
 
-teskproxy:
+proxy:
   image:
     repository: electrostatics/apbs-tesk-proxy
     tag: 0.3.1
@@ -56,8 +52,8 @@ teskproxy:
     downloaderImageTag:  0.3.1
     uploaderImageRepo: electrostatics/apbs-uploader
     uploaderImageTag:  0.3.1
+    # volcanoNamespace: apbs-jobs
 
-    # volcanoNamespace: volcano-system
 
 autofill:
   image:
@@ -79,6 +75,8 @@ storage:
     tag: 0.3.1
     #pullPolicy: IfNotPresent
     pullPolicy: Always
+  env:
+    minioJobBucketName: jobs
 
 workflow:
   image:
@@ -105,6 +103,7 @@ ingress:
   path: /
   hosts:
     # Hostname specified here is flexible. Using below as default
+    # If deploying on a website, replace the below with your domain name
     - apbs.localhost
   tls: []
   #  - secretName: chart-example-tls

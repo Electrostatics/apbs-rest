@@ -449,3 +449,226 @@ var adjustBackgroundTransparency = function(alpha_val) {
     glviewer.setBackgroundColor('black', 1-(alpha_val/100))
     glviewer.render()
 }
+
+// Adjust export button text
+var renderExportButtonText = function(select_val) {
+    console.log('function:   renderExportButtonText()')
+    console.log(`select_val: ${select_val}`)
+    console.log(`val jquery: ${ $("#select_export_type").val() }`)
+
+    // Set export function corresponding to export type
+    if( select_val === "png" )
+        $("#export-button").attr("onclick", "savePng()")
+
+    else if( select_val === "pymol" )
+        $("#export-button").attr("onclick", "savePymol()")
+
+    else if( select_val === "unitymol" )
+        $("#export-button").attr("onclick", "saveUnitymol()")
+}
+
+var showTransparancySlider = function(hide_button){
+    $("#transparency-div").attr("hidden", !hide_button)
+}
+
+/** Prevent user from changing export types or selecting export button while in-progress */
+var enableExportOptions = function(enable_button){
+    $("#export-button").prop("disabled", !enable_button)      // export button
+    $("#select_export_type").prop("disabled", !enable_button) // select export-type button
+}
+
+var downloadFile = function(filename, data) {
+    console.log(filename)
+    console.log(data)
+
+    // Create anchor element from which to download image
+    let link = document.createElement('a');
+    // let link = document.createElement('downloadFileAnchor');
+    link.href = data;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+var downloadTextAsBlob = function(filename, data, content_type) {
+    const blob = new Blob([data], {
+        type: content_type
+        // type: 'text/plain'
+    });
+
+    // Convert your blob into a Blob URL (a special url that points to an object in the browser's memory)
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Create a link element
+    const link = document.createElement("a");
+
+    // Set link's href to point to the Blob URL
+    link.href = blobUrl;
+    link.download = filename;
+
+    // Append link to the body
+    document.body.appendChild(link);
+
+    // Dispatch click event on the link
+    // This is necessary as link.click() does not work on the latest firefox
+    link.dispatchEvent(
+        new MouseEvent('click', { 
+            bubbles: true, 
+            cancelable: true, 
+            view: window 
+        })
+    );
+
+    // Remove link from body
+    document.body.removeChild(link);
+
+}
+
+// Create and download PyMol script
+// TODO: 2020/12/06, Elvis - Explore writing export script based on template file rather than in code
+var savePymol = function() {
+    let querystring_params = (new URL(document.location)).searchParams
+    let job_id = querystring_params.get('jobid')
+    let script_filename = `${job_id}_PyMol.pml`
+    let zip_export_filename = `${job_id}_PyMol.zip`
+
+    // Set beginning text
+    const heading_text = 
+        '# As long as the .pqr and .dx files are in this same directory, no path to the files is necessary\n'
+        + '# If needed, be sure to unzip any *.gz files referenced in this script\n\n'
+
+        + '# Drag this script into an open PyMOL window\n'
+        + '# The model will be loaded and also saved as a .pse file for ease of starting over\n\n'
+
+        + '# Load the files\n'
+
+    // Set file/path names
+    const structure_name = `${job_id}_APBS`
+    const pqr_name = `${job_id}.pqr`
+    const dx_name = `${job_id}-pot.dx`
+
+    // Write remainder text
+    const remaining_text = 
+        `load ${pqr_name}, molecule\n`
+        + `load ${dx_name}, electrostaticmap\n\n`
+
+        + `# Set scale for coloring protein surface\n`
+        + `ramp_new espramp, electrostaticmap, [ -3, 0, 3]\n\n`
+        
+        + `# Show the surface\n`
+        + `show surface\n\n`
+        
+        + `# Set surface colors from dx\n`
+        + `set surface_color, espramp\n`
+        + `set surface_ramp_above_mode\n\n`
+        
+        + `# Setup export\n`
+        + `set pse_export_version, 1.7\n\n`
+
+        + `# Save file as .pse\n`
+        + `save ${structure_name}.pse\n`
+
+
+    // Combine and create full script text
+    const all_data = heading_text + remaining_text
+
+    // Download PyMol file
+    bundleScriptFiles(job_id, zip_export_filename, script_filename, all_data, [pqr_name, `${dx_name}.gz`])
+}
+
+// Create and download UnityMol script
+// TODO: 2020/12/06, Elvis - Explore writing export script based on template file rather than in code
+var saveUnitymol = function() {
+    let querystring_params = (new URL(document.location)).searchParams
+    let job_id = querystring_params.get('jobid')
+    let script_filename = `${job_id}_UnityMol.py`
+    let zip_export_filename = `${job_id}_UnityMol.zip`
+    
+    // Set beginning text
+    const heading_text = 
+        '# As long as the .pqr and .dx files are in this same directory, no path to the files is necessary\n'
+        + '# If needed, be sure to unzip any *.gz files referenced in this script\n\n'
+        
+        + '# Open this file in UnityMol using the "Load Script" button\n\n'
+
+        + '# Load files\n'
+
+    // Set file/path names
+    const structure_name = `${job_id}_APBS`
+    const pqr_name = `${job_id}.pqr`
+    const dx_name = `${job_id}-pot.dx`
+
+    // Write remainder text
+    const remaining_text = 
+        `load(filePath="${pqr_name}", readHetm=True, forceDSSP=False, showDefaultRep=True, center=False);\n`
+        + `loadDXmap("${structure_name}", "${dx_name}")\n\n`
+        
+        + `# Set selection and center\n`
+        + `setCurrentSelection("all(${structure_name})")\n`
+        + `centerOnSelection("all(${structure_name})", True)\n\n`
+        
+        + `# Show surface\n`
+        + `showSelection("all(${structure_name})", "s")\n\n`
+
+        + `# Color surface by charge\n`
+        + `colorByCharge("all(${structure_name})", False, -10.000, 10.000)\n\n`
+
+    // Combine and create full script text
+    const all_data = heading_text + remaining_text
+
+    // Download UnityMol file
+    bundleScriptFiles(job_id, zip_export_filename, script_filename, all_data, [pqr_name, `${dx_name}.gz`])
+}
+
+// Download files and bundle via JSZip
+var bundleScriptFiles = function(job_id, zip_filename, script_filename, script_data, inputfile_list){
+    // Disable export button until export completes
+    enableExportOptions(false)
+
+    // Create zip archive
+    let zipfile_basename = zip_filename.slice(0,-4)
+    let zip_archive = new JSZip();
+    console.log('zip archive created')
+    
+    // Add PyMol/UnityMol script to zip
+    zip_archive.file(`${zipfile_basename}/${script_filename}`, script_data)
+    console.log(`File '${script_filename}' added to archive`)
+    
+    // For every file in list, download and add to zip archive
+    let promise_list = []
+    console.log(STORAGE_URL)
+    for( input_name of inputfile_list){
+        let file_url = `${STORAGE_URL}/${job_id}/${input_name}`
+        console.log(`Fetching file '${input_name}'`)
+        console.log(`${file_url}`)
+        promise_list.push( fetch( file_url ) )
+    }
+
+    Promise.all(promise_list)
+        .then((all_responses) => {
+            for(let i=0; i < all_responses.length; i++){
+                let response = all_responses[i]
+                let fetched_file_name = inputfile_list[i]
+
+                // zip_archive.file(fetched_file_name, response.text())
+                // zip_archive.file(fetched_file_name, response.arrayBuffer(), {binary: true})
+                zip_archive.file(`${zipfile_basename}/${fetched_file_name}`, response.blob('text/plain'), {binary: true})
+                console.log(`File '${fetched_file_name}' added to archive`)
+            }
+        })
+        .then(() => {
+            console.log(zip_archive)
+            zip_archive.generateAsync({type:"blob"})
+            .then(function (blob) {
+                console.log(`Saving zip archive`)
+                saveAs(blob, zip_filename);
+                console.log(`Zip archive saved`)
+            })
+            .finally(() => {
+                // Reenable export button
+                enableExportOptions(true)
+            })
+        })
+    ;    
+}

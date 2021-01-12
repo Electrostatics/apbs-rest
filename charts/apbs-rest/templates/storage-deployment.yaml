@@ -36,11 +36,11 @@ spec:
             value: /app/.minio_cache
 #FIXME pull from secret
           - name: MINIO_JOB_BUCKET
-            value: jobs
+            value: {{ .Values.storage.env.minioJobBucketName }}
           - name: MINIO_ACCESS_KEY
-            value: admin
+            value: {{ .Values.common.env.minioAccessKey }}
           - name: MINIO_SECRET_KEY
-            value: adminadmin
+            value: {{ .Values.common.env.minioSecretKey }}
           - name: UID_VALIDATE_URL
             value: http://{{ template "apbsrest.fullname" . }}-id/api/uid/validate
           ports:
