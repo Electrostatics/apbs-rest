@@ -54,7 +54,7 @@ def test_storage_service():
     '''
         Methods: GET, POST, DELETE, OPTIONS
     '''
-    job_id = 'pytest-%s' % uuid.uuid4().hex[:3]
+    job_id = requests.get('%s/id/' % APBS_URL).json()['job_id']
     url = '%s/storage' % APBS_URL
     object_name = 'sample_text.txt'
 
@@ -113,7 +113,7 @@ def test_storage_service():
     assert response.headers['Access-Control-Allow-Methods'] == str(['GET', 'POST', 'DELETE'])
 
 def test_task_service():
-    job_id = 'pytest-%s' % uuid.uuid4().hex[:3]
+    job_id = requests.get('%s/id/' % APBS_URL).json()['job_id']
     task_url = '%s/task' % APBS_URL
     pdb_id = '1a1p'
 
@@ -199,7 +199,7 @@ def test_task_service():
         requests.delete('%s/storage/%s' % (APBS_URL, job_id))
 
 def test_workflow_service():
-    job_id = 'pytest-%s' % uuid.uuid4().hex[:3]
+    job_id = requests.get('%s/id/' % APBS_URL).json()['job_id']
     workflow_url = '%s/workflow' % APBS_URL
     # pdb_id = '1a1p'
     job_id_url = '%s/%s' % (workflow_url, job_id)
