@@ -46,7 +46,6 @@ jobs:
 
     - name: Install APBS-REST via Helm
       run: |
-        # helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).nip.io
         helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs-testing.action
 
     - name: Wait for deployments
@@ -79,7 +78,6 @@ jobs:
       working-directory: ./tests/integration
       run: |
         source ../venv/bin/activate
-        # APBS_HOST=apbs.$(minikube ip).nip.io pytest -n 3
         APBS_HOST=apbs-testing.action pytest -n 3
         
     - name: Describe job pods upon PyTest failure

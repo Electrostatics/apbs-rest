@@ -136,16 +136,23 @@ jobs:
       run: |
         helm install apbs-rest charts/apbs-rest \
           -f tests/integration/config/github-actions-values.yaml \
-          --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).nip.io
+          --set ingress.enabled=true,ingress.hosts[0]=apbs-testing.action
 
     - name: Wait for deployments
       run: |
+        # Checks 10 times, in 30-second intervals (hence '30 10')
         python3 utilities/wait_for_deployments.py 30 10
 
     - name: Describe pods within Installation
       run: |
         kubectl get pods
         kubectl get pods --no-headers=true | awk '/apbs-rest/{print $1}' | xargs kubectl describe pod
+
+    - name: Add custom Minikube host entry to /etc/hosts
+      run: |
+        echo "$(minikube ip)  apbs-testing.action" | sudo tee -a /etc/hosts
+        sudo cat /etc/hosts
+        curl -s -D - -o /dev/null apbs-testing.action
 
     - name: Install PyTest and other Python dependencies
       working-directory: ./tests
@@ -161,7 +168,7 @@ jobs:
       working-directory: ./tests/integration
       run: |
         source ../venv/bin/activate
-        APBS_HOST=apbs.$(minikube ip).nip.io pytest -n 3
+        APBS_HOST=apbs-testing.action pytest -n 3
         
     - name: Describe job pods upon PyTest failure
       if: ${{ failure() }}
