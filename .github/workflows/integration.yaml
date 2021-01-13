@@ -15,11 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout APBS-REST codebase
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Install Minikube
       run: |
-        curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.9.2/minikube-linux-amd64
+        # curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.9.2/minikube-linux-amd64
+        curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.15.1/minikube-linux-amd64
         chmod +x minikube
         sudo mkdir -p /usr/local/bin/
         sudo install minikube /usr/local/bin/
@@ -45,12 +46,23 @@ jobs:
 
     - name: Install APBS-REST via Helm
       run: |
-        helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs.$(minikube ip).nip.io
+        helm install apbs-rest charts/apbs-rest --set ingress.enabled=true,ingress.hosts[0]=apbs-testing.action
 
     - name: Wait for deployments
       run: |
+        # Checks 20 times, in 30-second intervals (hence '30 20')
         python3 utilities/wait_for_deployments.py 30 20
+
+    - name: Describe pods within Installation
+      run: |
+        kubectl get pods
         kubectl get pods --no-headers=true | awk '/apbs-rest/{print $1}' | xargs kubectl describe pod
+
+    - name: Add custom Minikube host entry to /etc/hosts
+      run: |
+        echo "$(minikube ip)  apbs-testing.action" | sudo tee -a /etc/hosts
+        sudo cat /etc/hosts
+        curl -s -D - -o /dev/null apbs-testing.action
 
     - name: Install PyTest and other Python dependencies
       working-directory: ./tests
@@ -66,5 +78,21 @@ jobs:
       working-directory: ./tests/integration
       run: |
         source ../venv/bin/activate
-        APBS_HOST=apbs.$(minikube ip).nip.io pytest -n 3
+        APBS_HOST=apbs-testing.action pytest -n 3
         
+    - name: Describe job pods upon PyTest failure
+      if: ${{ failure() }}
+      run: |
+        kubectl get pods
+
+        printf "\nDownloader Log \n"
+        kubectl get pods --no-headers=true | awk '/task-(.*)-(apbs|pdb)/{print $1}' | xargs -L 1 kubectl logs -c apbs-rest-downloader 
+        
+        printf "\nExecution  Log \n"
+        kubectl get pods --no-headers=true | awk '/task-(.*)-(apbs|pdb)/{print $1}' | xargs -L 1 kubectl logs -c apbs-executor
+        
+        printf "\nUploader Log \n"
+        kubectl get pods --no-headers=true | awk '/task-(.*)-(apbs|pdb)/{print $1}' | xargs -L 1 kubectl logs -c apbs-rest-uploader
+
+        printf "\nPod Description \n"
+        kubectl get pods --no-headers=true | awk '/task-(.*)-(apbs|pdb)/{print $1}' | xargs kubectl describe pod
