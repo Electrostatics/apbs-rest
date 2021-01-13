@@ -30,7 +30,7 @@ def uid_generator():
         job_id = ''.join(choices(ascii_lowercase+digits, k=10)) # random 10-character alphanumeric string
 
         # TODO: 2020/07/02, Elvis - Leave uid_register_job() commented until Storage service is updated to validate jobIDs
-        # uid_register_job(job_id)
+        uid_register_job(job_id)
 
         http_code = 200
         response = {'job_id': str(job_id)}

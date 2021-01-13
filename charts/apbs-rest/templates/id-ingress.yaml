@@ -13,7 +13,7 @@ metadata:
     storage: id
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /api/uid/
-    # TODO: 2020/07/02, Elvis - commenting out line below for now since user doesn't need access beyond retrieving a new ID
+    # NOTE: 2020/07/02, Elvis - commenting out line below for now since user doesn't need access beyond retrieving a new ID
     # nginx.ingress.kubernetes.io/rewrite-target: /api/uid/$2
 spec:
 {{- if .Values.ingress.tls }}
@@ -32,7 +32,7 @@ spec:
       http:
         paths:
           - path: /id(/?)$
-          # TODO: 2020/07/02, Elvis - commenting out line below for now since user doesn't need access beyond retrieving a new ID
+          # NOTE: 2020/07/02, Elvis - commenting out line below for now since user doesn't need access beyond retrieving a new ID
           # - path: /id(/|$)(.*)
             backend:
               serviceName: {{ $fullName }}-id

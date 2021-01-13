@@ -1,6 +1,7 @@
 import sys, os
 from json import JSONEncoder, loads, dumps
 from io import BytesIO
+import requests
 
 from flask import request, send_from_directory, make_response
 from werkzeug.utils import secure_filename
@@ -15,6 +16,7 @@ MINIO_CACHE_DIR  = os.environ.get('STORAGE_CACHE_DIR', '/apbs-rest/.minio_cache'
 MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
 MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
 JOB_BUCKET_NAME  = os.environ.get('MINIO_JOB_BUCKET', 'jobs')
+VALIDATE_URL = os.environ.get('UID_VALIDATE_URL','')
 
 class StorageHandler:
     def __init__(self):
@@ -143,8 +145,23 @@ class StorageHandler:
     def post(self, object_name, job_id, file_name=None):
         # EXTENSION_WHITELIST = set(['pqr', 'pdb', 'in', 'p'])
         response = { 'status': None, 'message': None }
+
         # response = 'Success'
         http_response_code = 201
+
+        # check if job id has been properly registered
+        job_validate_url = F'{VALIDATE_URL}/{job_id}'
+
+        response_validate = requests.request("GET", job_validate_url).json()
+        is_valid = response_validate['valid']
+
+        if not is_valid:
+            http_response_code = 403
+            response['status'] = 'failed'
+            response['message'] = "Bad job id"
+            return response, http_response_code
+
+
 
         try:
             file_data = request.files['file_data']
