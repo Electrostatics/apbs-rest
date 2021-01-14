@@ -70,7 +70,7 @@ jobs:
         working-directory: ./src/storage
         run: |
           source venv/bin/activate
-          pytest tests/
+          pytest tests/ --ignore=tests/test_rest_api.py
   
   task-service:
     name : Task Service
