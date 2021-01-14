@@ -14,6 +14,18 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+  
+  id_service:
+    build:
+      context: ../../uid/
+      dockerfile: Dockerfile
+    image: id_service
+    ports:
+      - "5003:5003"
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:?}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:?}
+      MINIO_URL: minio:9000
 
   flaskapp:
     build:
@@ -27,4 +39,4 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:?}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:?}
       MINIO_URL: minio:9000
-
+      UID_VALIDATE_URL: http://id_service:5003/api/uid/validate

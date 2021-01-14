@@ -16,7 +16,28 @@ MINIO_CACHE_DIR  = os.environ.get('STORAGE_CACHE_DIR', '/apbs-rest/.minio_cache'
 MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
 MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
 JOB_BUCKET_NAME  = os.environ.get('MINIO_JOB_BUCKET', 'jobs')
-VALIDATE_URL = os.environ.get('UID_VALIDATE_URL','')
+VALIDATE_URL     = os.environ.get('UID_VALIDATE_URL')
+MISSING_VAR_LIST = []
+
+if MINIO_URL is None:
+    MISSING_VAR_LIST.append('MINIO_URL')
+    # raise EnvironmentError('Environment variable MINIO_URL is not set')
+if MINIO_ACCESS_KEY is None:
+    MISSING_VAR_LIST.append('MINIO_ACCESS_KEY')
+    # raise EnvironmentError('Environment variable MINIO_ACCESS_KEY is not set')
+if MINIO_SECRET_KEY is None:
+    MISSING_VAR_LIST.append('MINIO_SECRET_KEY')
+    # raise EnvironmentError('Environment variable MINIO_SECRET_KEY is not set')
+if JOB_BUCKET_NAME is None:
+    MISSING_VAR_LIST.append('MINIO_JOB_BUCKET')
+    # raise EnvironmentError('Environment variable JOB_BUCKET_NAME is not set')
+if VALIDATE_URL is None:
+    MISSING_VAR_LIST.append('UID_VALIDATE_URL')
+    # raise EnvironmentError('Environment variable VALIDATE_URL is not set')
+
+# Raise error for any missing environment variables
+if MISSING_VAR_LIST:
+    storage_utils.missing_env_variables_alert(MISSING_VAR_LIST)
 
 class StorageHandler:
     def __init__(self):

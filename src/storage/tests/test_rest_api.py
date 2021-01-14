@@ -13,8 +13,15 @@ from random import randint
 import requests
 import pytest
 
+from dotenv import load_dotenv
+load_dotenv()
+
 FLASK_HOST = "http://localhost:5001"
 STORAGE_ENDPOINT = FLASK_HOST + "/api/storage"
+
+ID_SERVICE_ENDPOINT = os.getenv('ID_SERVICE_URL')
+if ID_SERVICE_ENDPOINT is None:
+    raise EnvironmentError('Environment variable ID_SERVICE_URL is not set')
 
 # RESPONSE CODES
 DELETE_OK = 204
@@ -142,7 +149,7 @@ def test_upload(services, test_data, tmp_path):
     """
     test_files = test_data
 
-    job_id = 12345
+    job_id = requests.get(ID_SERVICE_ENDPOINT).json()['job_id']
 
     # test post operation
     for filepath in test_files:

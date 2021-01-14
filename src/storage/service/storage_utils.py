@@ -214,3 +214,10 @@ def get_request_options(response, methods_array):
     response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
     response.headers['Access-Control-Allow-Methods'] = methods_array
     return response
+
+def missing_env_variables_alert(missing_vars: list):
+    message = "Environment variables not set:\n"
+    for var in missing_vars:
+        message += f'    - {var}'
+
+    raise EnvironmentError( message )
